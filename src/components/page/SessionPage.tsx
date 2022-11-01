@@ -38,7 +38,9 @@ const SessionPage = () => {
 			<p>current step: {step + 1}</p>
 			{sessionSequence.map((e, idx) => {
 				if (step === idx) {
-					return <ControlPanel key={idx} sequence={e} onFinish={stepAhead} />;
+					return (
+						<ControlPanel key={idx} targetSequence={e} onFinish={stepAhead} />
+					);
 				}
 			})}
 		</div>

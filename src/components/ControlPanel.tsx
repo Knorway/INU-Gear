@@ -1,80 +1,82 @@
 import _ from 'lodash';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { DEFAULT_DELAY, SEQUENCES } from '../util/config';
+import { DEFAULT_DELAY, Sequence, SEQUENCES } from '../util/config';
 
 type Props = {
-	sequence: typeof SEQUENCES[number];
+	targetSequence: typeof SEQUENCES[number];
 	onFinish: () => void;
 };
 
 const rand = (range: number) => _.random(0, range - 1);
 
-const ControlPanel = ({ sequence, onFinish }: Props) => {
-	const direction = useMemo(() => sequence.direction, [sequence.direction]);
-	const starting = useMemo(
-		() => sequence.sequence[rand(sequence.sequence.length)],
-		[sequence.sequence]
-	);
+const ControlPanel = ({ targetSequence, onFinish }: Props) => {
+	const { sequence, direction, type } = targetSequence;
+	const starting = useMemo(() => sequence[rand(sequence.length)], [sequence]);
+	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
 
 	const destination = useMemo(() => {
-		let dist = sequence.sequence[rand(sequence.sequence.length)];
+		let dist = sequence[rand(sequence.length)];
 		while (dist === starting) {
-			dist = sequence.sequence[rand(sequence.sequence.length)];
+			dist = sequence[rand(sequence.length)];
 		}
 		return dist;
-	}, [sequence.sequence, starting]);
+	}, [sequence, starting]);
 
-	const [trace, setTrace] = useState<string[]>([]);
-	const [cursor, setCursor] = useState(
-		sequence.sequence.findIndex((e) => e === starting)
+	const indexOfChar = useCallback(
+		(char: Sequence<'sequence'>[number]) => {
+			return sequence.findIndex((e) => e === char);
+		},
+		[sequence]
 	);
 
+	const [trace, setTrace] = useState<string[]>([]);
+	const [cursor, setCursor] = useState(indexOfChar(starting));
+
 	const isFinished = useMemo(
-		() => cursor === sequence.sequence.findIndex((e) => e === destination),
-		[cursor, destination, sequence.sequence]
+		() => cursor === indexOfChar(destination),
+		[cursor, destination, indexOfChar]
 	);
 
 	const tint = useCallback(
 		(idx: number) => {
 			if (idx === cursor) return 'green';
-			if (idx === sequence.sequence.findIndex((e) => e === destination))
-				return 'crimson';
+			if (idx === indexOfChar(destination)) return 'crimson';
 			return 'black';
 		},
-		[cursor, destination, sequence.sequence]
+		[cursor, destination, indexOfChar]
 	);
 
 	const moveCursor = useCallback(
 		(value: number) => {
-			if (value < 0 || value > sequence.sequence.length - 1) return;
+			if (value < 0 || value > sequence.length - 1) return;
 			setCursor(value);
 		},
-		[sequence.sequence.length]
+		[sequence.length]
 	);
 
 	const onWheelL = useCallback(
 		(e: WheelEvent) => {
 			const P = e.deltaY;
-			const delta = !(sequence.direction === 'LEFT') ? -1 : 1;
+			const delta = isLeft ? 1 : -1;
 			if (P > 0) {
 				setTrace((prev) => [...prev, 'L']);
 				moveCursor(cursor + delta);
 			}
 		},
-		[cursor, moveCursor, sequence.direction]
+		[cursor, isLeft, moveCursor]
 	);
 
 	const onWheelR = useCallback(
 		(e: WheelEvent) => {
 			const P = e.deltaY;
-			const delta = !(sequence.direction === 'LEFT') ? 1 : -1;
+			const delta = isLeft ? -1 : 1;
 			if (P < 0 || P === 0) {
 				setTrace((prev) => [...prev, 'R']);
 				moveCursor(cursor + delta);
 			}
 		},
-		[cursor, moveCursor, sequence.direction]
+		[cursor, isLeft, moveCursor]
 	);
 
 	const onClick = useCallback(() => {
@@ -87,7 +89,7 @@ const ControlPanel = ({ sequence, onFinish }: Props) => {
 
 		window.addEventListener('wheel', dl);
 		window.addEventListener('wheel', dr);
-		if (sequence.type === 'B') {
+		if (type === 'B') {
 			window.addEventListener('click', onClick);
 		}
 
@@ -96,7 +98,7 @@ const ControlPanel = ({ sequence, onFinish }: Props) => {
 			window.removeEventListener('wheel', dr);
 			window.removeEventListener('click', onClick);
 		};
-	}, [onClick, onWheelL, onWheelR, sequence.type]);
+	}, [onClick, onWheelL, onWheelR, type]);
 
 	useEffect(() => {
 		if (isFinished) {
@@ -110,11 +112,7 @@ const ControlPanel = ({ sequence, onFinish }: Props) => {
 		<div>
 			<pre>travel: {JSON.stringify(trace)}</pre>
 			<pre>
-				distance:{' '}
-				{Math.abs(
-					sequence.sequence.findIndex((e) => e === destination) -
-						sequence.sequence.findIndex((e) => e === starting)
-				)}
+				distance: {Math.abs(indexOfChar(destination) - indexOfChar(starting))}
 			</pre>
 			<div>direction: {direction}</div>
 			<div>starting: {starting}</div>
@@ -129,7 +127,7 @@ const ControlPanel = ({ sequence, onFinish }: Props) => {
 					fontSize: '80px',
 				}}
 			>
-				{sequence.sequence.map((e, idx) => (
+				{sequence.map((e, idx) => (
 					<span
 						key={idx}
 						style={{
@@ -140,7 +138,7 @@ const ControlPanel = ({ sequence, onFinish }: Props) => {
 					</span>
 				))}
 			</div>
-			{sequence.direction === 'LEFT' && <span>P</span>}
+			{isLeft && <span>P</span>}
 			{isFinished && <h1>통과!</h1>}
 		</div>
 	);
