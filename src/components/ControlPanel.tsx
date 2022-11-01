@@ -11,68 +11,70 @@ type Props = {
 const rand = (range: number) => _.random(0, range - 1);
 
 const ControlPanel = ({ sequence, onFinish }: Props) => {
-	const copied = useMemo(() => sequence.slice(), [sequence]);
-	const direction = useMemo(() => copied.shift(), [copied]);
-	const starting = useMemo(() => copied[rand(copied.length)], [copied]);
+	const direction = useMemo(() => sequence.direction, [sequence.direction]);
+	const starting = useMemo(
+		() => sequence.sequence[rand(sequence.sequence.length)],
+		[sequence.sequence]
+	);
 
 	const destination = useMemo(() => {
-		let dist = copied[rand(copied.length)];
+		let dist = sequence.sequence[rand(sequence.sequence.length)];
 		while (dist === starting) {
-			dist = copied[rand(copied.length)];
+			dist = sequence.sequence[rand(sequence.sequence.length)];
 		}
 		return dist;
-	}, [copied, starting]);
-
-	const SEQ_TYPE_B = useMemo(() => copied.length === 3, [copied.length]);
-	const IS_LEFT = useMemo(() => direction === 'LEFT', [direction]);
+	}, [sequence.sequence, starting]);
 
 	const [trace, setTrace] = useState<string[]>([]);
-	const [cursor, setCursor] = useState(copied.indexOf(starting));
+	const [cursor, setCursor] = useState(
+		sequence.sequence.findIndex((e) => e === starting)
+	);
 
 	const isFinished = useMemo(
-		() => cursor === copied.indexOf(destination),
-		[copied, destination, cursor]
+		() => cursor === sequence.sequence.findIndex((e) => e === destination),
+		[cursor, destination, sequence.sequence]
 	);
 
 	const tint = useCallback(
 		(idx: number) => {
 			if (idx === cursor) return 'green';
-			if (idx === copied.indexOf(destination)) return 'crimson';
+			if (idx === sequence.sequence.findIndex((e) => e === destination))
+				return 'crimson';
 			return 'black';
 		},
-		[copied, destination, cursor]
+		[cursor, destination, sequence.sequence]
 	);
 
 	const moveCursor = useCallback(
 		(value: number) => {
-			if (value < 0 || value > copied.length - 1) return;
+			if (value < 0 || value > sequence.sequence.length - 1) return;
 			setCursor(value);
 		},
-		[copied.length]
+		[sequence.sequence.length]
 	);
 
 	const onWheelL = useCallback(
 		(e: WheelEvent) => {
 			const P = e.deltaY;
-			const delta = !IS_LEFT ? -1 : 1;
+			const delta = !(sequence.direction === 'LEFT') ? -1 : 1;
 			if (P > 0) {
 				setTrace((prev) => [...prev, 'L']);
 				moveCursor(cursor + delta);
 			}
 		},
-		[IS_LEFT, moveCursor, cursor]
+		[cursor, moveCursor, sequence.direction]
 	);
 
 	const onWheelR = useCallback(
 		(e: WheelEvent) => {
 			const P = e.deltaY;
-			const delta = !IS_LEFT ? 1 : -1;
+			const delta = !(sequence.direction === 'LEFT') ? 1 : -1;
 			if (P < 0 || P === 0) {
 				setTrace((prev) => [...prev, 'R']);
 				moveCursor(cursor + delta);
 			}
 		},
-		[IS_LEFT, moveCursor, cursor]
+		[cursor, moveCursor, sequence.direction]
 	);
 
 	const onClick = useCallback(() => {
@@ -85,7 +87,7 @@ const ControlPanel = ({ sequence, onFinish }: Props) => {
 
 		window.addEventListener('wheel', dl);
 		window.addEventListener('wheel', dr);
-		if (SEQ_TYPE_B) {
+		if (sequence.type === 'B') {
 			window.addEventListener('click', onClick);
 		}
 
@@ -94,7 +96,7 @@ const ControlPanel = ({ sequence, onFinish }: Props) => {
 			window.removeEventListener('wheel', dr);
 			window.removeEventListener('click', onClick);
 		};
-	}, [SEQ_TYPE_B, onClick, onWheelL, onWheelR]);
+	}, [onClick, onWheelL, onWheelR, sequence.type]);
 
 	useEffect(() => {
 		if (isFinished) {
@@ -109,7 +111,10 @@ const ControlPanel = ({ sequence, onFinish }: Props) => {
 			<pre>travel: {JSON.stringify(trace)}</pre>
 			<pre>
 				distance:{' '}
-				{Math.abs(copied.indexOf(destination) - copied.indexOf(starting))}
+				{Math.abs(
+					sequence.sequence.findIndex((e) => e === destination) -
+						sequence.sequence.findIndex((e) => e === starting)
+				)}
 			</pre>
 			<div>direction: {direction}</div>
 			<div>starting: {starting}</div>
@@ -124,7 +129,7 @@ const ControlPanel = ({ sequence, onFinish }: Props) => {
 					fontSize: '80px',
 				}}
 			>
-				{copied.map((e, idx) => (
+				{sequence.sequence.map((e, idx) => (
 					<span
 						key={idx}
 						style={{
@@ -135,7 +140,7 @@ const ControlPanel = ({ sequence, onFinish }: Props) => {
 					</span>
 				))}
 			</div>
-			{IS_LEFT && <span>P</span>}
+			{sequence.direction === 'LEFT' && <span>P</span>}
 			{isFinished && <h1>통과!</h1>}
 		</div>
 	);
