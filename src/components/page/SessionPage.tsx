@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import dynamic from 'next/dynamic';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { DEFAULT_DELAY, SEQUENCES } from '../../util/config';
 
@@ -8,17 +8,36 @@ const ControlPanel = dynamic(() => import('../ControlPanel'), {
 	ssr: false,
 });
 
+// reducer for global context & setting
+// useSequence, useSetting, useSession, ...
+
+const NUM_PHASE = 3;
+const NUM_STEP = SEQUENCES.length - 1;
+
 const SessionPage = () => {
+	const [sessionSequence, setSessionSequence] = useState(_.shuffle(SEQUENCES));
+	const [phase, setPhase] = useState(1);
 	const [step, setStep] = useState(0);
-	// const [pending, setPending] = useState(true);
 
-	const sessionSequence = useMemo(() => _.shuffle(SEQUENCES), []);
+	const goNextPhase = useCallback(() => {
+		if (phase >= NUM_PHASE) return;
+		setPhase((prev) => prev + 1);
+		setStep(0);
+		setSessionSequence(_.shuffle(SEQUENCES));
+	}, [phase]);
 
-	const stepAhead = useCallback(() => {
-		if (step < SEQUENCES.length - 1) {
-			setStep((prev) => prev + 1);
+	const goNextStep = useCallback(() => {
+		if (step < NUM_STEP) {
+			return setStep((prev) => prev + 1);
 		}
-	}, [step]);
+		goNextPhase();
+	}, [goNextPhase, step]);
+
+	// useEffect(() => {
+	// 	if (phase === NUM_PHASE && step === NUM_STEP + 1) {
+	// 		alert('session completed');
+	// 	}
+	// }, [phase, step]);
 
 	return (
 		<div
@@ -33,13 +52,18 @@ const SessionPage = () => {
 			<input type='number' defaultValue={DEFAULT_DELAY} />
 			<div>set sensitivity</div>
 			<div>
-				<button onClick={stepAhead}>next</button>
+				<button onClick={goNextStep}>next</button>
 			</div>
+			<p>current phase: {phase}</p>
 			<p>current step: {step + 1}</p>
 			{sessionSequence.map((e, idx) => {
 				if (step === idx) {
 					return (
-						<ControlPanel key={idx} targetSequence={e} onFinish={stepAhead} />
+						<ControlPanel
+							key={idx}
+							targetSequence={e}
+							onFinish={goNextStep}
+						/>
 					);
 				}
 			})}
