@@ -1,8 +1,13 @@
 import _ from 'lodash';
 import dynamic from 'next/dynamic';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
-import { DEFAULT_DELAY, SEQUENCES } from '../../util/config';
+import {
+  DEFAULT_DELAY,
+  NUM_PHASE,
+  NUM_STEP,
+  SEQUENCES,
+} from '../../config/settings';
 
 const ControlPanel = dynamic(() => import('../ControlPanel'), {
 	ssr: false,
@@ -11,11 +16,12 @@ const ControlPanel = dynamic(() => import('../ControlPanel'), {
 // reducer for global context & setting
 // useSequence, useSetting, useSession, ...
 
-const NUM_PHASE = 3;
-const NUM_STEP = SEQUENCES.length - 1;
+// type Log = {
+// 	sequence: typeof SEQUENCES[number][]
+// }
 
 const SessionPage = () => {
-	const [sessionSequence, setSessionSequence] = useState(_.shuffle(SEQUENCES));
+	const [sessionSequences, setSessionSequences] = useState(_.shuffle(SEQUENCES));
 	const [phase, setPhase] = useState(1);
 	const [step, setStep] = useState(0);
 
@@ -23,7 +29,7 @@ const SessionPage = () => {
 		if (phase >= NUM_PHASE) return;
 		setPhase((prev) => prev + 1);
 		setStep(0);
-		setSessionSequence(_.shuffle(SEQUENCES));
+		setSessionSequences(_.shuffle(SEQUENCES));
 	}, [phase]);
 
 	const goNextStep = useCallback(() => {
@@ -56,12 +62,12 @@ const SessionPage = () => {
 			</div>
 			<p>current phase: {phase}</p>
 			<p>current step: {step + 1}</p>
-			{sessionSequence.map((e, idx) => {
+			{sessionSequences.map((sequence, idx) => {
 				if (step === idx) {
 					return (
 						<ControlPanel
 							key={idx}
-							targetSequence={e}
+							targetSequence={sequence}
 							onFinish={goNextStep}
 						/>
 					);

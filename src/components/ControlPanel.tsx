@@ -1,157 +1,59 @@
-import _ from 'lodash';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 
-import { DEFAULT_DELAY, Sequence, SEQUENCES } from '../util/config';
+import {
+  DEFAULT_DELAY,
+  optrTable,
+  SEQUENCES,
+  TIMEOUT_MIN,
+  TIMEOUT_RANGE,
+  TIMEOUT_UNIT,
+} from '../config/settings';
+import useSequence from '../hooks/useSequence';
+import { rand } from '../utils';
 
 type Props = {
 	targetSequence: typeof SEQUENCES[number];
 	onFinish: () => void;
 };
 
-type SequenceChar = Sequence<'sequence'>[number];
-
-const TIMEOUT_RANGE = 10;
-const TIMEOUT_UNIT = 1000;
-const TIMEOUT_MIN = 1 * TIMEOUT_UNIT;
-
-const table: Record<SequenceChar, string> = {
-	D: '주행',
-	N: '중립',
-	P: '주차',
-	R: '후진',
-};
-
-const rand = (range: number) => _.random(0, range - 1);
-
 const ControlPanel = ({ targetSequence, onFinish }: Props) => {
-	const { sequence, direction, type } = targetSequence;
-	const starting = useMemo(() => sequence[rand(sequence.length)], [sequence]);
-	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
+	const [stepTimeout, setStepTimeout] = useState(0);
 
-	const destination = useMemo(() => {
-		const extended = [...new Set(sequence).add('P')];
-		let dest = extended[rand(extended.length)];
-		while (dest === starting) {
-			dest = extended[rand(extended.length)];
-		}
-		return dest as SequenceChar;
-	}, [sequence, starting]);
-
-	const indexOfChar = useCallback(
-		(char: SequenceChar) => {
-			return sequence.findIndex((e) => e === char);
-		},
-		[sequence]
-	);
-
-	const distance = useMemo(() => {
-		if (type === 'B' && destination === 'P') return 1;
-		return Math.abs(indexOfChar(destination) - indexOfChar(starting));
-	}, [destination, indexOfChar, starting, type]);
-
-	const [travel, setTravel] = useState<('L' | 'R' | 'P')[]>([]);
-	const [cursor, setCursor] = useState(indexOfChar(starting));
-	const [count, setCount] = useState(0);
-
-	const isFinished = useMemo(
-		() => cursor === indexOfChar(destination),
-		[cursor, destination, indexOfChar]
-	);
-
-	const moveCursor = useCallback(
-		(value: number) => {
-			if (value < 0 || value > sequence.length - 1) return;
-			setCursor(value);
-		},
-		[sequence.length]
-	);
-
-	const onWheelL = useCallback(
-		(e: WheelEvent) => {
-			const P = e.deltaY;
-			const delta = isLeft ? 1 : -1;
-			if (P > 0) {
-				setTravel((prev) => [...prev, 'L']);
-				moveCursor(cursor + delta);
-			}
-		},
-		[cursor, isLeft, moveCursor]
-	);
-
-	const onWheelR = useCallback(
-		(e: WheelEvent) => {
-			const P = e.deltaY;
-			const delta = isLeft ? -1 : 1;
-			if (P < 0 || P === 0) {
-				setTravel((prev) => [...prev, 'R']);
-				moveCursor(cursor + delta);
-			}
-		},
-		[cursor, isLeft, moveCursor]
-	);
-
-	const onClick = useCallback(() => {
-		setTravel((prev) => [...prev, 'P']);
-		if (destination === 'P') {
-			setCursor(indexOfChar(destination));
-		}
-	}, [destination, indexOfChar]);
+	const { sequence, cursor, info, utils } = useSequence(targetSequence);
+	const { chars, direction, type } = sequence;
+	const { current: currentCursor, starting, destination } = cursor;
+	const { distance, travel, isFinished, log } = info;
+	const { indexOfChar } = utils;
 
 	const tint = useCallback(
 		(idx: number) => {
-			if (idx === cursor) return 'green';
+			if (idx === currentCursor) return 'green';
 			if (idx === indexOfChar(destination)) return 'crimson';
 			return 'black';
 		},
-		[cursor, destination, indexOfChar]
+		[currentCursor, destination, indexOfChar]
 	);
-
-	useEffect(() => {
-		const dl = _.debounce(onWheelL, DEFAULT_DELAY);
-		const dr = _.debounce(onWheelR, DEFAULT_DELAY);
-
-		window.addEventListener('wheel', dl);
-		window.addEventListener('wheel', dr);
-		if (type === 'B') {
-			window.addEventListener('click', onClick);
-		}
-
-		return () => {
-			window.removeEventListener('wheel', dl);
-			window.removeEventListener('wheel', dr);
-			window.removeEventListener('click', onClick);
-		};
-	}, [onClick, onWheelL, onWheelR, type]);
 
 	useEffect(() => {
 		if (!isFinished) return;
 
 		const timeout = rand(TIMEOUT_RANGE) * TIMEOUT_UNIT + TIMEOUT_MIN;
-		setCount(timeout);
+		setStepTimeout(timeout);
 
 		const timeoutId = setTimeout(() => {
 			onFinish();
 		}, timeout);
 
-		const intervalId = setInterval(() => {
-			setCount((prev) => prev - 10);
-		}, 10);
-
 		return () => {
 			clearTimeout(timeoutId);
-			clearInterval(intervalId);
 		};
 	}, [isFinished, onFinish]);
 
-	// useEffect(() => {
-	// 	if (type !== 'B' || destination !== 'P') return;
-	// 	if (direction === 'UP') {
-	// 		moveCursor(0);
-	// 	}
-	// 	if (direction === 'LEFT') {
-	// 		moveCursor(sequence.length - 1);
-	// 	}
-	// }, [destination, direction, moveCursor, sequence.length, type]);
+	useEffect(() => {
+		if (isFinished) {
+			// -> store data
+		}
+	}, [isFinished, log]);
 
 	return (
 		<div>
@@ -160,19 +62,12 @@ const ControlPanel = ({ targetSequence, onFinish }: Props) => {
 			<div>direction: {direction}</div>
 			<div>starting: {starting}</div>
 			<div>destination: {destination}</div>
-			<pre>cursor: {cursor}</pre>
-			<div style={{ visibility: count !== 0 ? 'visible' : 'hidden' }}>
-				<code>timeout: {count}ms</code>
-				<h1
-					style={{
-						visibility: isFinished ? 'visible' : 'hidden',
-						fontSize: '40px',
-						color: 'green',
-					}}
-				>
-					PASS
-				</h1>
-			</div>
+			<pre>cursor: {currentCursor}</pre>
+			<pre>diff: {log.diff}ms</pre>
+			{/* {isFinished && ( */}
+			<pre>touch: {log.touch! - log.init! ? log.touch! - log.init! : 0}ms</pre>
+			{/* )} */}
+			<TimeoutCount timeout={stepTimeout} isFinished={isFinished} />
 			<div
 				style={{
 					fontSize: '40px',
@@ -180,7 +75,7 @@ const ControlPanel = ({ targetSequence, onFinish }: Props) => {
 					textAlign: 'center',
 				}}
 			>
-				{table[starting]} {'->'} {table[destination]}
+				{optrTable[starting]} {'->'} {optrTable[destination]}
 			</div>
 			<div
 				style={{
@@ -191,7 +86,7 @@ const ControlPanel = ({ targetSequence, onFinish }: Props) => {
 					fontSize: '80px',
 				}}
 			>
-				{sequence.map((e, idx) => (
+				{chars.map((e, idx) => (
 					<span
 						key={idx}
 						style={{
@@ -209,7 +104,8 @@ const ControlPanel = ({ targetSequence, onFinish }: Props) => {
 							color:
 								destination === 'P'
 									? 'crimson'
-									: starting === 'P' && cursor === indexOfChar('P')
+									: starting === 'P' &&
+									  currentCursor === indexOfChar('P')
 									? 'green'
 									: 'black',
 							fontSize: '80px',
@@ -223,4 +119,48 @@ const ControlPanel = ({ targetSequence, onFinish }: Props) => {
 	);
 };
 
+const TimeoutCount = (props: { timeout: number; isFinished: boolean }) => {
+	const [count, setCount] = useState(props.timeout);
+
+	useEffect(() => {
+		setCount(props.timeout);
+	}, [props.timeout]);
+
+	useEffect(() => {
+		if (!props.isFinished) return;
+		const intervalId = setInterval(() => {
+			setCount((prev) => prev - 32);
+		}, 32);
+
+		return () => {
+			clearInterval(intervalId);
+		};
+	}, [props.isFinished]);
+
+	return (
+		<div style={{ visibility: count !== 0 ? 'visible' : 'hidden' }}>
+			<code>timeout: {count}ms</code>
+			<h1
+				style={{
+					visibility: props.isFinished ? 'visible' : 'hidden',
+					fontSize: '40px',
+					color: 'green',
+				}}
+			>
+				PASS
+			</h1>
+		</div>
+	);
+};
+
 export default memo(ControlPanel);
+
+// useEffect(() => {
+// 	if (type !== 'B' || destination !== 'P') return;
+// 	if (direction === 'UP') {
+// 		moveCursor(0);
+// 	}
+// 	if (direction === 'LEFT') {
+// 		moveCursor(sequence.length - 1);
+// 	}
+// }, [destination, direction, moveCursor, sequence.length, type]);
