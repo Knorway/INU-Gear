@@ -7,12 +7,12 @@ const SessionPage = dynamic(() => import('../src/components/page/SessionPage'), 
 });
 
 const Page = () => {
-	useEffect(() => {
-		(async () => {
-			const response = await axios.get('/api/hello');
-			console.log(response.data);
-		})();
-	}, []);
+	// useEffect(() => {
+	// 	(async () => {
+	// 		const response = await axios.get('/api/hello');
+	// 		console.log(response.data);
+	// 	})();
+	// }, []);
 
 	return <SessionPage />;
 };
