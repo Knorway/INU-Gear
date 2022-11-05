@@ -1,11 +1,12 @@
-import _ from 'lodash';
+import _, { Function } from 'lodash';
 import dynamic from 'next/dynamic';
-import { useCallback, useState } from 'react';
+import React, { createContext, useCallback, useMemo, useState } from 'react';
 
 import {
   DEFAULT_DELAY,
   NUM_PHASE,
   NUM_STEP,
+  ResultData,
   SEQUENCES,
 } from '../../config/settings';
 
@@ -13,17 +14,15 @@ const ControlPanel = dynamic(() => import('../ControlPanel'), {
 	ssr: false,
 });
 
-// reducer for global context & setting
-// useSequence, useSetting, useSession, ...
-
-// type Log = {
-// 	sequence: typeof SEQUENCES[number][]
-// }
-
 const SessionPage = () => {
 	const [sessionSequences, setSessionSequences] = useState(_.shuffle(SEQUENCES));
 	const [phase, setPhase] = useState(1);
 	const [step, setStep] = useState(0);
+
+	const endSession = useMemo(
+		() => phase === NUM_PHASE && step === NUM_STEP,
+		[phase, step]
+	);
 
 	const goNextPhase = useCallback(() => {
 		if (phase >= NUM_PHASE) return;
@@ -39,12 +38,6 @@ const SessionPage = () => {
 		goNextPhase();
 	}, [goNextPhase, step]);
 
-	// useEffect(() => {
-	// 	if (phase === NUM_PHASE && step === NUM_STEP + 1) {
-	// 		alert('session completed');
-	// 	}
-	// }, [phase, step]);
-
 	return (
 		<div
 			style={{
@@ -55,11 +48,11 @@ const SessionPage = () => {
 				userSelect: 'none',
 			}}
 		>
-			<input type='number' defaultValue={DEFAULT_DELAY} />
-			<div>set sensitivity</div>
-			<div>
+			{/* <input type='number' defaultValue={DEFAULT_DELAY} />
+			<div>set sensitivity</div> */}
+			{/* <div>
 				<button onClick={goNextStep}>next</button>
-			</div>
+			</div> */}
 			<p>current phase: {phase}</p>
 			<p>current step: {step + 1}</p>
 			{sessionSequences.map((sequence, idx) => {
@@ -69,6 +62,7 @@ const SessionPage = () => {
 							key={idx}
 							targetSequence={sequence}
 							onFinish={goNextStep}
+							endSession={endSession}
 						/>
 					);
 				}

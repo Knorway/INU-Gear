@@ -1,7 +1,14 @@
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { DEFAULT_DELAY, SequenceChar, SEQUENCES } from '../config/settings';
+import {
+  DEFAULT_DELAY,
+  SequenceChar,
+  SEQUENCES,
+  TIMEOUT_MIN,
+  TIMEOUT_RANGE,
+  TIMEOUT_UNIT,
+} from '../config/settings';
 import { rand } from '../utils';
 
 type LogTimeStamps = {
@@ -41,6 +48,12 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 	const [cursor, setCursor] = useState(indexOfChar(starting));
 	const [log, setLog] = useState<LogTimeStamps>({});
 	const [isFinished, setIsFinished] = useState(false);
+	const [optrTimeout, setOptrTimeout] = useState(0);
+
+	const duringSession = useMemo(
+		() => !isFinished && Boolean(optrTimeout),
+		[isFinished, optrTimeout]
+	);
 
 	const writeLog = useCallback((key: keyof typeof log, value: number) => {
 		setLog((prev) => {
@@ -59,7 +72,8 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 
 	const onWheelL = useCallback(
 		(e: WheelEvent) => {
-			if (isFinished) return;
+			// if (isFinished) return;
+			if (!duringSession) return;
 			const P = e.deltaY;
 			const delta = isLeft ? 1 : -1;
 			if (P > 0) {
@@ -68,12 +82,13 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 				moveCursor(cursor + delta);
 			}
 		},
-		[cursor, isFinished, isLeft, moveCursor, writeLog]
+		[cursor, duringSession, isLeft, moveCursor, writeLog]
 	);
 
 	const onWheelR = useCallback(
 		(e: WheelEvent) => {
-			if (isFinished) return;
+			// if (isFinished) return;
+			if (!duringSession) return;
 			const P = e.deltaY;
 			const delta = isLeft ? -1 : 1;
 			if (P < 0 || P === 0) {
@@ -82,20 +97,37 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 				moveCursor(cursor + delta);
 			}
 		},
-		[cursor, isFinished, isLeft, moveCursor, writeLog]
+		[cursor, duringSession, isLeft, moveCursor, writeLog]
 	);
 
 	const onParking = useCallback(() => {
+		// if (isFinished) return;
+		if (!duringSession) return;
 		writeLog('touch', Date.now());
 		setTravel((prev) => [...prev, 'P']);
 		if (destination === 'P') {
 			setCursor(indexOfChar(destination));
 		}
-	}, [destination, indexOfChar, writeLog]);
+	}, [destination, duringSession, indexOfChar, writeLog]);
 
 	useEffect(() => {
-		writeLog('init', Date.now() + DEFAULT_DELAY);
-	}, [writeLog]);
+		if (duringSession) return;
+
+		const timeout = rand(4) * TIMEOUT_UNIT + TIMEOUT_MIN;
+		const timeoutId = setTimeout(() => {
+			setOptrTimeout(timeout);
+		}, timeout);
+
+		return () => {
+			clearTimeout(timeoutId);
+		};
+	}, [duringSession]);
+
+	useEffect(() => {
+		if (optrTimeout) {
+			writeLog('init', Date.now() + DEFAULT_DELAY);
+		}
+	}, [optrTimeout, writeLog]);
 
 	useEffect(() => {
 		setIsFinished(cursor === indexOfChar(destination));
@@ -149,6 +181,7 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 			travel,
 			isFinished,
 			log,
+			duringSession,
 		},
 		utils: {
 			indexOfChar,

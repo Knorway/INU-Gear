@@ -13,16 +13,17 @@ import { rand } from '../utils';
 
 type Props = {
 	targetSequence: typeof SEQUENCES[number];
+	endSession: boolean;
 	onFinish: () => void;
 };
 
-const ControlPanel = ({ targetSequence, onFinish }: Props) => {
+const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
 	const [stepTimeout, setStepTimeout] = useState(0);
 
 	const { sequence, cursor, info, utils } = useSequence(targetSequence);
 	const { chars, direction, type } = sequence;
 	const { current: currentCursor, starting, destination } = cursor;
-	const { distance, travel, isFinished, log } = info;
+	const { distance, travel, isFinished, log, duringSession } = info;
 	const { indexOfChar } = utils;
 
 	const tint = useCallback(
@@ -37,7 +38,8 @@ const ControlPanel = ({ targetSequence, onFinish }: Props) => {
 	useEffect(() => {
 		if (!isFinished) return;
 
-		const timeout = rand(TIMEOUT_RANGE) * TIMEOUT_UNIT + TIMEOUT_MIN;
+		// const timeout = rand(TIMEOUT_RANGE) * TIMEOUT_UNIT + TIMEOUT_MIN;
+		const timeout = 1000 * 10;
 		setStepTimeout(timeout);
 
 		const timeoutId = setTimeout(() => {
@@ -50,10 +52,12 @@ const ControlPanel = ({ targetSequence, onFinish }: Props) => {
 	}, [isFinished, onFinish]);
 
 	useEffect(() => {
-		if (isFinished) {
+		if (endSession && isFinished) {
 			// -> store data
+			alert('세션이 종료되었습니다. \n데이터 저장 후 메인화면으로 돌아갑니다.');
+			window.location.href = '/';
 		}
-	}, [isFinished, log]);
+	}, [endSession, isFinished]);
 
 	return (
 		<div>
@@ -64,9 +68,7 @@ const ControlPanel = ({ targetSequence, onFinish }: Props) => {
 			<div>destination: {destination}</div>
 			<pre>cursor: {currentCursor}</pre>
 			<pre>diff: {log.diff}ms</pre>
-			{/* {isFinished && ( */}
 			<pre>touch: {log.touch! - log.init! ? log.touch! - log.init! : 0}ms</pre>
-			{/* )} */}
 			<TimeoutCount timeout={stepTimeout} isFinished={isFinished} />
 			<div
 				style={{
@@ -75,8 +77,23 @@ const ControlPanel = ({ targetSequence, onFinish }: Props) => {
 					textAlign: 'center',
 				}}
 			>
-				{optrTable[starting]} {'->'} {optrTable[destination]}
+				{isFinished ? (
+					<h1
+						style={{
+							visibility: isFinished ? 'visible' : 'hidden',
+							fontSize: '40px',
+							color: 'green',
+						}}
+					>
+						PASS
+					</h1>
+				) : (
+					optrTable[starting]
+				)}
+				{!isFinished && ' -> '}
+				{duringSession && optrTable[destination]}
 			</div>
+
 			<div
 				style={{
 					marginTop: '10px',
@@ -140,7 +157,7 @@ const TimeoutCount = (props: { timeout: number; isFinished: boolean }) => {
 	return (
 		<div style={{ visibility: count !== 0 ? 'visible' : 'hidden' }}>
 			<code>timeout: {count}ms</code>
-			<h1
+			{/* <h1
 				style={{
 					visibility: props.isFinished ? 'visible' : 'hidden',
 					fontSize: '40px',
@@ -148,7 +165,7 @@ const TimeoutCount = (props: { timeout: number; isFinished: boolean }) => {
 				}}
 			>
 				PASS
-			</h1>
+			</h1> */}
 		</div>
 	);
 };
