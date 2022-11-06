@@ -60,77 +60,85 @@ const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
 	}, [endSession, isFinished]);
 
 	return (
-		<div>
-			{/* <pre>travel: {JSON.stringify(travel)}</pre>
-			<pre>distance: {distance}</pre>
-			<div>direction: {direction}</div>
-			<div>starting: {starting}</div>
-			<div>destination: {destination}</div>
-			<pre>cursor: {currentCursor}</pre>
-			<pre>diff: {log.diff}ms</pre>
-			<pre>touch: {log.touch! - log.init! ? log.touch! - log.init! : 0}ms</pre> */}
-			<TimeoutCount timeout={stepTimeout} isFinished={isFinished} />
-			<div
-				style={{
-					fontSize: '40px',
-					border: '1px solid black',
-					textAlign: 'center',
-				}}
-			>
-				{isFinished ? (
-					<h1
-						style={{
-							visibility: isFinished ? 'visible' : 'hidden',
-							fontSize: '40px',
-							color: 'green',
-						}}
-					>
-						PASS
-					</h1>
-				) : (
-					optrTable[starting]
-				)}
-				{!isFinished && ' -> '}
-				{duringSession && optrTable[destination]}
+		<div className='flex space-x-8'>
+			<div className='flex-1'>
+				<pre>travel: {JSON.stringify(travel)}</pre>
+				<pre>distance: {distance}</pre>
+				<div>direction: {direction}</div>
+				<div>starting: {starting}</div>
+				<div>destination: {destination}</div>
+				<pre>cursor: {currentCursor}</pre>
+				{/* <pre>given delay: {stepTimeout ? `${stepTimeout}ms` : 'await'}</pre> */}
+				<pre>diff: {log.diff ? `${log.diff}ms` : 'await'}</pre>
+				<pre>
+					touch:{' '}
+					{log.touch! - log.init! ? `${log.touch! - log.init!}ms` : 'await'}
+				</pre>
+				<TimeoutCount timeout={stepTimeout} isFinished={isFinished} />
 			</div>
-
-			<div
-				style={{
-					marginTop: '10px',
-					display: 'flex',
-					flexDirection: direction === 'LEFT' ? 'column' : 'row',
-					gap: '2px',
-					fontSize: '80px',
-				}}
-			>
-				{chars.map((e, idx) => (
-					<span
-						key={idx}
-						style={{
-							color: tint(idx),
-						}}
-					>
-						{e}
-					</span>
-				))}
-			</div>
-			{type === 'B' && (
-				<div style={{ display: 'flex', justifyContent: 'center' }}>
-					<span
-						style={{
-							color:
-								destination === 'P' && duringSession
-									? 'crimson'
-									: currentCursor === indexOfChar('P')
-									? 'green'
-									: 'black',
-							fontSize: '80px',
-						}}
-					>
-						P
-					</span>
+			<div className='flex-1'>
+				<div
+					style={{
+						fontSize: '40px',
+						border: '1px solid black',
+						textAlign: 'center',
+					}}
+				>
+					{isFinished ? (
+						<h1
+							style={{
+								visibility: isFinished ? 'visible' : 'hidden',
+								fontSize: '40px',
+								color: 'green',
+							}}
+						>
+							PASS
+						</h1>
+					) : (
+						optrTable[starting]
+					)}
+					{!isFinished && ' -> '}
+					{duringSession && optrTable[destination]}
 				</div>
-			)}
+
+				<div
+					style={{
+						marginTop: '10px',
+						display: 'flex',
+						flexDirection: direction === 'LEFT' ? 'column' : 'row',
+						gap: '2px',
+						fontSize: '80px',
+					}}
+				>
+					{chars.map((e, idx) => (
+						<span
+							key={idx}
+							style={{
+								color: tint(idx),
+							}}
+						>
+							{e}
+						</span>
+					))}
+				</div>
+				{type === 'B' && (
+					<div style={{ display: 'flex', justifyContent: 'center' }}>
+						<span
+							style={{
+								color:
+									destination === 'P' && duringSession
+										? 'crimson'
+										: currentCursor === indexOfChar('P')
+										? 'green'
+										: 'black',
+								fontSize: '80px',
+							}}
+						>
+							P
+						</span>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 };
