@@ -23,8 +23,8 @@ export type ResultData = {
 export const DEFAULT_DELAY = 30;
 
 export const TIMEOUT_UNIT = 1000;
-export const TIMEOUT_RANGE = 10;
-export const TIMEOUT_MIN = 1 * TIMEOUT_UNIT;
+export const TIMEOUT_RANGE = 4;
+export const TIMEOUT_MIN = 3 * TIMEOUT_UNIT;
 
 export const SEQUENCES = [
 	{ type: 'A', direction: 'UP', sequence: ['P', 'N', 'R', 'D'] },

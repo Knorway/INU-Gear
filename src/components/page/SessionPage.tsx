@@ -44,7 +44,7 @@ const SessionPage = () => {
 				margin: '0 auto',
 				display: 'flex',
 				flexDirection: 'column',
-				width: '300px',
+				maxWidth: '300px',
 				userSelect: 'none',
 			}}
 		>

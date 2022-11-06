@@ -29,14 +29,14 @@ const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
 	const tint = useCallback(
 		(idx: number) => {
 			if (idx === currentCursor) return 'green';
-			if (idx === indexOfChar(destination)) return 'crimson';
+			if (idx === indexOfChar(destination) && duringSession) return 'crimson';
 			return 'black';
 		},
-		[currentCursor, destination, indexOfChar]
+		[currentCursor, destination, duringSession, indexOfChar]
 	);
 
 	useEffect(() => {
-		if (!isFinished) return;
+		// if (!isFinished) return;
 
 		// const timeout = rand(TIMEOUT_RANGE) * TIMEOUT_UNIT + TIMEOUT_MIN;
 		const timeout = 1000 * 10;
@@ -49,7 +49,7 @@ const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
 		return () => {
 			clearTimeout(timeoutId);
 		};
-	}, [isFinished, onFinish]);
+	}, [onFinish]);
 
 	useEffect(() => {
 		if (endSession && isFinished) {
@@ -61,14 +61,14 @@ const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
 
 	return (
 		<div>
-			<pre>travel: {JSON.stringify(travel)}</pre>
+			{/* <pre>travel: {JSON.stringify(travel)}</pre>
 			<pre>distance: {distance}</pre>
 			<div>direction: {direction}</div>
 			<div>starting: {starting}</div>
 			<div>destination: {destination}</div>
 			<pre>cursor: {currentCursor}</pre>
 			<pre>diff: {log.diff}ms</pre>
-			<pre>touch: {log.touch! - log.init! ? log.touch! - log.init! : 0}ms</pre>
+			<pre>touch: {log.touch! - log.init! ? log.touch! - log.init! : 0}ms</pre> */}
 			<TimeoutCount timeout={stepTimeout} isFinished={isFinished} />
 			<div
 				style={{
@@ -119,10 +119,9 @@ const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
 					<span
 						style={{
 							color:
-								destination === 'P'
+								destination === 'P' && duringSession
 									? 'crimson'
-									: starting === 'P' &&
-									  currentCursor === indexOfChar('P')
+									: currentCursor === indexOfChar('P')
 									? 'green'
 									: 'black',
 							fontSize: '80px',
@@ -144,7 +143,7 @@ const TimeoutCount = (props: { timeout: number; isFinished: boolean }) => {
 	}, [props.timeout]);
 
 	useEffect(() => {
-		if (!props.isFinished) return;
+		// if (!props.isFinished) return;
 		const intervalId = setInterval(() => {
 			setCount((prev) => prev - 32);
 		}, 32);

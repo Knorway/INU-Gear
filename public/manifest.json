@@ -1,0 +1,14 @@
+{
+	"short_name": "Gear",
+	"name": "Gear",
+	"icons": [
+		{
+			"src": "vercel.svg",
+			"sizes": "192x192",
+			"type": "image/svg"
+		}
+	],
+	"start_url": "/",
+	"display": "standalone",
+	"orientation": "landscape"
+}
