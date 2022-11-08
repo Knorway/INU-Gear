@@ -5,6 +5,7 @@
 	"scripts": {
 		"dev": "next dev",
 		"build": "yarn build:css && next build",
+		"export": "yarn build && next export",
 		"start": "next start",
 		"lint": "next lint",
 		"dev:css": "npx tailwindcss -i ./styles/globals.css -o ./dist/output.css --watch",

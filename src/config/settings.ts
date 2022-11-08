@@ -21,6 +21,7 @@ export type ResultData = {
 };
 
 export const DEFAULT_DELAY = 30;
+export const DEFAULT_TIMEOUT = 1000 * 10;
 
 export const TIMEOUT_UNIT = 1000;
 export const TIMEOUT_RANGE = 4;

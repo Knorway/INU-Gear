@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 
 import {
   DEFAULT_DELAY,
+  DEFAULT_TIMEOUT,
   optrTable,
   SEQUENCES,
   TIMEOUT_MIN,
@@ -39,7 +40,7 @@ const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
 		// if (!isFinished) return;
 
 		// const timeout = rand(TIMEOUT_RANGE) * TIMEOUT_UNIT + TIMEOUT_MIN;
-		const timeout = 1000 * 10;
+		const timeout = DEFAULT_TIMEOUT;
 		setStepTimeout(timeout);
 
 		const timeoutId = setTimeout(() => {

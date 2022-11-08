@@ -115,7 +115,6 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 
 		// const timeout = rand(4) * TIMEOUT_UNIT + TIMEOUT_MIN;
 		const timeout = rand(TIMEOUT_RANGE) * TIMEOUT_UNIT + TIMEOUT_MIN;
-		console.log(timeout);
 		const timeoutId = setTimeout(() => {
 			setOptrTimeout(timeout);
 		}, timeout);
