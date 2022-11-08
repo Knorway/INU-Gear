@@ -2,13 +2,15 @@ version: '3'
 
 services:
   nextjs:
-    build: .
+    build:
+      context: ./client
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     volumes:
-      - ./pages:/app/pages
-      - ./src:/app/src
-      - ./dist:/app/dist
+      - ./client/pages:/app/pages
+      - ./client/src:/app/src
+      - ./client/dist:/app/dist
     environment:
       - DATABASE_URL=postgres://postgres:postgrespassword@postgres:5432/gear
     depends_on:

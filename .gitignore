@@ -40,3 +40,6 @@ next-env.d.ts
 deploy-migration.sh
 .dockerignore
 dist
+node_modules
+up
+down

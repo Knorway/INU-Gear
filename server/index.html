@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<h1>SSE</h1>
+		<button id="btn">trigger</button>
+		<script>
+			const sessionId = (Math.random() + 1).toString(16).substring(2);
+
+			const eventSource = new EventSource(`/subscribe/${sessionId}`);
+			eventSource.addEventListener('message', (e) => {
+				console.log(JSON.parse(e.data));
+			});
+			eventSource.addEventListener('error', (e) => {
+				console.log('error');
+			});
+
+			const btn = document.getElementById('btn');
+			btn.addEventListener('click', () => {
+				fetch(`/publish/${sessionId}`);
+			});
+		</script>
+	</body>
+</html>
