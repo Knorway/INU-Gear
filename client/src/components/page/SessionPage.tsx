@@ -1,16 +1,10 @@
-import _, { Function } from 'lodash';
+import _ from 'lodash';
 import dynamic from 'next/dynamic';
-import React, { createContext, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import {
-  DEFAULT_DELAY,
-  NUM_PHASE,
-  NUM_STEP,
-  ResultData,
-  SEQUENCES,
-} from '../../config/settings';
+import { NUM_PHASE, NUM_STEP, SEQUENCES } from '../../config/settings';
 
-const ControlPanel = dynamic(() => import('../ControlPanel'), {
+const ControlPanel = dynamic(() => import('./ControlPanel'), {
 	ssr: false,
 });
 

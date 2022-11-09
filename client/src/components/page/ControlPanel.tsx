@@ -1,21 +1,27 @@
-import { memo, useCallback, useEffect, useState } from 'react';
-
 import {
-  DEFAULT_DELAY,
-  DEFAULT_TIMEOUT,
-  optrTable,
-  SEQUENCES,
-  TIMEOUT_MIN,
-  TIMEOUT_RANGE,
-  TIMEOUT_UNIT,
-} from '../config/settings';
-import useSequence from '../hooks/useSequence';
-import { rand } from '../utils';
+  Dispatch,
+  memo,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+
+import { DEFAULT_TIMEOUT, optrTable, SEQUENCES } from '../../config/settings';
+import useSequence from '../../hooks/useSequence';
 
 type Props = {
 	targetSequence: typeof SEQUENCES[number];
 	endSession: boolean;
 	onFinish: () => void;
+};
+
+// -> eventSource도 받아와야 하고 / 아닌가 eventSource.on('message')에서 바꾼 boolean state를 넘겨줘야하나
+const eventSource = { on: (a: string, fn: CallableFunction) => {} };
+const onMessage = (fn: Dispatch<SetStateAction<boolean>>) => {
+	eventSource.on('message', () => {
+		fn(true);
+	});
 };
 
 const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
@@ -37,9 +43,7 @@ const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
 	);
 
 	useEffect(() => {
-		// if (!isFinished) return;
-
-		// const timeout = rand(TIMEOUT_RANGE) * TIMEOUT_UNIT + TIMEOUT_MIN;
+		// -> receive published data && trigger
 		const timeout = DEFAULT_TIMEOUT;
 		setStepTimeout(timeout);
 

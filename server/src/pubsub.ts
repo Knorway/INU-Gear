@@ -3,8 +3,6 @@ import { Response } from 'express';
 export class PubSub {
 	public readonly connections: Record<string, Response> = {};
 
-	constructor() {}
-
 	public subscribe({ conn, key }: { conn: Response; key: string }) {
 		this.connections[key] = conn;
 
@@ -20,7 +18,7 @@ export class PubSub {
 	}
 
 	public publish({ key, payload }: { key: string; payload: unknown }) {
-		const data = JSON.stringify({ sessionId: key });
+		const data = JSON.stringify(payload);
 		this.connections[key].write(`data: ${data}\n\n`);
 	}
 }

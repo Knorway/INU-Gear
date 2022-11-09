@@ -13,6 +13,16 @@ services:
       - ./client/dist:/app/dist
     environment:
       - DATABASE_URL=postgres://postgres:postgrespassword@postgres:5432/gear
+  server:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    volumes:
+      - ./server/src:/app/src
+    ports:
+      - "8090:8090"
+    environment:
+      - PORT=8090
     depends_on:
       - postgres
   postgres:
