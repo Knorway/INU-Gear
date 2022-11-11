@@ -1,24 +1,41 @@
-import { Fragment, ReactNode, useCallback, useState } from 'react';
+import {
+  Fragment,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 
 type Props<T> = {
-	options: T[];
-	displayProperty: keyof T[][number];
-	onChange: (sessionId: T[keyof T]) => void;
+	list: T[];
+	displayProperty: keyof T;
+	defaultLabel: string;
+	onChange: (sessionId: T) => void;
 };
 
-const ListBox = <T extends {}>(props: Props<T>) => {
-	const [selected, setSelected] = useState(props.options[0]);
+const ListBox = <T extends object>(props: Props<T>) => {
+	const listOptions = useMemo(
+		() => [{ [props.displayProperty]: props.defaultLabel } as T, ...props.list],
+		[props.displayProperty, props.list, props.defaultLabel]
+	);
+
+	const [selected, setSelected] = useState(listOptions[0]);
 
 	const onSelect = useCallback(
-		<E extends T>(e: E) => {
+		(e: T) => {
 			setSelected(e);
-			props.onChange(e[props.displayProperty]);
+			props.onChange(e);
 		},
 		[props]
 	);
+
+	useEffect(() => {
+		setSelected(listOptions[0]);
+	}, [listOptions]);
 
 	return (
 		<div className='top-16 w-72'>
@@ -42,7 +59,8 @@ const ListBox = <T extends {}>(props: Props<T>) => {
 						leaveTo='opacity-0'
 					>
 						<Listbox.Options className='absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm'>
-							{props.options.map((opt, idx) => (
+							{/* {props.list.map((opt, idx) => ( */}
+							{listOptions.map((option, idx) => (
 								<Listbox.Option
 									key={idx}
 									className={({ active }) =>
@@ -52,7 +70,7 @@ const ListBox = <T extends {}>(props: Props<T>) => {
 												: 'text-gray-900'
 										}`
 									}
-									value={opt}
+									value={option}
 								>
 									{({ selected }) => (
 										<>
@@ -63,7 +81,11 @@ const ListBox = <T extends {}>(props: Props<T>) => {
 														: 'font-normal'
 												}`}
 											>
-												{opt[props.displayProperty] as ReactNode}
+												{
+													option[
+														props.displayProperty
+													] as ReactNode
+												}
 											</span>
 											{selected ? (
 												<span className='absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600'>

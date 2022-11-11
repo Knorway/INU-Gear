@@ -3,7 +3,7 @@ export type Sequence<T extends keyof typeof SEQUENCES[number]> =
 
 export type SequenceChar = Sequence<'sequence'>[number];
 
-export type ResultData = {
+export type SessionLogResult = {
 	sequence: typeof SEQUENCES[number];
 	starting: SequenceChar;
 	destination: SequenceChar;
@@ -38,10 +38,6 @@ export const SEQUENCES = [
 	{ type: 'B', direction: 'LEFT', sequence: ['R', 'N', 'D'] },
 	{ type: 'B', direction: 'LEFT', sequence: ['D', 'N', 'R'] },
 ] as const;
-
-// array 순서는 정할 수 있어야 되고
-// -> 6 * length * 3(location)
-// 최종 사용자 화면은
 
 export const NUM_PHASE = 3;
 export const NUM_STEP = SEQUENCES.length - 1;

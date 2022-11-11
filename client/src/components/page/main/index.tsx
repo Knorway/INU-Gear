@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-import SelectSessionListBox from './SelectSessionListBox';
+import SessionTokenListBox from './SessionIdListBox';
 
 const MainPage = () => {
 	return (
@@ -12,7 +12,7 @@ const MainPage = () => {
 					<Link href={'/admin'}>admin</Link>
 				</div>
 				<h1 className='text-4xl font-bold'>Gear</h1>
-				<SelectSessionListBox />
+				<SessionTokenListBox />
 			</div>
 		</Fragment>
 	);

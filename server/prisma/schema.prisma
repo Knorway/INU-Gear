@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model manager {
+    id        Int      @id @default(autoincrement())
+    uuid      String   @default(uuid())
+    account   String   @db.VarChar(255)
+    password  String   @map("paassword") @db.VarChar(255)
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+    sessionToken sessionToken[]
+    sessionLog   sessionLog[]
+}
+
+model sessionLog {
+    id        Int      @id @default(autoincrement())
+    uuid      String   @default(uuid())
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+    managerId Int          @map("manager_id")
+    manager   manager      @relation(fields: [managerId], references: [id])
+    tokenId   Int          @map("token_id")
+    token     sessionToken @relation(fields: [tokenId], references: [id])
+
+    @@map("session_log")
+}
+
+model sessionToken {
+    id         Int      @id @default(autoincrement())
+    uuid       String   @default(uuid())
+    sequence   Json
+    isFinished Boolean  @default(false) @map("is_finished")
+    createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+    managerId Int     @map("manager_id")
+    manager   manager @relation(fields: [managerId], references: [id])
+
+    sessionLog sessionLog[]
+
+    @@map("session_token")
+}

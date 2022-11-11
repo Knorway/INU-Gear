@@ -12,6 +12,7 @@ const SessionPage = () => {
 	const [sessionSequences, setSessionSequences] = useState(_.shuffle(SEQUENCES));
 	const [phase, setPhase] = useState(1);
 	const [step, setStep] = useState(0);
+	const [start, setStart] = useState(false);
 
 	const endSession = useMemo(
 		() => phase === NUM_PHASE && step === NUM_STEP,
@@ -31,6 +32,8 @@ const SessionPage = () => {
 		}
 		goNextPhase();
 	}, [goNextPhase, step]);
+
+	if (!start) return <button onClick={() => setStart(true)}>start</button>;
 
 	return (
 		<div

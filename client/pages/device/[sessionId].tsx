@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router';
 
-const SessionDevice = () => {
-	const router = useRouter();
+import DevicePage from '../../src/components/page/device';
 
-	return <h1>Device sessionId: {router.query.sessionId}</h1>;
+const Page = () => {
+	return <DevicePage />;
 };
 
-export default SessionDevice;
+export default Page;

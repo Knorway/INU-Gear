@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router';
 
-const SessionPanel = () => {
-	const router = useRouter();
+import PanelPage from '../../src/components/page/panel';
 
-	return <h1>Panel sessionId: {router.query.sessionId}</h1>;
+const Page = () => {
+	return <PanelPage />;
 };
 
-export default SessionPanel;
+export default Page;
