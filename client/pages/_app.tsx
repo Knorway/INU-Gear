@@ -1,10 +1,9 @@
 import '../dist/output.css';
 
+import { QueryClientProvider } from '@tanstack/react-query';
 import Head from 'next/head';
 
-import { QueryClientProvider } from '@tanstack/react-query';
-
-import { queryClient } from '../src/api/queryClient';
+import { queryClient } from '~/src/api/queryClient';
 
 import type { AppProps } from 'next/app';
 

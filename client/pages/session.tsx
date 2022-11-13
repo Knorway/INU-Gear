@@ -1,8 +1,7 @@
-import axios from 'axios';
 import dynamic from 'next/dynamic';
-import { Fragment, useEffect, useRef } from 'react';
+import { Fragment } from 'react';
 
-const SessionPage = dynamic(() => import('../src/components/page/SessionPage'), {
+const SessionPage = dynamic(() => import('~/src/components/page/SessionPage'), {
 	ssr: false,
 });
 

@@ -1,7 +1,10 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
+// export const BACKEND_URL = 'http://localhost:8090';
+export const BACKEND_URL = 'http://172.30.1.50:8090';
+
 const client = axios.create({
-	baseURL: 'http://172.30.1.33:8090',
+	baseURL: BACKEND_URL,
 });
 
 export const request = async <T>(config: AxiosRequestConfig) => {

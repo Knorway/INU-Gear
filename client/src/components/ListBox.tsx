@@ -1,3 +1,5 @@
+import { Listbox, Transition } from '@headlessui/react';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import {
   Fragment,
   ReactNode,
@@ -6,9 +8,6 @@ import {
   useMemo,
   useState,
 } from 'react';
-
-import { Listbox, Transition } from '@headlessui/react';
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 
 type Props<T> = {
 	list: T[];

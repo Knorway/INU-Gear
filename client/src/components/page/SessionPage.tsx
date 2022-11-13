@@ -2,9 +2,9 @@ import _ from 'lodash';
 import dynamic from 'next/dynamic';
 import { useCallback, useMemo, useState } from 'react';
 
-import { NUM_PHASE, NUM_STEP, SEQUENCES } from '../../config/settings';
+import { NUM_PHASE, NUM_STEP, SEQUENCES } from '~/src/config/settings';
 
-const ControlPanel = dynamic(() => import('./ControlPanel'), {
+const ControlPanel = dynamic(() => import('~/src/components/page/ControlPanel'), {
 	ssr: false,
 });
 

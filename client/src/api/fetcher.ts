@@ -1,5 +1,5 @@
-import { SEQUENCES } from '../config/settings';
-import { request } from './request';
+import { request } from '~/src/api/request';
+import { SEQUENCES } from '~/src/config/settings';
 
 export type SessionToken = {
 	id: number;

@@ -1,9 +1,9 @@
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { Fragment, useEffect, useState } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
-
-import { getSessionToken } from '../../../api/fetcher';
+import { getSessionToken } from '~/src/api/fetcher';
+import { BACKEND_URL } from '~/src/api/request';
 
 const DevicePage = () => {
 	const [data, setData] = useState<any>([]);
@@ -17,19 +17,17 @@ const DevicePage = () => {
 	});
 
 	useEffect(() => {
-		if (!sessionToken) return;
+		// if (!sessionToken) return;
+		if (!sessionId) return;
 
-		const eventSource = new EventSource(
-			// `http://localhost:8090/subscribe/${sessionToken}`
-			`http://172.30.1.33:8090/subscribe/${sessionToken.uuid}`
-		);
+		const eventSource = new EventSource(`${BACKEND_URL}/subscribe/${sessionId}`);
+
 		eventSource.addEventListener('message', (e) => {
-			console.log(`${Date.now() - JSON.parse(e.data).timeStamp}ms`);
-			setData((prev: any) => [
-				...prev,
-				`${Date.now() - JSON.parse(e.data).timeStamp}ms`,
-			]);
+			const timeStampPre = JSON.parse(e.data).timeStamp;
+			const timeStampPost = Date.now();
+			setData((prev: any) => [...prev, `${timeStampPost - timeStampPre}ms`]);
 		});
+
 		eventSource.addEventListener('error', (e) => {
 			console.log('error');
 		});
@@ -37,7 +35,7 @@ const DevicePage = () => {
 		return () => {
 			eventSource.close();
 		};
-	}, [sessionToken]);
+	}, [sessionId]);
 
 	return (
 		<Fragment>

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-import SessionTokenListBox from './SessionIdListBox';
+import SessionTokenListBox from '~/src/components/page/main/SessionIdListBox';
 
 const MainPage = () => {
 	return (

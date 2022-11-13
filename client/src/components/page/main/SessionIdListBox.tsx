@@ -1,10 +1,9 @@
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
-
-import { getSessionTokens, SessionToken } from '../../../api/fetcher';
-import ListBox from '../../ListBox';
+import { getSessionTokens, SessionToken } from '~/src/api/fetcher';
+import ListBox from '~/src/components/ListBox';
 
 const SessionTokenListBox = () => {
 	const [selectedToken, setSelectedToken] = useState<SessionToken>();

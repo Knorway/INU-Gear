@@ -7,8 +7,8 @@ import {
   useState,
 } from 'react';
 
-import { DEFAULT_TIMEOUT, optrTable, SEQUENCES } from '../../config/settings';
-import useSequence from '../../hooks/useSequence';
+import { DEFAULT_TIMEOUT, optrTable, SEQUENCES } from '~/src/config/settings';
+import useSequence from '~/src/hooks/useSequence';
 
 type Props = {
 	targetSequence: typeof SEQUENCES[number];

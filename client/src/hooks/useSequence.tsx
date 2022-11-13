@@ -8,8 +8,8 @@ import {
   TIMEOUT_MIN,
   TIMEOUT_RANGE,
   TIMEOUT_UNIT,
-} from '../config/settings';
-import { rand } from '../utils';
+} from '~/src/config/settings';
+import { rand } from '~/src/utils';
 
 type LogTimeStamps = {
 	init?: number;

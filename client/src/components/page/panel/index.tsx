@@ -1,10 +1,10 @@
+import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { Fragment, useCallback } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
-
-import { getSessionToken } from '../../../api/fetcher';
+import { getSessionToken } from '~/src/api/fetcher';
+import { BACKEND_URL } from '~/src/api/request';
 
 const PanelPage = () => {
 	const router = useRouter();
@@ -17,12 +17,13 @@ const PanelPage = () => {
 	});
 
 	const publish = useCallback(() => {
-		if (!sessionToken) return;
-		// axios.post(`http://localhost:8090/publish/${sessionToken}`, {
-		axios.post(`http://172.30.1.33:8090/publish/${sessionToken.uuid}`, {
+		// if (!sessionToken) return;
+		if (!sessionId) return;
+
+		axios.post(`${BACKEND_URL}/publish/${sessionId}`, {
 			timeStamp: Date.now(),
 		});
-	}, [sessionToken]);
+	}, [sessionId]);
 
 	return (
 		<Fragment>
