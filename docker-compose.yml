@@ -12,7 +12,6 @@ services:
       - ./client/src:/app/src
       - ./client/dist:/app/dist
   server:
-    container_name: postgres
     build: 
       context: ./server
       dockerfile: Dockerfile
@@ -22,10 +21,11 @@ services:
       - "8090:8090"
     environment:
       - PORT=8090
-      - DATABASE_URL=postgres://postgres:postgrespassword@postgres:5432/gear
+      - DATABASE_URL=postgres://postgres:postgrespassword@postgres:5432/gear?connect_timeout=300
     depends_on:
       - postgres
   postgres:
+    container_name: postgres
     image: postgres:14-alpine
     ports:
       - "5432:5432"

@@ -3,5 +3,6 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn
 COPY ./ ./
-RUN yarn prisma generate
-CMD ["yarn", "dev"]
+RUN yarn tsc
+# RUN yarn prisma generate
+CMD [ "node", "dist/index.js" ]

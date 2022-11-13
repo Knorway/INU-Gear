@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-import { Fragment, useCallback, useMemo, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 
 import { getSessionTokens, SessionToken } from '~/src/api/fetcher';
 import ListBox from '~/src/components/ListBox';
+
+const DEFAULT_LABEL = '세션을 선택해주세요.';
 
 const SessionTokenListBox = () => {
 	const [selectedToken, setSelectedToken] = useState<SessionToken>();
@@ -11,16 +13,15 @@ const SessionTokenListBox = () => {
 		queryKey: ['sessionTokens'],
 		queryFn: getSessionTokens,
 	});
-	const defaultLabel = useMemo(() => '세션을 선택해주세요.', []);
 
 	const router = useRouter();
 
 	const selectDisplayType = useCallback(
 		(kind: 'device' | 'panel') => () => {
-			if (!selectedToken || selectedToken.uuid === defaultLabel) return;
+			if (!selectedToken || selectedToken.uuid === DEFAULT_LABEL) return;
 			router.push(`/${kind}/${selectedToken.uuid}`);
 		},
-		[router, selectedToken, defaultLabel]
+		[router, selectedToken]
 	);
 
 	const selectSessionToken = useCallback((token: SessionToken) => {
@@ -34,7 +35,7 @@ const SessionTokenListBox = () => {
 			<ListBox
 				list={sessionTokens ?? []}
 				displayProperty='uuid'
-				defaultLabel={defaultLabel}
+				defaultLabel={DEFAULT_LABEL}
 				onChange={selectSessionToken}
 			/>
 			<div className='space-x-4'>

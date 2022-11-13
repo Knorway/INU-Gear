@@ -16,14 +16,6 @@ type Props = {
 	onFinish: () => void;
 };
 
-// -> eventSource도 받아와야 하고 / 아닌가 eventSource.on('message')에서 바꾼 boolean state를 넘겨줘야하나
-const eventSource = { on: (a: string, fn: CallableFunction) => {} };
-const onMessage = (fn: Dispatch<SetStateAction<boolean>>) => {
-	eventSource.on('message', () => {
-		fn(true);
-	});
-};
-
 const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
 	const [stepTimeout, setStepTimeout] = useState(0);
 
@@ -169,15 +161,6 @@ const TimeoutCount = (props: { timeout: number; isFinished: boolean }) => {
 	return (
 		<div style={{ visibility: count !== 0 ? 'visible' : 'hidden' }}>
 			<code>timeout: {count}ms</code>
-			{/* <h1
-				style={{
-					visibility: props.isFinished ? 'visible' : 'hidden',
-					fontSize: '40px',
-					color: 'green',
-				}}
-			>
-				PASS
-			</h1> */}
 		</div>
 	);
 };

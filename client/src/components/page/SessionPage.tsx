@@ -9,7 +9,8 @@ const ControlPanel = dynamic(() => import('~/src/components/page/ControlPanel'),
 });
 
 const SessionPage = () => {
-	const [sessionSequences, setSessionSequences] = useState(_.shuffle(SEQUENCES));
+	// const [sessionSequences, setSessionSequences] = useState(_.shuffle(SEQUENCES));
+	const [sessionSequences, setSessionSequences] = useState(SEQUENCES);
 	const [phase, setPhase] = useState(1);
 	const [step, setStep] = useState(0);
 	const [start, setStart] = useState(false);
@@ -23,7 +24,7 @@ const SessionPage = () => {
 		if (phase >= NUM_PHASE) return;
 		setPhase((prev) => prev + 1);
 		setStep(0);
-		setSessionSequences(_.shuffle(SEQUENCES));
+		// setSessionSequences(_.shuffle(SEQUENCES));
 	}, [phase]);
 
 	const goNextStep = useCallback(() => {

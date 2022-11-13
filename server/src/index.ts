@@ -1,7 +1,6 @@
+import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import express, { ErrorRequestHandler, Handler } from 'express';
-
-import { PrismaClient } from '@prisma/client';
 
 import { PubSub } from './pubsub';
 
