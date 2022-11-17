@@ -10,6 +10,11 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+generator js {
+    provider        = "prisma-client-js"
+    previewFeatures = ["extendedWhereUnique"]
+}
+
 model manager {
     id        Int      @id @default(autoincrement())
     uuid      String   @default(uuid())

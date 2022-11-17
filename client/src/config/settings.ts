@@ -20,24 +20,46 @@ export type SessionLogResult = {
 	};
 };
 
-export const DEFAULT_DELAY = 30;
+export type MessageStream = {
+	timeStamp: number;
+	cursor: {
+		starting: SequenceChar;
+		destination: SequenceChar;
+	};
+	isOperational: boolean;
+	isFinished: boolean;
+};
+
+export const DEFAULT_DELAY = 40;
 export const DEFAULT_TIMEOUT = 1000 * 10;
 
 export const TIMEOUT_UNIT = 1000;
 export const TIMEOUT_RANGE = 4;
 export const TIMEOUT_MIN = 3 * TIMEOUT_UNIT;
 
-export const SEQUENCES = [
-	{ type: 'A', direction: 'UP', sequence: ['P', 'N', 'R', 'D'] },
-	{ type: 'A', direction: 'UP', sequence: ['D', 'N', 'R', 'P'] },
-	{ type: 'A', direction: 'LEFT', sequence: ['P', 'R', 'N', 'D'] },
-	{ type: 'A', direction: 'LEFT', sequence: ['D', 'N', 'R', 'P'] },
+export const REPETITION_LIMIT = 1;
 
-	{ type: 'B', direction: 'UP', sequence: ['R', 'N', 'D'] },
-	{ type: 'B', direction: 'UP', sequence: ['D', 'N', 'R'] },
-	{ type: 'B', direction: 'LEFT', sequence: ['R', 'N', 'D'] },
-	{ type: 'B', direction: 'LEFT', sequence: ['D', 'N', 'R'] },
+export const SEQUENCES = [
+	{ type: 'A', direction: 'UP', sequence: ['P', 'N', 'R', 'D'], repetition: 0 },
+	{ type: 'A', direction: 'UP', sequence: ['D', 'N', 'R', 'P'], repetition: 0 },
+	{ type: 'A', direction: 'LEFT', sequence: ['P', 'R', 'N', 'D'], repetition: 0 },
+	{ type: 'A', direction: 'LEFT', sequence: ['D', 'N', 'R', 'P'], repetition: 0 },
+
+	{ type: 'B', direction: 'UP', sequence: ['R', 'N', 'D'], repetition: 0 },
+	{ type: 'B', direction: 'UP', sequence: ['D', 'N', 'R'], repetition: 0 },
+	{ type: 'B', direction: 'LEFT', sequence: ['R', 'N', 'D'], repetition: 0 },
+	{ type: 'B', direction: 'LEFT', sequence: ['D', 'N', 'R'], repetition: 0 },
 ] as const;
+
+// spacing, 4.5 for rest operation!(custom), no timeout, 5 secs of rest
+// -> configurable
+// 현재 ~상태 입니다 / ~상태로 변속하세요
+// 여섯개 한뭉탱이 시작, 종료 여유
+// 랜덤인데 이미 진행한 조합은 방향을 막론하고 다음번 랜덤에서 제외되어야 한다
+// 6 * 8 * 3. 세션 토큰 진행상황 표시?
+
+// 홍길동 남 1/8
+// 록맨 https://www.google.com/search?q=%EB%A1%9D%EB%A7%A8&sxsrf=ALiCzsZOaOZn1KRRXT5O0LJiRjhcGLQO2w:1668603324681&source=lnms&tbm=isch&sa=X&ved=2ahUKEwij0cDj37L7AhXwrlYBHQcVAhsQ_AUoAXoECAIQAw&biw=1440&bih=733&dpr=2#imgrc=SfycwtwKxUvNfM
 
 export const NUM_PHASE = 3;
 export const NUM_STEP = SEQUENCES.length - 1;

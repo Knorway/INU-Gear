@@ -50,7 +50,7 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 	const [isFinished, setIsFinished] = useState(false);
 	const [optrTimeout, setOptrTimeout] = useState(0);
 
-	const duringSession = useMemo(
+	const isOperational = useMemo(
 		() => !isFinished && Boolean(optrTimeout),
 		[isFinished, optrTimeout]
 	);
@@ -72,8 +72,7 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 
 	const onWheelL = useCallback(
 		(e: WheelEvent) => {
-			// if (isFinished) return;
-			if (!duringSession) return;
+			if (!isOperational) return;
 			const P = e.deltaY;
 			const delta = isLeft ? 1 : -1;
 			if (P > 0) {
@@ -82,13 +81,12 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 				moveCursor(cursor + delta);
 			}
 		},
-		[cursor, duringSession, isLeft, moveCursor, writeLog]
+		[cursor, isOperational, isLeft, moveCursor, writeLog]
 	);
 
 	const onWheelR = useCallback(
 		(e: WheelEvent) => {
-			// if (isFinished) return;
-			if (!duringSession) return;
+			if (!isOperational) return;
 			const P = e.deltaY;
 			const delta = isLeft ? -1 : 1;
 			if (P < 0 || P === 0) {
@@ -97,21 +95,20 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 				moveCursor(cursor + delta);
 			}
 		},
-		[cursor, duringSession, isLeft, moveCursor, writeLog]
+		[cursor, isOperational, isLeft, moveCursor, writeLog]
 	);
 
 	const onParking = useCallback(() => {
-		// if (isFinished) return;
-		if (!duringSession) return;
+		if (!isOperational) return;
 		writeLog('touch', Date.now());
 		setTravel((prev) => [...prev, 'P']);
 		if (destination === 'P') {
 			setCursor(indexOfChar(destination));
 		}
-	}, [destination, duringSession, indexOfChar, writeLog]);
+	}, [destination, isOperational, indexOfChar, writeLog]);
 
 	useEffect(() => {
-		if (duringSession) return;
+		if (isOperational) return;
 
 		// const timeout = rand(4) * TIMEOUT_UNIT + TIMEOUT_MIN;
 		const timeout = rand(TIMEOUT_RANGE) * TIMEOUT_UNIT + TIMEOUT_MIN;
@@ -122,7 +119,7 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 		return () => {
 			clearTimeout(timeoutId);
 		};
-	}, [duringSession]);
+	}, [isOperational]);
 
 	useEffect(() => {
 		if (optrTimeout) {
@@ -182,7 +179,7 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 			travel,
 			isFinished,
 			log,
-			duringSession,
+			isOperational,
 		},
 		utils: {
 			indexOfChar,

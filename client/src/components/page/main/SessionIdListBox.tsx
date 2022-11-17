@@ -5,6 +5,8 @@ import { Fragment, useCallback, useState } from 'react';
 import { getSessionTokens, SessionToken } from '~/src/api/fetcher';
 import ListBox from '~/src/components/ListBox';
 
+import SequenceGrid from './SequenceGrid';
+
 const DEFAULT_LABEL = '세션을 선택해주세요.';
 
 const SessionTokenListBox = () => {
@@ -42,6 +44,7 @@ const SessionTokenListBox = () => {
 				<button onClick={selectDisplayType('panel')}>패널</button>
 				<button onClick={selectDisplayType('device')}>디바이스</button>
 			</div>
+			<SequenceGrid />
 		</Fragment>
 	);
 };

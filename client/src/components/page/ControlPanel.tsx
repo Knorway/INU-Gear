@@ -22,16 +22,16 @@ const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
 	const { sequence, cursor, info, utils } = useSequence(targetSequence);
 	const { chars, direction, type } = sequence;
 	const { current: currentCursor, starting, destination } = cursor;
-	const { distance, travel, isFinished, log, duringSession } = info;
+	const { distance, travel, isFinished, log, isOperational } = info;
 	const { indexOfChar } = utils;
 
 	const tint = useCallback(
 		(idx: number) => {
 			if (idx === currentCursor) return 'green';
-			if (idx === indexOfChar(destination) && duringSession) return 'crimson';
+			if (idx === indexOfChar(destination) && isOperational) return 'crimson';
 			return 'black';
 		},
-		[currentCursor, destination, duringSession, indexOfChar]
+		[currentCursor, destination, isOperational, indexOfChar]
 	);
 
 	useEffect(() => {
@@ -95,7 +95,7 @@ const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
 						optrTable[starting]
 					)}
 					{!isFinished && ' -> '}
-					{duringSession && optrTable[destination]}
+					{isOperational && optrTable[destination]}
 				</div>
 
 				<div
@@ -123,7 +123,7 @@ const ControlPanel = ({ targetSequence, endSession, onFinish }: Props) => {
 						<span
 							style={{
 								color:
-									destination === 'P' && duringSession
+									destination === 'P' && isOperational
 										? 'crimson'
 										: currentCursor === indexOfChar('P')
 										? 'green'

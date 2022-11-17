@@ -1,21 +1,75 @@
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import { Fragment } from 'react';
+import { useRouter } from 'next/router';
+import { Fragment, useCallback, useState } from 'react';
 
-import SessionTokenListBox from '~/src/components/page/main/SessionIdListBox';
+import {
+  getSessionToken,
+  getSessionTokens,
+  SessionToken,
+} from '~/src/api/fetcher';
+import ListBox from '~/src/components/ListBox';
+
+import LoadingSpinner from '../../LoadingSpinner';
+import SequenceGrid from './SequenceGrid';
+
+const DEFAULT_LABEL = '세션을 선택해주세요.';
 
 const MainPage = () => {
+	const [selectedToken, setSelectedToken] = useState<SessionToken>();
+	const router = useRouter();
+
+	const { data: sessionTokens, isLoading } = useQuery({
+		queryKey: ['sessionTokens'],
+		queryFn: getSessionTokens,
+	});
+
+	const selectDisplayType = useCallback(
+		(kind: 'device' | 'panel') => () => {
+			if (!selectedToken || selectedToken.uuid === DEFAULT_LABEL) return;
+			router.push(`/${kind}/${selectedToken.uuid}`);
+		},
+		[router, selectedToken]
+	);
+
+	const selectSessionToken = useCallback((token: SessionToken) => {
+		setSelectedToken(token);
+	}, []);
+
+	// if (isLoading) return <LoadingSpinner />;
+	// if (!sessionTokens) return null;
+
 	return (
 		<Fragment>
+			{isLoading && <LoadingSpinner />}
 			<div className='flex flex-col items-center justify-center'>
 				<div className='space-x-4 text-blue-500 underline'>
 					<Link href={'/session'}>session</Link>
 					<Link href={'/admin'}>admin</Link>
 				</div>
 				<h1 className='text-4xl font-bold'>Gear</h1>
-				<SessionTokenListBox />
+				<ListBox
+					list={sessionTokens ?? []}
+					displayProperty='uuid'
+					defaultLabel={DEFAULT_LABEL}
+					onChange={selectSessionToken}
+				/>
+				<div className='space-x-4'>
+					<button onClick={selectDisplayType('panel')}>패널</button>
+					<button onClick={selectDisplayType('device')}>디바이스</button>
+				</div>
+			</div>
+			<div>
+				<SequenceGrid sessionToken={selectedToken} />
 			</div>
 		</Fragment>
 	);
 };
 
 export default MainPage;
+
+// const { data: sessionToken } = useQuery({
+// 	queryKey: ['sessionToken', selectedToken?.uuid],
+// 	queryFn: () => getSessionToken({ uuid: selectedToken?.uuid as string }),
+// 	enabled: Boolean(selectedToken),
+// });
