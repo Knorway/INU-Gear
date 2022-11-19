@@ -19,11 +19,9 @@ app.use(express.static(path.resolve() + '/build'));
 const asyncHandler = (fn: Handler) =>
 	<Handler>((req, res, next) => Promise.resolve(fn(req, res, next)).then(next));
 
+const html = fs.readFileSync(path.resolve() + '/build/index.html', 'utf-8');
+
 app.get('/', async (req, res) => {
-	const html = await fs.promises.readFile(
-		path.resolve() + '/build/index.html',
-		'utf-8'
-	);
 	res.send(html);
 });
 

@@ -1,16 +1,13 @@
+import { ComputerDesktopIcon } from '@heroicons/react/24/solid';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Fragment, useCallback, useState } from 'react';
 
-import {
-  getSessionToken,
-  getSessionTokens,
-  SessionToken,
-} from '~/src/api/fetcher';
+import { getSessionTokens, SessionToken } from '~/src/api/fetcher';
 import ListBox from '~/src/components/ListBox';
+import LoadingSpinner from '~/src/components/LoadingSpinner';
 
-import LoadingSpinner from '../../LoadingSpinner';
 import SequenceGrid from './SequenceGrid';
 
 const DEFAULT_LABEL = '세션을 선택해주세요.';
@@ -55,8 +52,10 @@ const MainPage = () => {
 					onChange={selectSessionToken}
 				/>
 				<div className='space-x-4'>
-					<button onClick={selectDisplayType('panel')}>패널</button>
-					<button onClick={selectDisplayType('device')}>디바이스</button>
+					<ComputerDesktopIcon
+						onClick={selectDisplayType('panel')}
+						className='w-8 h-8 p-1 mt-4 border rounded-md cursor-pointer'
+					/>
 				</div>
 			</div>
 			<div>

@@ -1,14 +1,27 @@
 import { useRouter } from 'next/router';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 
 import { BACKEND_URL } from '~/src/api/request';
 import PanelScreen from '~/src/components/page/panel/PanelScreen';
 import { MessageStream } from '~/src/config/settings';
 
+import EnteringCountDown from './EnteringCountDown';
+
+// type PanelState = ''
+
 const PanelPage = () => {
-	const [message, setMessage] = useState<MessageStream>();
+	const [message, setMessage] = useState<MessageStream['payload'] | null>(null);
+	const [initialized, setInitialized] = useState(false);
+
+	const firstEntering = useMemo(() => initialized && !message, [initialized, message]);
+
 	const router = useRouter();
 	const sessionId = router.query.sessionId;
+
+	useEffect(() => {
+		if (!message) return;
+		console.log(`${Date.now() - message.timeStamp}ms`);
+	}, [message]);
 
 	useEffect(() => {
 		if (!sessionId) return;
@@ -16,23 +29,37 @@ const PanelPage = () => {
 		const eventSource = new EventSource(`${BACKEND_URL}/subscribe/${sessionId}`);
 
 		eventSource.addEventListener('message', (e) => {
-			// if (e.data.type === 'connection')
-			setMessage(JSON.parse(e.data));
+			const data = JSON.parse(e.data) as MessageStream;
+
+			switch (data.type) {
+				case 'initialize': {
+					setInitialized(true);
+					break;
+				}
+				case 'message': {
+					setInitialized(false);
+					setMessage(data.payload);
+					break;
+				}
+				case 'complete': {
+					router.push('/');
+					break;
+				}
+				default:
+					break;
+			}
 		});
 
 		eventSource.addEventListener('error', (e) => {
-			console.log('error');
+			console.log('eventSource error', e);
 		});
 
 		return () => {
 			eventSource.close();
 		};
-	}, [sessionId]);
+	}, [router, sessionId]);
 
-	useEffect(() => {
-		if (!message) return;
-		console.log(`${Date.now() - message.timeStamp}ms`);
-	}, [message]);
+	if (firstEntering) return <EnteringCountDown />;
 
 	if (!message) {
 		return (

@@ -1,23 +1,26 @@
 import _ from 'lodash';
 
-import { SEQUENCES } from '../config/settings';
+import { Sequence, SequenceChar } from '../config/settings';
 
 export const rand = (range: number) => _.random(0, range - 1);
 
-export const filterCandidates = (sequence?: typeof SEQUENCES) => {
+export const generateStartDest = (sequence?: Sequence<'sequence'>) => {
 	if (!sequence || sequence.length < 2) return [];
 
+	const extended = [...new Set(sequence).add('P')];
+	const result = new Set<string>();
 	let cap = 0;
-	for (let i = 2; i <= sequence.length; i++) {
+
+	for (let i = 2; i <= extended.length; i++) {
 		cap = i - 1 + cap;
 	}
 
-	const result = new Set();
 	while (result.size !== cap) {
-		const starting = sequence[rand(sequence.length)];
-		let dest = sequence[rand(sequence.length)];
+		const starting = extended[rand(extended.length)];
+		let dest = extended[rand(extended.length)];
+
 		while (starting === dest) {
-			dest = sequence[rand(sequence.length)];
+			dest = extended[rand(extended.length)];
 		}
 
 		const candidate = `${starting}-${dest}`;
@@ -29,5 +32,5 @@ export const filterCandidates = (sequence?: typeof SEQUENCES) => {
 		}
 	}
 
-	return [...result] as Array<string>;
+	return [...result].map((e) => e.split('-')) as Array<SequenceChar[]>;
 };

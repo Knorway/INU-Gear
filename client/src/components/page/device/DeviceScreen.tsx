@@ -1,23 +1,29 @@
 import { useMutation } from '@tanstack/react-query';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { postMessageStream } from '~/src/api/fetcher';
-import { DEFAULT_TIMEOUT, SEQUENCES } from '~/src/config/settings';
+import {
+  DEFAULT_TIMEOUT,
+  MessageStream,
+  ParamOf,
+  SequenceChar,
+  SEQUENCES,
+} from '~/src/config/settings';
+import { useEffectOnce } from '~/src/hooks/useEffectOnce';
 import useSequence from '~/src/hooks/useSequence';
-
-type ParamOf<T extends (...args: any) => any> = Parameters<T>[0];
 
 type Props = {
 	targetSequence: typeof SEQUENCES[number];
-	endSession: boolean;
-	onFinish: () => void;
 	sessionId: string;
+	startDest: SequenceChar[];
+	onFinish: () => void;
 };
 
-const DeviceScreen = ({ targetSequence, endSession, onFinish, sessionId }: Props) => {
+const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props) => {
 	const [stepTimeout, setStepTimeout] = useState(0);
+	const [initialized, setInitialized] = useState(false);
 
-	const { cursor, sequence, utils, info } = useSequence(targetSequence);
+	const { cursor, sequence, utils, info } = useSequence({ targetSequence, startDest });
 	const { chars, type, direction } = sequence;
 	const { current: currentCursor, destination, starting } = cursor;
 	const { isOperational, isFinished } = info;
@@ -30,33 +36,68 @@ const DeviceScreen = ({ targetSequence, endSession, onFinish, sessionId }: Props
 
 	const tint = useCallback(
 		(idx: number) => {
+			if (!initialized) return 'black';
 			if (idx === currentCursor) return 'green';
 			if (idx === indexOfChar(destination) && isOperational) return 'crimson';
 			return 'black';
 		},
-		[currentCursor, destination, isOperational, indexOfChar]
+		[currentCursor, destination, indexOfChar, initialized, isOperational]
 	);
 
-	const publish = useCallback(() => {
-		if (!sessionId) return;
+	const tintP = useCallback(() => {
+		if (!initialized) return 'black';
+		if (destination === 'P' && isOperational) {
+			return 'crimson';
+		}
+		return currentCursor === indexOfChar('P') ? 'green' : 'black';
+	}, [currentCursor, destination, indexOfChar, initialized, isOperational]);
 
-		publishMessage({
-			uuid: sessionId,
-			message: {
-				timeStamp: Date.now(),
-				cursor: { starting, destination },
-				isOperational,
-				isFinished,
-			},
-		});
-	}, [destination, isOperational, isFinished, publishMessage, sessionId, starting]);
+	const publish = useCallback(
+		(type: MessageStream['type']) => {
+			if (!sessionId) return;
+
+			publishMessage({
+				uuid: sessionId,
+				message: {
+					type,
+					payload: {
+						timeStamp: Date.now(),
+						cursor: { starting, destination },
+						isOperational,
+						isFinished,
+					},
+				},
+			});
+		},
+		[destination, isOperational, isFinished, publishMessage, sessionId, starting]
+	);
+
+	// useEffect(() => {
+	// 	if (!initialized) {
+	// 		publish('initialize');
+	// 		setTimeout(() => {
+	// 			setInitialized(true);
+	// 		}, 5000);
+	// 	}
+	// }, [initialized, publish]);
+
+	useEffectOnce(() => {
+		publish('initialize');
+		setTimeout(() => {
+			setInitialized(true);
+		}, 5000);
+	});
 
 	useEffect(() => {
-		publish();
-	}, [publish]);
+		if (initialized) {
+			publish('message');
+		}
+	}, [initialized, publish]);
 
 	useEffect(() => {
-		const timeout = DEFAULT_TIMEOUT;
+		if (!isFinished) return;
+
+		const timeout = !initialized ? 1000 * 5 : 0;
 		setStepTimeout(timeout);
 
 		const timeoutId = setTimeout(() => {
@@ -66,11 +107,10 @@ const DeviceScreen = ({ targetSequence, endSession, onFinish, sessionId }: Props
 		return () => {
 			clearTimeout(timeoutId);
 		};
-	}, [onFinish]);
+	}, [initialized, isFinished, onFinish]);
 
 	return (
 		<div>
-			{/* <button onClick={publish}>publish</button> */}
 			<div className='flex-1'>
 				<div
 					style={{
@@ -96,12 +136,7 @@ const DeviceScreen = ({ targetSequence, endSession, onFinish, sessionId }: Props
 					<div style={{ display: 'flex', justifyContent: 'center' }}>
 						<span
 							style={{
-								color:
-									destination === 'P' && isOperational
-										? 'crimson'
-										: currentCursor === indexOfChar('P')
-										? 'green'
-										: 'black',
+								color: tintP(),
 								fontSize: '80px',
 							}}
 						>

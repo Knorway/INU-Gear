@@ -9,8 +9,6 @@ type Props = {
 	sessionToken?: SessionToken;
 };
 
-// _.chunk(sessionToken.sequence, 3);
-
 const SequenceGrid = ({ sessionToken }: Props) => {
 	const router = useRouter();
 
@@ -18,21 +16,16 @@ const SequenceGrid = ({ sessionToken }: Props) => {
 
 	const navigate = (seqeunce: typeof SEQUENCES[number]) => () => {
 		if (!sessionToken) return;
-		router.push(
-			{
-				pathname: `/go/[token]`,
-				query: {
-					token: sessionToken.uuid,
-					sequence: JSON.stringify(seqeunce),
-				},
-			}
-			// `go/${sessionToken?.uuid}`
-		);
+		router.push({
+			pathname: `/device/[sessionId]`,
+			query: {
+				sessionId: sessionToken.uuid,
+				sequence: JSON.stringify(seqeunce),
+			},
+		});
 	};
 
 	if (!sessionToken || !sessionToken.sequence) return null;
-
-	console.log(Object.entries(_.groupBy(sessionToken.sequence, 'type')));
 
 	return (
 		<Fragment>
@@ -54,7 +47,7 @@ const SequenceGrid = ({ sessionToken }: Props) => {
 											onClick: navigate(sequence),
 										})}
 									>
-										{JSON.stringify(sequence)}
+										<pre>{JSON.stringify(sequence, null, 2)}</pre>
 									</div>
 								))}
 							</div>
@@ -64,10 +57,6 @@ const SequenceGrid = ({ sessionToken }: Props) => {
 			)}
 		</Fragment>
 	);
-};
-
-const GridChunk = () => {
-	return null;
 };
 
 export default SequenceGrid;

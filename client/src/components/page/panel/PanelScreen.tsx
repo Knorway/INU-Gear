@@ -1,12 +1,20 @@
+import { useMemo } from 'react';
+
 import { MessageStream, optrTable } from '~/src/config/settings';
 
 type Props = {
-	message: MessageStream;
+	message: MessageStream['payload'];
 };
 
 const PanelScreen = ({ message }: Props) => {
 	const { cursor, isFinished, isOperational } = message;
 	const { starting, destination } = cursor;
+
+	const operationText = useMemo(() => {
+		if (isOperational) return `[${optrTable[destination]}] 상태로 변속하세요.`;
+		return `현재 [${optrTable[starting]}] 상태입니다.`;
+	}, [destination, isOperational, starting]);
+
 	return (
 		<div>
 			<div className='flex-1'>
@@ -28,10 +36,8 @@ const PanelScreen = ({ message }: Props) => {
 							PASS
 						</h1>
 					) : (
-						optrTable[starting]
+						operationText
 					)}
-					{!isFinished && ' -> '}
-					{isOperational && optrTable[destination]}
 				</div>
 			</div>
 		</div>

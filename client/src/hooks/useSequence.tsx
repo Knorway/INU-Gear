@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   DEFAULT_DELAY,
@@ -11,6 +11,11 @@ import {
 } from '~/src/config/settings';
 import { rand } from '~/src/utils';
 
+type Props = {
+	targetSequence: typeof SEQUENCES[number];
+	startDest: SequenceChar[];
+};
+
 type LogTimeStamps = {
 	init?: number;
 	touch?: number;
@@ -18,19 +23,11 @@ type LogTimeStamps = {
 	diff?: number;
 };
 
-const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
+const useSequence = ({ targetSequence, startDest }: Props) => {
 	const { sequence, direction, type } = targetSequence;
-	const starting = useMemo(() => sequence[rand(sequence.length)], [sequence]);
-	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
+	const [starting, destination] = startDest;
 
-	const destination = useMemo(() => {
-		const extended = [...new Set(sequence).add('P')];
-		let dest = extended[rand(extended.length)];
-		while (dest === starting) {
-			dest = extended[rand(extended.length)];
-		}
-		return dest as SequenceChar;
-	}, [sequence, starting]);
+	// console.log(startDest);
 
 	const indexOfChar = useCallback(
 		(char: SequenceChar) => {
@@ -39,21 +36,24 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 		[sequence]
 	);
 
-	const distance = useMemo(() => {
-		if (type === 'B' && destination === 'P') return 1;
-		return Math.abs(indexOfChar(destination) - indexOfChar(starting));
-	}, [destination, indexOfChar, starting, type]);
-
 	const [travel, setTravel] = useState<('L' | 'R' | 'P')[]>([]);
 	const [cursor, setCursor] = useState(indexOfChar(starting));
 	const [log, setLog] = useState<LogTimeStamps>({});
 	const [isFinished, setIsFinished] = useState(false);
 	const [optrTimeout, setOptrTimeout] = useState(0);
 
+	const initRef = useRef(false);
+	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
+
 	const isOperational = useMemo(
 		() => !isFinished && Boolean(optrTimeout),
 		[isFinished, optrTimeout]
 	);
+
+	const distance = useMemo(() => {
+		if (type === 'B' && destination === 'P') return 1;
+		return Math.abs(indexOfChar(destination) - indexOfChar(starting));
+	}, [destination, indexOfChar, starting, type]);
 
 	const writeLog = useCallback((key: keyof typeof log, value: number) => {
 		setLog((prev) => {
@@ -110,8 +110,8 @@ const useSequence = (targetSequence: typeof SEQUENCES[number]) => {
 	useEffect(() => {
 		if (isOperational) return;
 
-		// const timeout = rand(4) * TIMEOUT_UNIT + TIMEOUT_MIN;
-		const timeout = rand(TIMEOUT_RANGE) * TIMEOUT_UNIT + TIMEOUT_MIN;
+		const timeout = !initRef.current ? 5000 + 1000 * 4.5 : 1000 * 4.5;
+		initRef.current = true;
 		const timeoutId = setTimeout(() => {
 			setOptrTimeout(timeout);
 		}, timeout);
