@@ -1,12 +1,12 @@
 import { ComputerDesktopIcon } from '@heroicons/react/24/solid';
 import { useQuery } from '@tanstack/react-query';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Fragment, useCallback, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 
 import { getSessionTokens, SessionToken } from '~/src/api/fetcher';
 import ListBox from '~/src/components/ListBox';
 import LoadingSpinner from '~/src/components/LoadingSpinner';
+import Notifiation from '~/src/components/Notifiation';
 
 import SequenceGrid from './SequenceGrid';
 
@@ -33,17 +33,11 @@ const MainPage = () => {
 		setSelectedToken(token);
 	}, []);
 
-	// if (isLoading) return <LoadingSpinner />;
-	// if (!sessionTokens) return null;
-
 	return (
 		<Fragment>
 			{isLoading && <LoadingSpinner />}
-			<div className='flex flex-col items-center justify-center'>
-				<div className='space-x-4 text-blue-500 underline'>
-					<Link href={'/session'}>session</Link>
-					<Link href={'/admin'}>admin</Link>
-				</div>
+			<div className='flex flex-col items-center justify-center mt-4'>
+				<div className='space-x-4 text-blue-500 underline'></div>
 				<h1 className='text-4xl font-bold'>Gear</h1>
 				<ListBox
 					list={sessionTokens ?? []}

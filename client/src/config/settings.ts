@@ -4,7 +4,7 @@ export type Sequence<T extends keyof typeof SEQUENCES[number]> =
 export type SequenceChar = Sequence<'sequence'>[number];
 
 export type SessionLogResult = {
-	sequence: typeof SEQUENCES[number];
+	sequence: Sequence<'sequence'>;
 	starting: SequenceChar;
 	destination: SequenceChar;
 	type: Sequence<'type'>;
@@ -12,11 +12,11 @@ export type SessionLogResult = {
 	distance: number;
 	travel: number;
 	logs: {
-		init?: number;
-		touch?: number;
-		pass?: number;
-		diff?: number;
-		delay?: number;
+		init: number;
+		touch: number;
+		pass: number;
+		diff: number;
+		// delay: number;
 	};
 };
 
@@ -33,8 +33,6 @@ export type MessageStream = {
 	} | null;
 };
 
-export type ParamOf<T extends (...args: any) => any> = Parameters<T>[0];
-
 export const DEFAULT_DELAY = 40;
 export const DEFAULT_TIMEOUT = 1000 * 10;
 
@@ -45,15 +43,35 @@ export const TIMEOUT_MIN = 3 * TIMEOUT_UNIT;
 export const REPETITION_LIMIT = 1;
 
 export const SEQUENCES = [
-	{ type: 'A', direction: 'UP', sequence: ['P', 'R', 'N', 'D'], repetition: 0 },
-	{ type: 'A', direction: 'UP', sequence: ['D', 'N', 'R', 'P'], repetition: 0 },
-	{ type: 'A', direction: 'LEFT', sequence: ['P', 'R', 'N', 'D'], repetition: 0 },
-	{ type: 'A', direction: 'LEFT', sequence: ['D', 'N', 'R', 'P'], repetition: 0 },
+	{
+		type: 'A',
+		direction: 'UP',
+		sequence: ['P', 'R', 'N', 'D'],
+		repetition: 0 as number,
+	},
+	{
+		type: 'A',
+		direction: 'UP',
+		sequence: ['D', 'N', 'R', 'P'],
+		repetition: 0 as number,
+	},
+	{
+		type: 'A',
+		direction: 'LEFT',
+		sequence: ['P', 'R', 'N', 'D'],
+		repetition: 0 as number,
+	},
+	{
+		type: 'A',
+		direction: 'LEFT',
+		sequence: ['D', 'N', 'R', 'P'],
+		repetition: 0 as number,
+	},
 
-	{ type: 'B', direction: 'UP', sequence: ['R', 'N', 'D'], repetition: 0 },
-	{ type: 'B', direction: 'UP', sequence: ['D', 'N', 'R'], repetition: 0 },
-	{ type: 'B', direction: 'LEFT', sequence: ['R', 'N', 'D'], repetition: 0 },
-	{ type: 'B', direction: 'LEFT', sequence: ['D', 'N', 'R'], repetition: 0 },
+	{ type: 'B', direction: 'UP', sequence: ['R', 'N', 'D'], repetition: 0 as number },
+	{ type: 'B', direction: 'UP', sequence: ['D', 'N', 'R'], repetition: 0 as number },
+	{ type: 'B', direction: 'LEFT', sequence: ['R', 'N', 'D'], repetition: 0 as number },
+	{ type: 'B', direction: 'LEFT', sequence: ['D', 'N', 'R'], repetition: 0 as number },
 ] as const;
 
 export const NUM_PHASE = 3;

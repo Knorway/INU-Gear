@@ -1,5 +1,13 @@
+import { Fragment } from 'react';
+
+import AdminPage from '~/src/components/page/admin';
+
 const Page = () => {
-	return <h1>admin page</h1>;
+	return (
+		<Fragment>
+			<AdminPage />
+		</Fragment>
+	);
 };
 
 export default Page;

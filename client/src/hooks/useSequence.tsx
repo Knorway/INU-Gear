@@ -11,19 +11,27 @@ import {
 } from '~/src/config/settings';
 import { rand } from '~/src/utils';
 
-type Props = {
+type LogTimeStamps = {
+	init: number;
+	touch: number;
+	pass: number;
+	diff: number;
+};
+
+const initialTimeStamps: LogTimeStamps = {
+	init: 0,
+	touch: 0,
+	pass: 0,
+	diff: 0,
+};
+
+const useSequence = ({
+	targetSequence,
+	startDest,
+}: {
 	targetSequence: typeof SEQUENCES[number];
 	startDest: SequenceChar[];
-};
-
-type LogTimeStamps = {
-	init?: number;
-	touch?: number;
-	pass?: number;
-	diff?: number;
-};
-
-const useSequence = ({ targetSequence, startDest }: Props) => {
+}) => {
 	const { sequence, direction, type } = targetSequence;
 	const [starting, destination] = startDest;
 
@@ -38,7 +46,7 @@ const useSequence = ({ targetSequence, startDest }: Props) => {
 
 	const [travel, setTravel] = useState<('L' | 'R' | 'P')[]>([]);
 	const [cursor, setCursor] = useState(indexOfChar(starting));
-	const [log, setLog] = useState<LogTimeStamps>({});
+	const [log, setLog] = useState<LogTimeStamps>(initialTimeStamps);
 	const [isFinished, setIsFinished] = useState(false);
 	const [optrTimeout, setOptrTimeout] = useState(0);
 
@@ -156,8 +164,8 @@ const useSequence = ({ targetSequence, startDest }: Props) => {
 		writeLog('pass', finalTouch); // -> ?
 
 		const diff = (() => {
-			if (distance === 1 && travel.length === 1) return log.touch! - log.init!;
-			return finalTouch - log.init!;
+			if (distance === 1 && travel.length === 1) return log.touch - log.init;
+			return finalTouch - log.init;
 		})();
 
 		writeLog('diff', diff);

@@ -1,10 +1,15 @@
 import { request } from '~/src/api/request';
-import { MessageStream, SEQUENCES } from '~/src/config/settings';
+import {
+  MessageStream,
+  SEQUENCES,
+  SessionLogResult,
+} from '~/src/config/settings';
 
 export type SessionToken = {
 	id: number;
 	uuid: string;
 	createdAt: Date;
+	label: string;
 	mangerId: number;
 	sequence: typeof SEQUENCES;
 	repetition: number;
@@ -20,6 +25,15 @@ export const getSessionToken = async ({ uuid }: { uuid: string }) => {
 	return response.data;
 };
 
+export const postSessionToken = async (data: { label: string }) => {
+	const response = await request<SessionToken>({
+		url: `/session-token`,
+		method: 'POST',
+		data,
+	});
+	return response.data;
+};
+
 export const postMessageStream = async ({
 	uuid,
 	message,
@@ -31,6 +45,36 @@ export const postMessageStream = async ({
 		url: `/publish/${uuid}`,
 		method: 'POST',
 		data: message,
+	});
+	return response.data;
+};
+
+export const patchSequence = async ({
+	uuid,
+	sequence,
+}: {
+	uuid: string;
+	sequence: typeof SEQUENCES[number];
+}) => {
+	const response = await request<SessionToken>({
+		url: `/session-token/${uuid}`,
+		method: 'PATCH',
+		data: sequence,
+	});
+	return response.data;
+};
+
+export const postSessionLog = async ({
+	uuid,
+	data,
+}: {
+	uuid: string;
+	data: SessionLogResult[];
+}) => {
+	const response = await request<never>({
+		url: `/session-log/${uuid}`,
+		method: 'POST',
+		data,
 	});
 	return response.data;
 };

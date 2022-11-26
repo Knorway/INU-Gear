@@ -2,26 +2,24 @@ import { useRouter } from 'next/router';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 
 import { BACKEND_URL } from '~/src/api/request';
+import Notifiation from '~/src/components/Notifiation';
 import PanelScreen from '~/src/components/page/panel/PanelScreen';
 import { MessageStream } from '~/src/config/settings';
+import { useNotification } from '~/src/hooks/useNotification';
 
 import EnteringCountDown from './EnteringCountDown';
-
-// type PanelState = ''
 
 const PanelPage = () => {
 	const [message, setMessage] = useState<MessageStream['payload'] | null>(null);
 	const [initialized, setInitialized] = useState(false);
+	const [completed, setCompleted] = useState(false);
 
 	const firstEntering = useMemo(() => initialized && !message, [initialized, message]);
 
 	const router = useRouter();
 	const sessionId = router.query.sessionId;
 
-	useEffect(() => {
-		if (!message) return;
-		console.log(`${Date.now() - message.timeStamp}ms`);
-	}, [message]);
+	const { isActive, activate } = useNotification();
 
 	useEffect(() => {
 		if (!sessionId) return;
@@ -42,7 +40,7 @@ const PanelPage = () => {
 					break;
 				}
 				case 'complete': {
-					router.push('/');
+					setCompleted(true);
 					break;
 				}
 				default:
@@ -57,7 +55,25 @@ const PanelPage = () => {
 		return () => {
 			eventSource.close();
 		};
-	}, [router, sessionId]);
+	}, [sessionId]);
+
+	useEffect(() => {
+		if (!completed) return;
+
+		activate();
+		const id = setTimeout(() => {
+			router.push('/');
+		}, 3500);
+
+		return () => {
+			clearTimeout(id);
+		};
+	}, [activate, completed, router]);
+
+	useEffect(() => {
+		if (!message) return;
+		console.log(`${Date.now() - message.timeStamp}ms`);
+	}, [message]);
 
 	if (firstEntering) return <EnteringCountDown />;
 
@@ -80,6 +96,13 @@ const PanelPage = () => {
 			<h1>Panel sessionId: {router.query.sessionId}</h1>
 			<pre>{JSON.stringify(message, null, 2)}</pre>
 			<PanelScreen message={message} />
+			{isActive && (
+				<Notifiation
+					variant='positive'
+					title='세션이 종료되었습니다'
+					description='잠시후 메인 화면으로 되돌아갑니다'
+				/>
+			)}
 		</Fragment>
 	);
 };

@@ -2,9 +2,14 @@ import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { postMessageStream } from '~/src/api/fetcher';
+import {
+  patchSequence,
+  postMessageStream,
+  postSessionLog,
+} from '~/src/api/fetcher';
+import { mutationizeFetcher } from '~/src/api/queryClient';
 import DeviceScreen from '~/src/components/page/device/DeviceScreen';
-import { ParamOf, SEQUENCES } from '~/src/config/settings';
+import { SEQUENCES, SessionLogResult } from '~/src/config/settings';
 import { generateStartDest } from '~/src/utils';
 
 const STEP_LIMIT = 6;
@@ -12,13 +17,19 @@ const STEP_LIMIT = 6;
 const DevicePage = () => {
 	const [sequences, setSequences] = useState<typeof SEQUENCES[number][] | null>(null);
 	const [step, setStep] = useState(0);
+	const [resultLogs, setResultLogs] = useState<SessionLogResult[]>([]);
 
 	const router = useRouter();
-	const sessionId = router.query.sessionId;
+	const sessionId = router.query.sessionId as string;
 
-	const { mutate: publishMessage } = useMutation({
-		mutationFn: (param: ParamOf<typeof postMessageStream>) =>
-			postMessageStream(param),
+	const { mutate: publishMessage, isSuccess: successPublishing } = useMutation({
+		mutationFn: mutationizeFetcher(postMessageStream),
+	});
+	const { mutate: updateSequnce, isSuccess: successUpdatingSequence } = useMutation({
+		mutationFn: mutationizeFetcher(patchSequence),
+	});
+	const { mutate: createLog } = useMutation({
+		mutationFn: mutationizeFetcher(postSessionLog),
 	});
 
 	const startDest = useMemo(
@@ -26,14 +37,15 @@ const DevicePage = () => {
 		[sequences]
 	);
 
-	// console.log(sequences);
-	// console.log(startDest);
-
-	const goNextStep = useCallback(() => {
-		if (step !== STEP_LIMIT) {
-			return setStep((prev) => prev + 1);
-		}
-	}, [step]);
+	const goNextStep = useCallback(
+		(log: SessionLogResult) => {
+			if (step !== STEP_LIMIT) {
+				setStep((prev) => prev + 1);
+				setResultLogs((prev) => [...prev, log]);
+			}
+		},
+		[step]
+	);
 
 	useEffect(() => {
 		try {
@@ -55,9 +67,33 @@ const DevicePage = () => {
 					payload: null,
 				},
 			});
-			router.push('/');
+
+			updateSequnce({
+				uuid: sessionId,
+				sequence: sequences![0],
+			});
 		}
-	}, [publishMessage, router, sessionId, step]);
+	}, [publishMessage, router, sequences, sessionId, step, updateSequnce]);
+
+	useEffect(() => {
+		if (successPublishing && successUpdatingSequence) {
+			createLog(
+				{ uuid: sessionId, data: resultLogs },
+				{
+					onSuccess: () => {
+						router.push('/');
+					},
+				}
+			);
+		}
+	}, [
+		createLog,
+		resultLogs,
+		router,
+		sessionId,
+		successPublishing,
+		successUpdatingSequence,
+	]);
 
 	if (!sequences || !sessionId) return null;
 
@@ -70,9 +106,8 @@ const DevicePage = () => {
 						<DeviceScreen
 							key={idx}
 							targetSequence={sequence}
-							// startDest={startDest.slice(step, step + 1).flatMap((e) => e)}
 							startDest={startDest[step]}
-							sessionId={sessionId as string}
+							sessionId={sessionId}
 							onFinish={goNextStep}
 						/>
 					);

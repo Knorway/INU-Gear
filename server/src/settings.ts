@@ -7,14 +7,56 @@ export type SessionToken = {
 	repetition: number;
 };
 
-export const SEQUENCES = [
-	{ type: 'A', direction: 'UP', sequence: ['P', 'N', 'R', 'D'], repetition: 0 },
-	{ type: 'A', direction: 'UP', sequence: ['D', 'N', 'R', 'P'], repetition: 0 },
-	{ type: 'A', direction: 'LEFT', sequence: ['P', 'R', 'N', 'D'], repetition: 0 },
-	{ type: 'A', direction: 'LEFT', sequence: ['D', 'N', 'R', 'P'], repetition: 0 },
+export type Sequence<T extends keyof typeof SEQUENCES[number]> =
+	typeof SEQUENCES[number][T];
 
-	{ type: 'B', direction: 'UP', sequence: ['R', 'N', 'D'], repetition: 0 },
-	{ type: 'B', direction: 'UP', sequence: ['D', 'N', 'R'], repetition: 0 },
-	{ type: 'B', direction: 'LEFT', sequence: ['R', 'N', 'D'], repetition: 0 },
-	{ type: 'B', direction: 'LEFT', sequence: ['D', 'N', 'R'], repetition: 0 },
+export type SequenceChar = Sequence<'sequence'>[number];
+
+export type SessionLogResult = {
+	sequence: typeof SEQUENCES[number];
+	starting: SequenceChar;
+	destination: SequenceChar;
+	type: Sequence<'type'>;
+	direction: Sequence<'direction'>;
+	distance: number;
+	travel: number;
+	logs: {
+		init: number;
+		touch: number;
+		pass: number;
+		diff: number;
+		// delay: number;
+	};
+};
+
+export const SEQUENCES = [
+	{
+		type: 'A',
+		direction: 'UP',
+		sequence: ['P', 'N', 'R', 'D'],
+		repetition: 0 as number,
+	},
+	{
+		type: 'A',
+		direction: 'UP',
+		sequence: ['D', 'N', 'R', 'P'],
+		repetition: 0 as number,
+	},
+	{
+		type: 'A',
+		direction: 'LEFT',
+		sequence: ['P', 'R', 'N', 'D'],
+		repetition: 0 as number,
+	},
+	{
+		type: 'A',
+		direction: 'LEFT',
+		sequence: ['D', 'N', 'R', 'P'],
+		repetition: 0 as number,
+	},
+
+	{ type: 'B', direction: 'UP', sequence: ['R', 'N', 'D'], repetition: 0 as number },
+	{ type: 'B', direction: 'UP', sequence: ['D', 'N', 'R'], repetition: 0 as number },
+	{ type: 'B', direction: 'LEFT', sequence: ['R', 'N', 'D'], repetition: 0 as number },
+	{ type: 'B', direction: 'LEFT', sequence: ['D', 'N', 'R'], repetition: 0 as number },
 ] as const;

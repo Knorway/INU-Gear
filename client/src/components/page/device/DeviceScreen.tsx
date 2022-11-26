@@ -1,13 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { postMessageStream } from '~/src/api/fetcher';
+import { mutationizeFetcher } from '~/src/api/queryClient';
 import {
-  DEFAULT_TIMEOUT,
   MessageStream,
-  ParamOf,
   SequenceChar,
   SEQUENCES,
+  SessionLogResult,
 } from '~/src/config/settings';
 import { useEffectOnce } from '~/src/hooks/useEffectOnce';
 import useSequence from '~/src/hooks/useSequence';
@@ -16,7 +16,7 @@ type Props = {
 	targetSequence: typeof SEQUENCES[number];
 	sessionId: string;
 	startDest: SequenceChar[];
-	onFinish: () => void;
+	onFinish: (log: SessionLogResult) => void;
 };
 
 const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props) => {
@@ -26,12 +26,11 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 	const { cursor, sequence, utils, info } = useSequence({ targetSequence, startDest });
 	const { chars, type, direction } = sequence;
 	const { current: currentCursor, destination, starting } = cursor;
-	const { isOperational, isFinished } = info;
+	const { isOperational, isFinished, distance, log, travel } = info;
 	const { indexOfChar } = utils;
 
 	const { mutate: publishMessage } = useMutation({
-		mutationFn: (param: ParamOf<typeof postMessageStream>) =>
-			postMessageStream(param),
+		mutationFn: mutationizeFetcher(postMessageStream),
 	});
 
 	const tint = useCallback(
@@ -46,9 +45,7 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 
 	const tintP = useCallback(() => {
 		if (!initialized) return 'black';
-		if (destination === 'P' && isOperational) {
-			return 'crimson';
-		}
+		if (destination === 'P' && isOperational) return 'crimson';
 		return currentCursor === indexOfChar('P') ? 'green' : 'black';
 	}, [currentCursor, destination, indexOfChar, initialized, isOperational]);
 
@@ -72,15 +69,6 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 		[destination, isOperational, isFinished, publishMessage, sessionId, starting]
 	);
 
-	// useEffect(() => {
-	// 	if (!initialized) {
-	// 		publish('initialize');
-	// 		setTimeout(() => {
-	// 			setInitialized(true);
-	// 		}, 5000);
-	// 	}
-	// }, [initialized, publish]);
-
 	useEffectOnce(() => {
 		publish('initialize');
 		setTimeout(() => {
@@ -97,17 +85,33 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 	useEffect(() => {
 		if (!isFinished) return;
 
+		const resultLog = {
+			sequence: targetSequence.sequence,
+			starting: cursor.starting,
+			destination: cursor.destination,
+			type: sequence.type,
+			direction: sequence.direction,
+			distance: info.distance,
+			travel: info.travel.length,
+			logs: {
+				init: log.init,
+				touch: log.touch - log.init,
+				pass: log.pass,
+				diff: log.diff,
+			},
+		};
+
 		const timeout = !initialized ? 1000 * 5 : 0;
 		setStepTimeout(timeout);
 
 		const timeoutId = setTimeout(() => {
-			onFinish();
+			onFinish(resultLog);
 		}, timeout);
 
 		return () => {
 			clearTimeout(timeoutId);
 		};
-	}, [initialized, isFinished, onFinish]);
+	}, [cursor, info, initialized, isFinished, log, onFinish, sequence, targetSequence]);
 
 	return (
 		<div>
@@ -149,4 +153,47 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 	);
 };
 
+const TimeoutCount = (props: { timeout: number; isFinished: boolean }) => {
+	const [count, setCount] = useState(props.timeout);
+
+	useEffect(() => {
+		setCount(props.timeout);
+	}, [props.timeout]);
+
+	useEffect(() => {
+		// if (!props.isFinished) return;
+		const intervalId = setInterval(() => {
+			setCount((prev) => prev - 32);
+		}, 32);
+
+		return () => {
+			clearInterval(intervalId);
+		};
+	}, [props.isFinished]);
+
+	return (
+		<div style={{ visibility: count !== 0 ? 'visible' : 'hidden' }}>
+			<code>timeout: {count}ms</code>
+		</div>
+	);
+};
+
 export default DeviceScreen;
+
+{
+	/* <div>
+				<p>logging infomation</p>
+				<pre>travel: {JSON.stringify(travel)}</pre>
+				<pre>distance: {distance}</pre>
+				<div>direction: {direction}</div>
+				<div>starting: {starting}</div>
+				<div>destination: {destination}</div>
+				<pre>cursor: {currentCursor}</pre>
+				<pre>diff: {log.diff ? `${log.diff}ms` : 'await'}</pre>
+				<pre>
+					touch:{' '}
+					{log.touch! - log.init! ? `${log.touch! - log.init!}ms` : 'await'}
+				</pre>
+				<TimeoutCount timeout={stepTimeout} isFinished={isFinished} />
+			</div> */
+}

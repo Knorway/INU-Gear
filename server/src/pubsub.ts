@@ -19,6 +19,12 @@ export class PubSub {
 
 	public publish({ key, payload }: { key: string; payload: unknown }) {
 		const data = JSON.stringify(payload);
-		this.connections[key].write(`data: ${data}\n\n`);
+		try {
+			this.connections[key].write(`data: ${data}\n\n`);
+		} catch (error) {
+			throw new Error(
+				`error publishing to the connection stream with [${key}] as a key`
+			);
+		}
 	}
 }

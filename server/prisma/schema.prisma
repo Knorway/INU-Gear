@@ -31,6 +31,16 @@ model sessionLog {
     uuid      String   @default(uuid())
     createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
 
+    sequence        Json
+    starting        String @db.VarChar(255)
+    destination     String @db.VarChar(255)
+    type            String @db.VarChar(255)
+    direction       String @db.VarChar(255)
+    distance        Int
+    travel          Int
+    initialReaction Int    @map("initial_reaction")
+    responseTime    Int    @map("response_time")
+
     managerId Int          @map("manager_id")
     manager   manager      @relation(fields: [managerId], references: [id])
     tokenId   Int          @map("token_id")
@@ -43,6 +53,7 @@ model sessionToken {
     id         Int      @id @default(autoincrement())
     uuid       String   @default(uuid())
     sequence   Json
+    label      String
     isFinished Boolean  @default(false) @map("is_finished")
     createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
 

@@ -1,11 +1,6 @@
 import { useEffect, useState } from 'react';
 
-type Props = {
-	duration: number;
-	delay: number;
-};
-
-export const useCountDown = (props: Props) => {
+export const useCountDown = (props: { duration: number; delay: number }) => {
 	const [count, setCount] = useState(props.duration);
 
 	useEffect(() => {

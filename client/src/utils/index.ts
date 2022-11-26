@@ -4,6 +4,10 @@ import { Sequence, SequenceChar } from '../config/settings';
 
 export const rand = (range: number) => _.random(0, range - 1);
 
+export const checkExcludedUrl = (url: string, excluded: string[]) => {
+	return !excluded.includes(url.split('/').filter(Boolean)[0]);
+};
+
 export const generateStartDest = (sequence?: Sequence<'sequence'>) => {
 	if (!sequence || sequence.length < 2) return [];
 
