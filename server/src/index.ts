@@ -20,9 +20,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.resolve() + '/build'));
 
-// const asyncHandler = (fn: Handler) =>
-// 	<Handler>((req, res, next) => Promise.resolve(fn(req, res, next)).then(next));
-
 const asyncHandler = (fn: Handler) => <Handler>(async (req, res, next) => {
 		try {
 			await Promise.resolve(fn(req, res, next));
@@ -34,7 +31,11 @@ const asyncHandler = (fn: Handler) => <Handler>(async (req, res, next) => {
 app.get('/subscribe/:sessionId', (req, res) => {
 	const { sessionId } = req.params;
 	pubsub.subscribe({ key: sessionId, conn: res });
-	console.log('device connected with token uuid', Object.keys(pubsub.connections));
+	console.log(
+		`stream connected with ${JSON.stringify(
+			Object.keys(pubsub.connections)
+		)} as a key`
+	);
 });
 
 app.post(
@@ -110,8 +111,16 @@ app.patch(
 	})
 );
 
-// 이거 json이 맞는데. mongo를 쓰는 게 맞는데 그냥 hasura 쓰는 방법도 있다.
-// 통계 내야 할 수도 있는데 생각 잘해야함. Prisma고 뭐고 그냥 ORM 못써먹겠다. 거기에 뭔갈 해도 자신감이 안생김
+app.get(
+	'/session-log/:uuid',
+	asyncHandler(async (req, res) => {
+		const logs = await prisma.sessionLog.findMany({
+			// pagination
+		});
+		res.json(logs);
+	})
+);
+
 app.post(
 	'/session-log/:uuid',
 	asyncHandler(async (req, res) => {
@@ -142,13 +151,39 @@ app.post(
 	})
 );
 
+app.get(
+	'/aggregate/:sequence',
+	asyncHandler(async (req, res) => {
+		const agg = await prisma.sessionLog.aggregate({
+			where: {
+				sequence: {
+					equals: JSON.parse(req.params.sequence),
+				},
+			},
+			_avg: {
+				responseTime: true,
+				initialReaction: true,
+			},
+			_min: {
+				responseTime: true,
+				initialReaction: true,
+			},
+			_max: {
+				responseTime: true,
+				initialReaction: true,
+			},
+		});
+		res.json(agg);
+	})
+);
+
 app.use('*', (req, res) => {
 	res.send(html);
 });
 
 app.use(<ErrorRequestHandler>((error, req, res, next) => {
 	res.status(500).json({ route: req.url, error: error.message, handled: true });
-	console.log(error.message);
+	console.log(error.message); // TODO: send error message to db
 }));
 
 app.listen(PORT, () => console.log(`server running on http://localhost:${PORT}`));

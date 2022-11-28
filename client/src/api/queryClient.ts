@@ -9,8 +9,10 @@ export const mutationizeFetcher =
 
 export const queryClient = new QueryClient({
 	defaultOptions: {
-		// queries: {
-		// 	refetchOnWindowFocus: false,
-		// },
+		queries: {
+			refetchOnWindowFocus: true,
+		},
 	},
 });
+
+export const queryKey = {};

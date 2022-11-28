@@ -1,6 +1,7 @@
 import { request } from '~/src/api/request';
 import {
   MessageStream,
+  SequenceChar,
   SEQUENCES,
   SessionLogResult,
 } from '~/src/config/settings';
@@ -12,7 +13,7 @@ export type SessionToken = {
 	label: string;
 	mangerId: number;
 	sequence: typeof SEQUENCES;
-	repetition: number;
+	// TODO: isFinished
 };
 
 export const getSessionTokens = async () => {
@@ -75,6 +76,14 @@ export const postSessionLog = async ({
 		url: `/session-log/${uuid}`,
 		method: 'POST',
 		data,
+	});
+	return response.data;
+};
+
+export const getSimpleSequnceAgg = async ({ sequence }: { sequence: SequenceChar[] }) => {
+	const response = await request<unknown>({
+		url: `/aggregate/${JSON.stringify(sequence)}`,
+		method: 'GET',
 	});
 	return response.data;
 };

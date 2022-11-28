@@ -10,6 +10,7 @@ import type { AppProps } from 'next/app';
 export default function App({ Component, pageProps }: AppProps) {
 	return (
 		<QueryClientProvider client={queryClient}>
+			{/* !error boundary */}
 			<Head>
 				<meta name='mobile-web-app-capable' content='yes' />
 				<link rel='manifest' href='/manifest.json' />
@@ -17,6 +18,8 @@ export default function App({ Component, pageProps }: AppProps) {
 			<MainLayout>
 				<Component {...pageProps} />
 			</MainLayout>
+			{/* <GlobalNotifier /> */}
+			{/* <GlobalLoadingSpinner /> */}
 		</QueryClientProvider>
 	);
 }

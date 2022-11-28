@@ -15,7 +15,7 @@ const variantIcons: Record<Props['variant'], React.ReactElement> = {
 	negative: <XCircleIcon className='w-5 h-5 text-white bg-red-500 rounded-full' />,
 };
 
-const Notifiation = (props: Props) => {
+const Toast = (props: Props) => {
 	const buttonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
@@ -41,16 +41,16 @@ const Notifiation = (props: Props) => {
 								static
 								className='relative z-10 w-screen max-w-sm px-4 mt-3 transform -translate-x-1/2 left-1/2 sm:px-0 lg:max-w-3xl'
 							>
-								<div className='flex-row items-center justify-center p-4 overflow-hidden transition-all transform bg-white shadow-xl rounded-2xl'>
+								<div className='flex-row items-center justify-center p-4 overflow-hidden transition-all transform bg-white border border-green-300 shadow-xl rounded-2xl '>
 									<div className='flex items-center space-x-2'>
 										<div>{variantIcons[props.variant]}</div>
-										<div className='text-lg font-medium leading-6 text-gray-900'>
+										<div className='text-xl font-medium leading-6 text-gray-900'>
 											{props.title}
 										</div>
 									</div>
 									{props.description && (
 										<div className='mt-2'>
-											<p className='text-sm text-gray-500'>
+											<p className='text-base text-gray-500'>
 												{props.description}
 											</p>
 										</div>
@@ -64,4 +64,4 @@ const Notifiation = (props: Props) => {
 		</div>
 	);
 };
-export default React.memo(Notifiation);
+export default React.memo(Toast);

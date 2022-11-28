@@ -11,6 +11,7 @@ import {
 } from '~/src/config/settings';
 import { useEffectOnce } from '~/src/hooks/useEffectOnce';
 import useSequence from '~/src/hooks/useSequence';
+import { useSound } from '~/src/hooks/useSound';
 
 type Props = {
 	targetSequence: typeof SEQUENCES[number];
@@ -20,14 +21,13 @@ type Props = {
 };
 
 const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props) => {
-	const [stepTimeout, setStepTimeout] = useState(0);
+	const [, setStepTimeout] = useState(0);
 	const [initialized, setInitialized] = useState(false);
 
-	const { cursor, sequence, utils, info } = useSequence({ targetSequence, startDest });
-	const { chars, type, direction } = sequence;
+	const { cursor, sequence, info } = useSequence({ targetSequence, startDest });
+	const { chars, direction } = sequence;
 	const { current: currentCursor, destination, starting } = cursor;
-	const { isOperational, isFinished, distance, log, travel } = info;
-	const { indexOfChar } = utils;
+	const { isOperational, isFinished, log } = info;
 
 	const { mutate: publishMessage } = useMutation({
 		mutationFn: mutationizeFetcher(postMessageStream),
@@ -37,17 +37,10 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 		(idx: number) => {
 			if (!initialized) return 'black';
 			if (idx === currentCursor) return 'green';
-			if (idx === indexOfChar(destination) && isOperational) return 'crimson';
 			return 'black';
 		},
-		[currentCursor, destination, indexOfChar, initialized, isOperational]
+		[currentCursor, initialized]
 	);
-
-	const tintP = useCallback(() => {
-		if (!initialized) return 'black';
-		if (destination === 'P' && isOperational) return 'crimson';
-		return currentCursor === indexOfChar('P') ? 'green' : 'black';
-	}, [currentCursor, destination, indexOfChar, initialized, isOperational]);
 
 	const publish = useCallback(
 		(type: MessageStream['type']) => {
@@ -93,6 +86,7 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 			direction: sequence.direction,
 			distance: info.distance,
 			travel: info.travel.length,
+			// TODO: overTraveled: travel - distance,
 			logs: {
 				init: log.init,
 				touch: log.touch - log.init,
@@ -113,87 +107,29 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 		};
 	}, [cursor, info, initialized, isFinished, log, onFinish, sequence, targetSequence]);
 
+	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
+
 	return (
-		<div>
-			<div className='flex-1'>
+		<div className='overflow-hidden select-none'>
+			<div
+				className={`inline-flex items-center justify-center h-screen w-screen
+				${isLeft ? 'rotate-90' : ''} 
+				`}
+			>
 				<div
-					style={{
-						marginTop: '10px',
-						display: 'flex',
-						flexDirection: direction === 'LEFT' ? 'column' : 'row',
-						gap: '2px',
-						fontSize: '80px',
-					}}
+					className={`flex text-9xl ${isLeft ? 'flex-col' : 'flex-row'}
+					${isLeft ? 'space-y-4' : 'space-x-4'}
+					`}
 				>
 					{chars.map((e, idx) => (
-						<span
-							key={idx}
-							style={{
-								color: tint(idx),
-							}}
-						>
+						<span key={idx} style={{ color: tint(idx) }}>
 							{e}
 						</span>
 					))}
 				</div>
-				{type === 'B' && (
-					<div style={{ display: 'flex', justifyContent: 'center' }}>
-						<span
-							style={{
-								color: tintP(),
-								fontSize: '80px',
-							}}
-						>
-							P
-						</span>
-					</div>
-				)}
 			</div>
 		</div>
 	);
 };
 
-const TimeoutCount = (props: { timeout: number; isFinished: boolean }) => {
-	const [count, setCount] = useState(props.timeout);
-
-	useEffect(() => {
-		setCount(props.timeout);
-	}, [props.timeout]);
-
-	useEffect(() => {
-		// if (!props.isFinished) return;
-		const intervalId = setInterval(() => {
-			setCount((prev) => prev - 32);
-		}, 32);
-
-		return () => {
-			clearInterval(intervalId);
-		};
-	}, [props.isFinished]);
-
-	return (
-		<div style={{ visibility: count !== 0 ? 'visible' : 'hidden' }}>
-			<code>timeout: {count}ms</code>
-		</div>
-	);
-};
-
 export default DeviceScreen;
-
-{
-	/* <div>
-				<p>logging infomation</p>
-				<pre>travel: {JSON.stringify(travel)}</pre>
-				<pre>distance: {distance}</pre>
-				<div>direction: {direction}</div>
-				<div>starting: {starting}</div>
-				<div>destination: {destination}</div>
-				<pre>cursor: {currentCursor}</pre>
-				<pre>diff: {log.diff ? `${log.diff}ms` : 'await'}</pre>
-				<pre>
-					touch:{' '}
-					{log.touch! - log.init! ? `${log.touch! - log.init!}ms` : 'await'}
-				</pre>
-				<TimeoutCount timeout={stepTimeout} isFinished={isFinished} />
-			</div> */
-}

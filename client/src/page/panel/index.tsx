@@ -2,10 +2,11 @@ import { useRouter } from 'next/router';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 
 import { BACKEND_URL } from '~/src/api/request';
-import Notifiation from '~/src/components/Notifiation';
-import PanelScreen from '~/src/components/page/panel/PanelScreen';
+import Spinner from '~/src/components/notifier/Spinner';
+import Toast from '~/src/components/notifier/Toast';
 import { MessageStream } from '~/src/config/settings';
 import { useNotification } from '~/src/hooks/useNotification';
+import PanelScreen from '~/src/page/panel/PanelScreen';
 
 import EnteringCountDown from './EnteringCountDown';
 
@@ -17,7 +18,7 @@ const PanelPage = () => {
 	const firstEntering = useMemo(() => initialized && !message, [initialized, message]);
 
 	const router = useRouter();
-	const sessionId = router.query.sessionId;
+	const sessionId = router.query.sessionId as string;
 
 	const { isActive, activate } = useNotification();
 
@@ -97,7 +98,7 @@ const PanelPage = () => {
 			<pre>{JSON.stringify(message, null, 2)}</pre>
 			<PanelScreen message={message} />
 			{isActive && (
-				<Notifiation
+				<Toast
 					variant='positive'
 					title='세션이 종료되었습니다'
 					description='잠시후 메인 화면으로 되돌아갑니다'

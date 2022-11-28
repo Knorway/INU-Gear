@@ -1,7 +1,4 @@
-import {
-  Cog6ToothIcon,
-  PresentationChartBarIcon,
-} from '@heroicons/react/24/outline';
+import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/router';
 
 import { checkExcludedUrl } from '~/src/utils';

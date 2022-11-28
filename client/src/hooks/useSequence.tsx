@@ -1,15 +1,9 @@
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import {
-  DEFAULT_DELAY,
-  SequenceChar,
-  SEQUENCES,
-  TIMEOUT_MIN,
-  TIMEOUT_RANGE,
-  TIMEOUT_UNIT,
-} from '~/src/config/settings';
-import { rand } from '~/src/utils';
+import { DEFAULT_DELAY, SequenceChar, SEQUENCES } from '~/src/config/settings';
+
+import { useSound } from './useSound';
 
 type LogTimeStamps = {
 	init: number;
@@ -35,8 +29,6 @@ const useSequence = ({
 	const { sequence, direction, type } = targetSequence;
 	const [starting, destination] = startDest;
 
-	// console.log(startDest);
-
 	const indexOfChar = useCallback(
 		(char: SequenceChar) => {
 			return sequence.findIndex((e) => e === char);
@@ -52,6 +44,8 @@ const useSequence = ({
 
 	const initRef = useRef(false);
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
+
+	const { playSound } = useSound({ fileName: 'beep-sound-8333.mp3' });
 
 	const isOperational = useMemo(
 		() => !isFinished && Boolean(optrTimeout),
@@ -89,7 +83,7 @@ const useSequence = ({
 				moveCursor(cursor + delta);
 			}
 		},
-		[cursor, isOperational, isLeft, moveCursor, writeLog]
+		[cursor, isLeft, isOperational, moveCursor, writeLog]
 	);
 
 	const onWheelR = useCallback(
@@ -103,7 +97,7 @@ const useSequence = ({
 				moveCursor(cursor + delta);
 			}
 		},
-		[cursor, isOperational, isLeft, moveCursor, writeLog]
+		[cursor, isLeft, isOperational, moveCursor, writeLog]
 	);
 
 	const onParking = useCallback(() => {
@@ -113,7 +107,15 @@ const useSequence = ({
 		if (destination === 'P') {
 			setCursor(indexOfChar(destination));
 		}
-	}, [destination, isOperational, indexOfChar, writeLog]);
+	}, [isOperational, writeLog, destination, indexOfChar]);
+
+	const pass = useMemo(
+		() =>
+			_.debounce(() => {
+				setIsFinished(true);
+			}, 2000),
+		[]
+	);
 
 	useEffect(() => {
 		if (isOperational) return;
@@ -135,33 +137,61 @@ const useSequence = ({
 		}
 	}, [optrTimeout, writeLog]);
 
+	const [finalTouch, setFinalTouch] = useState(0);
+
 	useEffect(() => {
-		setIsFinished(cursor === indexOfChar(destination));
-	}, [cursor, destination, indexOfChar]);
+		if (cursor === indexOfChar(destination)) {
+			setFinalTouch(Date.now());
+			pass();
+		} else {
+			pass.cancel();
+		}
+	}, [cursor, destination, pass, indexOfChar]);
+
+	console.log(finalTouch);
 
 	useEffect(() => {
 		const dl = _.debounce(onWheelL, DEFAULT_DELAY);
 		const dr = _.debounce(onWheelR, DEFAULT_DELAY);
+		const beep = _.debounce(playSound, DEFAULT_DELAY);
 
 		window.addEventListener('wheel', dl);
 		window.addEventListener('wheel', dr);
+		window.addEventListener('wheel', beep);
 
 		if (type === 'B') {
+			window.addEventListener('mousedown', beep);
 			window.addEventListener('mousedown', onParking);
 		}
 
 		return () => {
 			window.removeEventListener('wheel', dl);
 			window.removeEventListener('wheel', dr);
+			window.removeEventListener('wheel', beep);
+
+			window.removeEventListener('mousedown', beep);
 			window.removeEventListener('mousedown', onParking);
 		};
-	}, [onParking, onWheelL, onWheelR, type]);
+	}, [onParking, onWheelL, onWheelR, playSound, type]);
+
+	// useEffect(() => {
+	// 	if (!isFinished) return;
+
+	// 	const finalTouch = Date.now();
+	// 	writeLog('pass', finalTouch); // -> ?
+
+	// 	const diff = (() => {
+	// 		if (distance === 1 && travel.length === 1) return log.touch - log.init;
+	// 		return finalTouch - log.init;
+	// 	})();
+
+	// 	writeLog('diff', diff);
+	// }, [distance, isFinished, log.init, log.touch, travel.length, writeLog]);
 
 	useEffect(() => {
 		if (!isFinished) return;
 
-		const finalTouch = Date.now();
-		writeLog('pass', finalTouch); // -> ?
+		writeLog('pass', finalTouch);
 
 		const diff = (() => {
 			if (distance === 1 && travel.length === 1) return log.touch - log.init;
@@ -169,7 +199,7 @@ const useSequence = ({
 		})();
 
 		writeLog('diff', diff);
-	}, [distance, isFinished, log.init, log.touch, travel.length, writeLog]);
+	}, [distance, finalTouch, isFinished, log.init, log.touch, travel.length, writeLog]);
 
 	return {
 		cursor: {

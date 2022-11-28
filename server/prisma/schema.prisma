@@ -50,16 +50,16 @@ model sessionLog {
 }
 
 model sessionToken {
-    id         Int      @id @default(autoincrement())
-    uuid       String   @default(uuid())
-    sequence   Json
+    id        Int      @id @default(autoincrement())
+    uuid      String   @default(uuid())
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
     label      String
-    isFinished Boolean  @default(false) @map("is_finished")
-    createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+    sequence   Json
+    isFinished Boolean @default(false) @map("is_finished")
 
-    managerId Int     @map("manager_id")
-    manager   manager @relation(fields: [managerId], references: [id])
-
+    managerId  Int          @map("manager_id")
+    manager    manager      @relation(fields: [managerId], references: [id])
     sessionLog sessionLog[]
 
     @@map("session_token")

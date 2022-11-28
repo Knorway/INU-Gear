@@ -1,12 +1,11 @@
 import { ComputerDesktopIcon } from '@heroicons/react/24/solid';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useRef, useState } from 'react';
 
 import { getSessionTokens, SessionToken } from '~/src/api/fetcher';
 import ListBox from '~/src/components/ListBox';
-import LoadingSpinner from '~/src/components/LoadingSpinner';
-import Notifiation from '~/src/components/Notifiation';
+import Spinner from '~/src/components/notifier/Spinner';
 
 import SequenceGrid from './SequenceGrid';
 
@@ -35,7 +34,7 @@ const MainPage = () => {
 
 	return (
 		<Fragment>
-			{isLoading && <LoadingSpinner />}
+			{isLoading && <Spinner />}
 			<div className='flex flex-col items-center justify-center mt-4'>
 				<div className='space-x-4 text-blue-500 underline'></div>
 				<h1 className='text-4xl font-bold'>Gear</h1>
@@ -55,12 +54,17 @@ const MainPage = () => {
 			<div>
 				<SequenceGrid sessionToken={selectedToken} />
 			</div>
+			{/* <button onClick={play}>click</button>
+			<audio ref={audioRef}>
+				<source src='beep-sound-8333.mp3' type='audio/mp3' />
+			</audio> */}
 		</Fragment>
 	);
 };
 
 export default MainPage;
 
+// TODO
 // const { data: sessionToken } = useQuery({
 // 	queryKey: ['sessionToken', selectedToken?.uuid],
 // 	queryFn: () => getSessionToken({ uuid: selectedToken?.uuid as string }),

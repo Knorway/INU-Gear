@@ -5,15 +5,15 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { postSessionToken } from '~/src/api/fetcher';
 import { mutationizeFetcher } from '~/src/api/queryClient';
 import FormInput from '~/src/components/FormInput';
-import LoadingSpinner from '~/src/components/LoadingSpinner';
-import Notifiation from '~/src/components/Notifiation';
+import Spinner from '~/src/components/notifier/Spinner';
+import Toast from '~/src/components/notifier/Toast';
 import { useNotification } from '~/src/hooks/useNotification';
 
 type FormType = {
 	label: string;
 };
 
-const TokenRegisterForm = () => {
+const TokenRegisterTab = () => {
 	const formMethods = useForm<FormType>();
 	const { isActive, activate } = useNotification();
 
@@ -39,11 +39,11 @@ const TokenRegisterForm = () => {
 
 	return (
 		<Fragment>
-			{isLoading && <LoadingSpinner />}
+			{isLoading && <Spinner />}
 			<FormProvider {...formMethods}>
 				<form
 					onSubmit={formMethods.handleSubmit(registerToken)}
-					className='flex-row w-1/3 m-auto mt-4 space-y-6'
+					className='flex-row space-y-4'
 				>
 					<h1 className='text-4xl font-bold'>Register session token</h1>
 					<FormInput
@@ -63,7 +63,7 @@ const TokenRegisterForm = () => {
 				</form>
 			</FormProvider>
 			{isActive && (
-				<Notifiation
+				<Toast
 					variant='positive'
 					title='유저 세션을 생성했습니다'
 					description={JSON.stringify({
@@ -76,4 +76,4 @@ const TokenRegisterForm = () => {
 	);
 };
 
-export default TokenRegisterForm;
+export default TokenRegisterTab;

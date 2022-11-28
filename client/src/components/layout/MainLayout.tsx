@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { Fragment, useMemo } from 'react';
+import { Fragment } from 'react';
 
 import { checkExcludedUrl } from '~/src/utils';
 

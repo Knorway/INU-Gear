@@ -8,8 +8,8 @@ import {
   postSessionLog,
 } from '~/src/api/fetcher';
 import { mutationizeFetcher } from '~/src/api/queryClient';
-import DeviceScreen from '~/src/components/page/device/DeviceScreen';
 import { SEQUENCES, SessionLogResult } from '~/src/config/settings';
+import DeviceScreen from '~/src/page/device/DeviceScreen';
 import { generateStartDest } from '~/src/utils';
 
 const STEP_LIMIT = 6;
@@ -99,7 +99,7 @@ const DevicePage = () => {
 
 	return (
 		<Fragment>
-			<pre>Device session: {sessionId}</pre>
+			{/* <pre>Device session: {sessionId}</pre> */}
 			{sequences.map((sequence, idx) => {
 				if (step === idx) {
 					return (

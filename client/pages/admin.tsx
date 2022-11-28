@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import AdminPage from '~/src/components/page/admin';
+import AdminPage from '~/src/page/admin';
 
 const Page = () => {
 	return (
