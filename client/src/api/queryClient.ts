@@ -10,7 +10,7 @@ export const mutationizeFetcher =
 export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
-			refetchOnWindowFocus: true,
+			refetchOnWindowFocus: false,
 		},
 	},
 });

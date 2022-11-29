@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { Fragment, useCallback, useRef, useState } from 'react';
 
-import { getSessionTokens, SessionToken } from '~/src/api/fetcher';
+import { query, SessionToken } from '~/src/api/fetcher';
 import ListBox from '~/src/components/ListBox';
 import Spinner from '~/src/components/notifier/Spinner';
 
@@ -17,7 +17,8 @@ const MainPage = () => {
 
 	const { data: sessionTokens, isLoading } = useQuery({
 		queryKey: ['sessionTokens'],
-		queryFn: getSessionTokens,
+		queryFn: query.getSessionTokens,
+		refetchOnWindowFocus: true,
 	});
 
 	const selectDisplayType = useCallback(

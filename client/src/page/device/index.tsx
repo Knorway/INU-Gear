@@ -2,11 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 
-import {
-  patchSequence,
-  postMessageStream,
-  postSessionLog,
-} from '~/src/api/fetcher';
+import { mutatation } from '~/src/api/fetcher';
 import { mutationizeFetcher } from '~/src/api/queryClient';
 import { SEQUENCES, SessionLogResult } from '~/src/config/settings';
 import DeviceScreen from '~/src/page/device/DeviceScreen';
@@ -23,13 +19,13 @@ const DevicePage = () => {
 	const sessionId = router.query.sessionId as string;
 
 	const { mutate: publishMessage, isSuccess: successPublishing } = useMutation({
-		mutationFn: mutationizeFetcher(postMessageStream),
+		mutationFn: mutatation.postMessageStream,
 	});
 	const { mutate: updateSequnce, isSuccess: successUpdatingSequence } = useMutation({
-		mutationFn: mutationizeFetcher(patchSequence),
+		mutationFn: mutatation.patchSequence,
 	});
 	const { mutate: createLog } = useMutation({
-		mutationFn: mutationizeFetcher(postSessionLog),
+		mutationFn: mutatation.postSessionLog,
 	});
 
 	const startDest = useMemo(

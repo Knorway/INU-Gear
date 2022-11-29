@@ -1,8 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { postMessageStream } from '~/src/api/fetcher';
-import { mutationizeFetcher } from '~/src/api/queryClient';
+import { mutatation } from '~/src/api/fetcher';
 import {
   MessageStream,
   SequenceChar,
@@ -11,7 +10,6 @@ import {
 } from '~/src/config/settings';
 import { useEffectOnce } from '~/src/hooks/useEffectOnce';
 import useSequence from '~/src/hooks/useSequence';
-import { useSound } from '~/src/hooks/useSound';
 
 type Props = {
 	targetSequence: typeof SEQUENCES[number];
@@ -29,8 +27,10 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 	const { current: currentCursor, destination, starting } = cursor;
 	const { isOperational, isFinished, log } = info;
 
+	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
+
 	const { mutate: publishMessage } = useMutation({
-		mutationFn: mutationizeFetcher(postMessageStream),
+		mutationFn: mutatation.postMessageStream,
 	});
 
 	const tint = useCallback(
@@ -106,8 +106,6 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 			clearTimeout(timeoutId);
 		};
 	}, [cursor, info, initialized, isFinished, log, onFinish, sequence, targetSequence]);
-
-	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
 
 	return (
 		<div className='overflow-hidden select-none'>

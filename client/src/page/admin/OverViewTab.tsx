@@ -1,27 +1,27 @@
 import { useQuery } from '@tanstack/react-query';
 import { Fragment } from 'react';
 
-import { getSessionTokens, getSimpleSequnceAgg } from '~/src/api/fetcher';
+import { query } from '~/src/api/fetcher';
+import Spinner from '~/src/components/notifier/Spinner';
 
 const OverViewTab = () => {
 	const { data: sessionTokens, isLoading } = useQuery({
 		queryKey: ['sessionTokens'],
-		queryFn: getSessionTokens,
+		queryFn: query.getSessionTokens,
 	});
 
 	const { data } = useQuery({
 		queryKey: ['aggregate', 'sequence'],
 		queryFn: () => {
-			return getSimpleSequnceAgg({ sequence: ['D', 'N', 'R'] });
+			return query.getSimpleSequnceAgg({ sequence: ['D', 'N', 'R'] });
 		},
 	});
-
-	console.log(data);
 
 	if (!sessionTokens) return null;
 
 	return (
 		<Fragment>
+			{isLoading && <Spinner />}
 			<div>생성된 참가자 세션: {sessionTokens.length}</div>
 		</Fragment>
 	);

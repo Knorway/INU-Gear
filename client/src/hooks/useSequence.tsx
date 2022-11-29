@@ -193,6 +193,9 @@ const useSequence = ({
 
 		writeLog('pass', finalTouch);
 
+		// TODO
+		// const offset = travel.length * DEFAULT_DELAY;;
+
 		const diff = (() => {
 			if (distance === 1 && travel.length === 1) return log.touch - log.init;
 			return finalTouch - log.init;

@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Fragment } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
-import { postSessionToken } from '~/src/api/fetcher';
+import { mutatation } from '~/src/api/fetcher';
 import { mutationizeFetcher } from '~/src/api/queryClient';
 import FormInput from '~/src/components/FormInput';
 import Spinner from '~/src/components/notifier/Spinner';
@@ -22,7 +22,7 @@ const TokenRegisterTab = () => {
 		data,
 		isLoading,
 	} = useMutation({
-		mutationFn: mutationizeFetcher(postSessionToken),
+		mutationFn: mutatation.postSessionToken,
 	});
 
 	const registerToken: SubmitHandler<FormType> = async (data) => {

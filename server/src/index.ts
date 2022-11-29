@@ -4,8 +4,8 @@ import express, { ErrorRequestHandler, Handler } from 'express';
 import fs from 'fs';
 import path from 'path';
 
+import { SEQUENCES, SessionLogResult, SessionToken } from './config';
 import { PubSub } from './pubsub';
-import { SEQUENCES, SessionLogResult, SessionToken } from './settings';
 
 const prisma = new PrismaClient({ log: ['query'] });
 const pubsub = new PubSub();
@@ -114,10 +114,14 @@ app.patch(
 app.get(
 	'/session-log/:uuid',
 	asyncHandler(async (req, res) => {
-		const logs = await prisma.sessionLog.findMany({
-			// pagination
+		const log = await prisma.sessionLog.findMany({
+			where: {
+				token: {
+					uuid: req.params.uuid,
+				},
+			},
 		});
-		res.json(logs);
+		res.json(log);
 	})
 );
 
