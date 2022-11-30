@@ -5,7 +5,7 @@ import { Fragment, useCallback, useRef, useState } from 'react';
 
 import { query, SessionToken } from '~/src/api/fetcher';
 import ListBox from '~/src/components/ListBox';
-import Spinner from '~/src/components/notifier/Spinner';
+import Spinner from '~/src/components/Spinner';
 
 import SequenceGrid from './SequenceGrid';
 

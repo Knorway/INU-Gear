@@ -1,10 +1,9 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 export const BACKEND_URL = (() => {
-	if (process.env.NODE_ENV === 'production') {
-		return 'http://158.247.234.222:8090';
+	if (process.env.NODE_ENV !== 'production') {
+		return process.env.NEXT_PUBLIC_BACKEND_URL_DEV;
 	}
-	return 'http://127.0.0.1:8090';
 
 	// if (typeof window === 'undefined') return;
 	// const ip = localStorage.getItem('local_ip');

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Fragment } from 'react';
 
 import { query } from '~/src/api/fetcher';
-import Spinner from '~/src/components/notifier/Spinner';
+import Spinner from '~/src/components/Spinner';
 
 const OverViewTab = () => {
 	const { data: sessionTokens, isLoading } = useQuery({

@@ -30,7 +30,8 @@ export const query = {
 	},
 
 	getSessionLog: async ({ uuid }: { uuid: string }) => {
-		if (!uuid) return;
+		if (!uuid) return null;
+		console.log(uuid, 'getSessionLog fetcher call');
 		const response = await request<any>({
 			url: `/session-log/${uuid}`,
 		});

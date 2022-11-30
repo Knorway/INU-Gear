@@ -1,16 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import _ from 'lodash';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 
-import { query, SessionToken } from '~/src/api/fetcher';
-import Spinner from '~/src/components/notifier/Spinner';
-import Toast from '~/src/components/notifier/Toast';
+import { query } from '~/src/api/fetcher';
+import Spinner from '~/src/components/Spinner';
 import Table from '~/src/components/Table';
-import { Sequence, SequenceChar } from '~/src/config/settings';
 
-type KeyChars = `${SequenceChar},${SequenceChar},${SequenceChar}`;
-type ParsedLog = Record<Sequence<'type'>, Record<KeyChars, SessionToken[]>>;
-type ValueOf<T> = T[keyof T];
+import LogDocument from './LogDocument';
 
 const tableHeads = ['이름', '식별번호'];
 
@@ -29,18 +24,12 @@ const TokenTable = () => {
 	});
 
 	const expandRow = (uuid: string) => {
-		setExpandedRow(uuid !== expandedRow ? uuid : '');
+		setExpandedRow(uuid);
 	};
 
-	const parsedLog = useMemo(() => {
-		return Object.entries(_.groupBy(log, 'type')).reduce((map, [type, log]) => {
-			map[type as keyof ParsedLog] = _.groupBy(
-				log,
-				'sequence'
-			) as ValueOf<ParsedLog>;
-			return map;
-		}, {} as ParsedLog);
-	}, [log]);
+	const clearExpanding = useCallback(() => {
+		setExpandedRow('');
+	}, []);
 
 	if (!sessionTokens) return null;
 
@@ -77,27 +66,10 @@ const TokenTable = () => {
 							<td className='px-6 py-4'>{data.uuid}</td>
 						</tr>
 						{expandedRow === data.uuid && (
-							<Toast
-								variant='information'
-								className={{ body: 'max-h-[95vh] h-screen' }}
-								title={<span className='font-bold'>{data.label}</span>}
-								description={
-									<span className='text-black'>{data.uuid}</span>
-								}
-								component={
-									<div className='relative'>
-										<span className='text-black'>
-											생성된 로그: {log?.length}
-										</span>
-										{_.isEmpty(parsedLog) ? (
-											<div>아직 시작하지 않은 세션입니다.</div>
-										) : (
-											<pre>
-												{JSON.stringify(parsedLog, null, 2)}
-											</pre>
-										)}
-									</div>
-								}
+							<LogDocument
+								log={log}
+								token={data}
+								onUnmount={clearExpanding}
 							/>
 						)}
 					</Fragment>

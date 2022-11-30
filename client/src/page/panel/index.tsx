@@ -2,8 +2,7 @@ import { useRouter } from 'next/router';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 
 import { BACKEND_URL } from '~/src/api/request';
-import Spinner from '~/src/components/notifier/Spinner';
-import Toast from '~/src/components/notifier/Toast';
+import Toast from '~/src/components/Toast';
 import { MessageStream } from '~/src/config/settings';
 import { useNotification } from '~/src/hooks/useNotification';
 import PanelScreen from '~/src/page/panel/PanelScreen';
@@ -25,7 +24,9 @@ const PanelPage = () => {
 	useEffect(() => {
 		if (!sessionId) return;
 
-		const eventSource = new EventSource(`${BACKEND_URL}/subscribe/${sessionId}`);
+		const eventSource = new EventSource(
+			`${BACKEND_URL ?? ''}/subscribe/${sessionId}`
+		);
 
 		eventSource.addEventListener('message', (e) => {
 			const data = JSON.parse(e.data) as MessageStream;

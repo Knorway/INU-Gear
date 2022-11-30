@@ -12,6 +12,8 @@ type Props = {
 		panel?: string;
 		body?: string;
 	};
+	onEnter?: () => void;
+	onLeave?: () => void;
 };
 
 const variantBorder: Record<Props['variant'], string> = {
@@ -55,6 +57,8 @@ const Toast = (props: Props) => {
 							leave='transition ease-in duration-150'
 							leaveFrom='opacity-100 translate-y-0'
 							leaveTo='opacity-0 translate-y-1'
+							afterEnter={() => props.onEnter?.()}
+							afterLeave={() => props.onLeave?.()}
 						>
 							<Popover.Panel
 								static
