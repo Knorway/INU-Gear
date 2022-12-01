@@ -18,7 +18,15 @@ const TEMP_MANAGER_ID = 3;
 const app = express();
 
 app.use(cors());
-app.use(compression());
+// app.use(
+// 	compression({
+// 		filter: (req, res) => {
+// 			if (req.url.includes('publish') || req.url.includes('subscribe'))
+// 				return false;
+// 			return compression.filter(req, res);
+// 		},
+// 	})
+// );
 app.use(express.json());
 app.use(express.static(path.resolve() + '/build'));
 

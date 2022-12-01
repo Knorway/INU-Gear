@@ -42,9 +42,15 @@ const useSequence = ({
 	const [isFinished, setIsFinished] = useState(false);
 	const [optrTimeout, setOptrTimeout] = useState(0);
 	const [finalTouch, setFinalTouch] = useState(0);
-
 	// 처음 기어 풀기
-	const [releaseParking, setReleaseParking] = useState('');
+	// const [parkingLocked, setParkingLocked] = useState(type === 'B' && starting === 'P');
+
+	const isParked = useMemo(() => cursor === -1, [cursor]);
+
+	// const parkingLocked = useMemo(
+	// 	() => releaseParking && type === 'B' && starting === 'P',
+	// 	[releaseParking, starting, type]
+	// );
 
 	const initRef = useRef(false);
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
@@ -76,6 +82,8 @@ const useSequence = ({
 		[sequence.length]
 	);
 
+	console.log(sequence);
+
 	const onWheelL = useCallback(
 		(e: WheelEvent) => {
 			if (!isOperational) return;
@@ -84,10 +92,20 @@ const useSequence = ({
 			if (P > 0) {
 				writeLog('touch', Date.now());
 				setTravel((prev) => [...prev, 'L']);
-				moveCursor(cursor + delta);
+
+				const newCursor = (() => {
+					if (!isParked) return cursor + delta;
+					if (!isLeft) return 0;
+					return sequence.length - 1;
+				})();
+
+				moveCursor(newCursor);
+				// setParkingLocked(false);
+
+				// moveCursor(cursor + delta);
 			}
 		},
-		[cursor, isLeft, isOperational, moveCursor, writeLog]
+		[cursor, isLeft, isOperational, isParked, moveCursor, sequence.length, writeLog]
 	);
 
 	const onWheelR = useCallback(
@@ -98,18 +116,34 @@ const useSequence = ({
 			if (P < 0 || P === 0) {
 				writeLog('touch', Date.now());
 				setTravel((prev) => [...prev, 'R']);
-				moveCursor(cursor + delta);
+
+				const newCursor = (() => {
+					if (!isParked) return cursor + delta;
+					if (!isLeft) return sequence.length - 1;
+					return 0;
+				})();
+
+				moveCursor(newCursor);
+
+				// setParkingLocked(false);
+
+				// moveCursor(cursor + delta);
 			}
 		},
-		[cursor, isLeft, isOperational, moveCursor, writeLog]
+		[cursor, isLeft, isOperational, isParked, moveCursor, sequence.length, writeLog]
 	);
 
 	const onParking = useCallback(() => {
 		if (!isOperational) return;
 		writeLog('touch', Date.now());
 		setTravel((prev) => [...prev, 'P']);
+		// setParkingLocked(true);
+
+		// TODO: 이것도 이제 필요없는 거 아닌가
 		if (destination === 'P') {
 			setCursor(indexOfChar(destination));
+		} else {
+			setCursor(-1);
 		}
 	}, [isOperational, writeLog, destination, indexOfChar]);
 
@@ -120,6 +154,10 @@ const useSequence = ({
 			}, 2000),
 		[]
 	);
+
+	useEffect(() => {
+		console.log(type === 'B' && starting === 'P' && isOperational === true, '---');
+	}, [isOperational, starting, type]);
 
 	useEffect(() => {
 		if (isOperational) return;
