@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client';
+import compression from 'compression';
 import cors from 'cors';
 import express, { ErrorRequestHandler, Handler } from 'express';
 import fs from 'fs';
@@ -17,6 +18,7 @@ const TEMP_MANAGER_ID = 3;
 const app = express();
 
 app.use(cors());
+app.use(compression());
 app.use(express.json());
 app.use(express.static(path.resolve() + '/build'));
 
