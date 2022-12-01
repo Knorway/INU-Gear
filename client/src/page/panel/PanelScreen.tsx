@@ -16,7 +16,7 @@ const PanelScreen = ({ message }: Props) => {
 	}, [destination, isOperational, starting]);
 
 	return (
-		<div>
+		<div className='w-full'>
 			<div className='flex-1'>
 				<div
 					style={{

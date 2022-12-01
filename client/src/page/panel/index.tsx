@@ -24,9 +24,7 @@ const PanelPage = () => {
 	useEffect(() => {
 		if (!sessionId) return;
 
-		const eventSource = new EventSource(
-			`${BACKEND_URL ?? ''}/subscribe/${sessionId}`
-		);
+		const eventSource = new EventSource(`${BACKEND_URL}/subscribe/${sessionId}`);
 
 		eventSource.addEventListener('message', (e) => {
 			const data = JSON.parse(e.data) as MessageStream;
@@ -95,9 +93,11 @@ const PanelPage = () => {
 
 	return (
 		<Fragment>
-			<h1>Panel sessionId: {router.query.sessionId}</h1>
-			<pre>{JSON.stringify(message, null, 2)}</pre>
-			<PanelScreen message={message} />
+			{/* <h1>Panel sessionId: {router.query.sessionId}</h1>
+			<pre>{JSON.stringify(message, null, 2)}</pre> */}
+			<div className='flex items-center justify-center h-[85vh]'>
+				<PanelScreen message={message} />
+			</div>
 			{isActive && (
 				<Toast
 					variant='positive'

@@ -4,6 +4,7 @@ export const BACKEND_URL = (() => {
 	if (process.env.NODE_ENV !== 'production') {
 		return process.env.NEXT_PUBLIC_BACKEND_URL_DEV;
 	}
+	return '';
 
 	// if (typeof window === 'undefined') return;
 	// const ip = localStorage.getItem('local_ip');
@@ -18,10 +19,10 @@ const client = axios.create({
 export const request = async <T>(config: AxiosRequestConfig) => {
 	const token = localStorage.getItem('access_token');
 
-	return (await client({
+	return <AxiosResponse<T>>await client({
 		...config,
 		headers: {
 			...(token && { Authorization: `Bearer ${token}` }),
 		},
-	})) as AxiosResponse<T>;
+	});
 };

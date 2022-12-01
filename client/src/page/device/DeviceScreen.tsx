@@ -36,7 +36,7 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 	const tint = useCallback(
 		(idx: number) => {
 			if (!initialized) return 'black';
-			if (idx === currentCursor) return 'green';
+			if (idx === currentCursor) return 'rgb(250 204 21)';
 			return 'black';
 		},
 		[currentCursor, initialized]
@@ -114,6 +114,7 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 				${isLeft ? 'rotate-90' : ''} 
 				`}
 			>
+				{/* TODO: line height */}
 				<div
 					className={`flex text-9xl ${isLeft ? 'flex-col' : 'flex-row'}
 					${isLeft ? 'space-y-4' : 'space-x-4'}

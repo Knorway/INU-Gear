@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { mutatation } from '~/src/api/fetcher';
-import { mutationizeFetcher } from '~/src/api/queryClient';
 import { SEQUENCES, SessionLogResult } from '~/src/config/settings';
 import DeviceScreen from '~/src/page/device/DeviceScreen';
 import { generateStartDest } from '~/src/utils';

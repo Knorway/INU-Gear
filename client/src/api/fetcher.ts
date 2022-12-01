@@ -31,14 +31,13 @@ export const query = {
 
 	getSessionLog: async ({ uuid }: { uuid: string }) => {
 		if (!uuid) return null;
-		console.log(uuid, 'getSessionLog fetcher call');
 		const response = await request<any>({
 			url: `/session-log/${uuid}`,
 		});
 		return response.data;
 	},
 
-	getSimpleSequnceAgg: async ({ sequence }: { sequence: SequenceChar[] }) => {
+	getOverviewAggregate: async ({ sequence }: { sequence: SequenceChar[] }) => {
 		const response = await request<unknown>({
 			url: `/aggregate/${JSON.stringify(sequence)}`,
 			method: 'GET',

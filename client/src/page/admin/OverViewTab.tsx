@@ -13,7 +13,7 @@ const OverViewTab = () => {
 	const { data } = useQuery({
 		queryKey: ['aggregate', 'sequence'],
 		queryFn: () => {
-			return query.getSimpleSequnceAgg({ sequence: ['D', 'N', 'R'] });
+			return query.getOverviewAggregate({ sequence: ['D', 'N', 'R'] });
 		},
 	});
 

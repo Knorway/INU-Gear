@@ -28,12 +28,11 @@ export type SessionLogResult = {
 		// delay: number;
 	};
 };
-
 export const SEQUENCES = [
 	{
 		type: 'A',
 		direction: 'UP',
-		sequence: ['P', 'N', 'R', 'D'],
+		sequence: ['P', 'R', 'N', 'D'],
 		repetition: 0 as number,
 	},
 	{
