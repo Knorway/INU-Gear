@@ -41,6 +41,10 @@ const useSequence = ({
 	const [log, setLog] = useState<LogTimeStamps>(initialTimeStamps);
 	const [isFinished, setIsFinished] = useState(false);
 	const [optrTimeout, setOptrTimeout] = useState(0);
+	const [finalTouch, setFinalTouch] = useState(0);
+
+	// 처음 기어 풀기
+	const [releaseParking, setReleaseParking] = useState('');
 
 	const initRef = useRef(false);
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
@@ -137,8 +141,6 @@ const useSequence = ({
 		}
 	}, [optrTimeout, writeLog]);
 
-	const [finalTouch, setFinalTouch] = useState(0);
-
 	useEffect(() => {
 		if (cursor === indexOfChar(destination)) {
 			setFinalTouch(Date.now());
@@ -147,8 +149,6 @@ const useSequence = ({
 			pass.cancel();
 		}
 	}, [cursor, destination, pass, indexOfChar]);
-
-	console.log(finalTouch);
 
 	useEffect(() => {
 		const dl = _.debounce(onWheelL, DEFAULT_DELAY);

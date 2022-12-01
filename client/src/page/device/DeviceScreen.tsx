@@ -108,7 +108,7 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 	}, [cursor, info, initialized, isFinished, log, onFinish, sequence, targetSequence]);
 
 	return (
-		<div className='overflow-hidden select-none'>
+		<div className='col-auto overflow-hidden'>
 			<div
 				className={`inline-flex items-center justify-center h-screen w-screen
 				${isLeft ? 'rotate-90' : ''} 

@@ -11,6 +11,7 @@ services:
       - ./client/pages:/app/pages
       - ./client/src:/app/src
       - ./client/dist:/app/dist
+      - ./client/styles:/app/styles
   server:
     build: 
       context: ./server
