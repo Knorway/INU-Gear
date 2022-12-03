@@ -191,6 +191,7 @@ app.get(
 	})
 );
 
+// TODO: rewrites config and forEach
 app.use('*', (req, res) => {
 	res.send(html);
 });

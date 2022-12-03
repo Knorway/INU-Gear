@@ -25,9 +25,12 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 	const { cursor, sequence, info } = useSequence({ targetSequence, startDest });
 	const { chars, direction } = sequence;
 	const { current: currentCursor, destination, starting } = cursor;
-	const { isOperational, isFinished, log } = info;
+	const { isOperational, isFinished, log, distance } = info;
 
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
+
+	// console.log(starting, destination);
+	// console.log(distance, '--');
 
 	const { mutate: publishMessage } = useMutation({
 		mutationFn: mutatation.postMessageStream,
@@ -108,26 +111,37 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 	}, [cursor, info, initialized, isFinished, log, onFinish, sequence, targetSequence]);
 
 	return (
-		<div className='col-auto overflow-hidden'>
+		<div className='overflow-hidden'>
 			<div
 				className={`inline-flex items-center justify-center h-screen w-screen
 				${isLeft ? 'rotate-90' : ''} 
 				`}
 			>
-				{/* TODO: line height */}
 				<div
-					className={`flex text-9xl ${isLeft ? 'flex-col' : 'flex-row'}
-					${isLeft ? 'space-y-4' : 'space-x-4'}
-					`}
+					className={`flex text-9xl ${
+						isLeft ? 'flex-col space-y-8' : 'flex-row space-x-8'
+					} `}
 				>
-					{chars.map((e, idx) => (
-						<span key={idx} style={{ color: tint(idx) }}>
-							{e}
-						</span>
+					{chars.map((char, idx) => (
+						<Char key={char} char={char} tint={tint(idx)} />
 					))}
 				</div>
 			</div>
 		</div>
+	);
+};
+
+const Char = (props: { char: SequenceChar; tint: string }) => {
+	const letterSpacing =
+		props.char === 'N' ? 'tracking-[-1.07rem]' : 'tracking-[-0.85rem]';
+
+	return (
+		<span
+			style={{ color: props.tint }}
+			className={`block ${letterSpacing} leading-[5.7rem]`}
+		>
+			{props.char}
+		</span>
 	);
 };
 

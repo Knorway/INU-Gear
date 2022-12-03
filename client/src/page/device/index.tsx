@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import _ from 'lodash';
 import { useRouter } from 'next/router';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -27,10 +28,13 @@ const DevicePage = () => {
 		mutationFn: mutatation.postSessionLog,
 	});
 
-	const startDest = useMemo(
-		() => generateStartDest(sequences?.[0].sequence),
-		[sequences]
-	);
+	const startDest = useMemo(() => {
+		const gen = generateStartDest(sequences?.[0].sequence);
+		// return _.shuffle(gen.concat(gen));
+		return gen;
+	}, [sequences]);
+
+	console.log(startDest);
 
 	const goNextStep = useCallback(
 		(log: SessionLogResult) => {

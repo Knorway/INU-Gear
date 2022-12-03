@@ -42,18 +42,11 @@ const useSequence = ({
 	const [isFinished, setIsFinished] = useState(false);
 	const [optrTimeout, setOptrTimeout] = useState(0);
 	const [finalTouch, setFinalTouch] = useState(0);
-	// 처음 기어 풀기
-	// const [parkingLocked, setParkingLocked] = useState(type === 'B' && starting === 'P');
-
-	const isParked = useMemo(() => cursor === -1, [cursor]);
-
-	// const parkingLocked = useMemo(
-	// 	() => releaseParking && type === 'B' && starting === 'P',
-	// 	[releaseParking, starting, type]
-	// );
 
 	const initRef = useRef(false);
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
+	const isParked = useMemo(() => cursor === -1, [cursor]);
+	// const isParked = useMemo(() => type === 'B' && cursor === -1, [cursor, type]);
 
 	const { playSound } = useSound({ fileName: 'beep-sound-8333.mp3' });
 
@@ -63,9 +56,13 @@ const useSequence = ({
 	);
 
 	const distance = useMemo(() => {
-		if (type === 'B' && destination === 'P') return 1;
+		if (type === 'B') {
+			if (destination === 'P') return 1;
+			if (starting === 'P' && [sequence[0], sequence.at(-1)].includes(destination))
+				return 1;
+		}
 		return Math.abs(indexOfChar(destination) - indexOfChar(starting));
-	}, [destination, indexOfChar, starting, type]);
+	}, [destination, indexOfChar, sequence, starting, type]);
 
 	const writeLog = useCallback((key: keyof typeof log, value: number) => {
 		setLog((prev) => {
@@ -81,8 +78,6 @@ const useSequence = ({
 		},
 		[sequence.length]
 	);
-
-	console.log(sequence);
 
 	const onWheelL = useCallback(
 		(e: WheelEvent) => {
@@ -100,9 +95,6 @@ const useSequence = ({
 				})();
 
 				moveCursor(newCursor);
-				// setParkingLocked(false);
-
-				// moveCursor(cursor + delta);
 			}
 		},
 		[cursor, isLeft, isOperational, isParked, moveCursor, sequence.length, writeLog]
@@ -124,10 +116,6 @@ const useSequence = ({
 				})();
 
 				moveCursor(newCursor);
-
-				// setParkingLocked(false);
-
-				// moveCursor(cursor + delta);
 			}
 		},
 		[cursor, isLeft, isOperational, isParked, moveCursor, sequence.length, writeLog]
@@ -137,15 +125,8 @@ const useSequence = ({
 		if (!isOperational) return;
 		writeLog('touch', Date.now());
 		setTravel((prev) => [...prev, 'P']);
-		// setParkingLocked(true);
-
-		// TODO: 이것도 이제 필요없는 거 아닌가
-		if (destination === 'P') {
-			setCursor(indexOfChar(destination));
-		} else {
-			setCursor(-1);
-		}
-	}, [isOperational, writeLog, destination, indexOfChar]);
+		setCursor(-1);
+	}, [isOperational, writeLog]);
 
 	const pass = useMemo(
 		() =>
@@ -156,14 +137,11 @@ const useSequence = ({
 	);
 
 	useEffect(() => {
-		console.log(type === 'B' && starting === 'P' && isOperational === true, '---');
-	}, [isOperational, starting, type]);
-
-	useEffect(() => {
 		if (isOperational) return;
 
 		const timeout = !initRef.current ? 5000 + 1000 * 4.5 : 1000 * 4.5;
 		initRef.current = true;
+
 		const timeoutId = setTimeout(() => {
 			setOptrTimeout(timeout);
 		}, timeout);
@@ -212,27 +190,13 @@ const useSequence = ({
 		};
 	}, [onParking, onWheelL, onWheelR, playSound, type]);
 
-	// useEffect(() => {
-	// 	if (!isFinished) return;
-
-	// 	const finalTouch = Date.now();
-	// 	writeLog('pass', finalTouch); // -> ?
-
-	// 	const diff = (() => {
-	// 		if (distance === 1 && travel.length === 1) return log.touch - log.init;
-	// 		return finalTouch - log.init;
-	// 	})();
-
-	// 	writeLog('diff', diff);
-	// }, [distance, isFinished, log.init, log.touch, travel.length, writeLog]);
-
 	useEffect(() => {
 		if (!isFinished) return;
 
 		writeLog('pass', finalTouch);
 
 		// TODO
-		// const offset = travel.length * DEFAULT_DELAY;;
+		// const offset = travel.length * DEFAULT_DELAY;
 
 		const diff = (() => {
 			if (distance === 1 && travel.length === 1) return log.touch - log.init;
