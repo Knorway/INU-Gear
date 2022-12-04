@@ -11,6 +11,8 @@ import {
 import { useEffectOnce } from '~/src/hooks/useEffectOnce';
 import useSequence from '~/src/hooks/useSequence';
 
+import Char from './Char';
+
 type Props = {
 	targetSequence: typeof SEQUENCES[number];
 	sessionId: string;
@@ -29,21 +31,9 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
 
-	// console.log(starting, destination);
-	// console.log(distance, '--');
-
 	const { mutate: publishMessage } = useMutation({
 		mutationFn: mutatation.postMessageStream,
 	});
-
-	const tint = useCallback(
-		(idx: number) => {
-			if (!initialized) return 'black';
-			if (idx === currentCursor) return 'rgb(250 204 21)';
-			return 'black';
-		},
-		[currentCursor, initialized]
-	);
 
 	const publish = useCallback(
 		(type: MessageStream['type']) => {
@@ -63,6 +53,18 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 			});
 		},
 		[destination, isOperational, isFinished, publishMessage, sessionId, starting]
+	);
+
+	// console.log(starting, destination);
+	// console.log(distance, '--');
+
+	const tint = useCallback(
+		(idx: number) => {
+			if (!initialized) return 'black';
+			if (idx === currentCursor) return 'rgb(250 204 21)';
+			return 'black';
+		},
+		[currentCursor, initialized]
 	);
 
 	useEffectOnce(() => {
@@ -128,20 +130,6 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 				</div>
 			</div>
 		</div>
-	);
-};
-
-const Char = (props: { char: SequenceChar; tint: string }) => {
-	const letterSpacing =
-		props.char === 'N' ? 'tracking-[-1.07rem]' : 'tracking-[-0.85rem]';
-
-	return (
-		<span
-			style={{ color: props.tint }}
-			className={`block ${letterSpacing} leading-[5.7rem]`}
-		>
-			{props.char}
-		</span>
 	);
 };
 

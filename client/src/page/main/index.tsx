@@ -41,7 +41,7 @@ const MainPage = () => {
 				<h1 className='text-4xl font-bold'>Gear</h1>
 				<ListBox
 					list={sessionTokens ?? []}
-					displayProperty='uuid'
+					displayProperty='label'
 					defaultLabel={DEFAULT_LABEL}
 					onChange={selectSessionToken}
 				/>
