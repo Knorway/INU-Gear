@@ -10,7 +10,7 @@ const AdminPage = () => {
 					<SideTabList />
 				</div>
 
-				<div className='w-full p-2 px-20'>
+				<div className='relative w-full p-2 px-20 overflow-hidden'>
 					<TabComponent />
 				</div>
 			</div>

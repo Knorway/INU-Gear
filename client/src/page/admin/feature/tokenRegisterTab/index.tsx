@@ -44,7 +44,7 @@ const TokenRegisterTab = () => {
 					onSubmit={formMethods.handleSubmit(registerToken)}
 					className='flex-row space-y-4'
 				>
-					<h1 className='text-4xl font-bold'>Register session token</h1>
+					<h1 className='text-3xl font-bold'>참가자 등록하기</h1>
 					<FormInput
 						name='label'
 						type='text'

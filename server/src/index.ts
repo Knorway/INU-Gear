@@ -14,7 +14,8 @@ const TEMP_MANAGER_ID = 3;
 const prisma = new PrismaClient({ log: ['query'] });
 const pubsub = new PubSub();
 
-const html = fs.readFileSync(path.resolve() + '/build/index.html', 'utf-8');
+const mainHtml = fs.readFileSync(path.resolve() + '/build/index.html', 'utf-8');
+const amdinHtml = fs.readFileSync(path.resolve() + '/build/admin.html', 'utf-8');
 
 const app = express();
 
@@ -80,6 +81,21 @@ app.post(
 			},
 		});
 		res.json(token);
+	})
+);
+
+app.delete(
+	'/session-token',
+	asyncHandler(async (req, res) => {
+		const { tokens } = req.body;
+		await prisma.sessionToken.deleteMany({
+			where: {
+				uuid: {
+					in: tokens,
+				},
+			},
+		});
+		res.end();
 	})
 );
 
@@ -197,8 +213,14 @@ app.get(
 );
 
 // TODO: rewrites config and forEach
-app.use('*', (req, res) => {
-	res.send(html);
+const rewrites = {};
+
+app.get(['/admin', '/admin/*'], (req, res) => {
+	res.send(amdinHtml);
+});
+
+app.get('*', (req, res) => {
+	res.send(mainHtml);
 });
 
 app.use(<ErrorRequestHandler>((error, req, res, next) => {

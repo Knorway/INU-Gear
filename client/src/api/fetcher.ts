@@ -56,6 +56,15 @@ export const mutatation = {
 		return response.data;
 	}),
 
+	deleteSessionToken: mutationizeFetcher(async (data: { tokens: string[] }) => {
+		const response = await request<any>({
+			url: `/session-token`,
+			method: 'DELETE',
+			data,
+		});
+		return response.data;
+	}),
+
 	postMessageStream: mutationizeFetcher(
 		async ({ uuid, message }: { uuid: string; message: MessageStream }) => {
 			const response = await request<never>({

@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { useMemo } from 'react';
 
 import { SessionToken } from '~/src/api/fetcher';
+import Spinner from '~/src/components/Spinner';
 import Table from '~/src/components/Table';
 import Toast from '~/src/components/Toast';
 import { Sequence, SequenceChar } from '~/src/config/settings';
@@ -132,7 +133,7 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 			className={{ body: 'max-h-[96vh] h-screen' }}
 			title={title}
 			description={description}
-			component={component}
+			component={_.isEmpty(parsedLog) ? <Spinner /> : component}
 			onLeave={onUnmount}
 		/>
 	);

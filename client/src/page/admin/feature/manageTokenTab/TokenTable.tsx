@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { Fragment, useCallback, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 import { query } from '~/src/api/fetcher';
 import { queryKey } from '~/src/api/queryClient';
-import Spinner from '~/src/components/Spinner';
 import Table from '~/src/components/Table';
 
 import LogDocument from './LogDocument';
@@ -13,7 +13,9 @@ const tableHeads = ['이름', '식별번호'];
 const TokenTable = () => {
 	const [expandedRow, setExpandedRow] = useState('');
 
-	const { data: sessionTokens, isLoading } = useQuery({
+	const { register } = useFormContext();
+
+	const { data: sessionTokens } = useQuery({
 		queryKey: queryKey.sessionTokens,
 		queryFn: query.getSessionTokens,
 	});
@@ -32,7 +34,6 @@ const TokenTable = () => {
 		setExpandedRow('');
 	}, []);
 
-	if (isLoading) return <Spinner />;
 	if (!sessionTokens) return null;
 
 	return (
@@ -52,6 +53,8 @@ const TokenTable = () => {
 										type='checkbox'
 										className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 focus:ring-2 '
 										onClick={(e) => e.stopPropagation()}
+										value={data.uuid}
+										{...register('checkedTokens')}
 									/>
 									<label htmlFor='checkbox-table-1' className='sr-only'>
 										checkbox

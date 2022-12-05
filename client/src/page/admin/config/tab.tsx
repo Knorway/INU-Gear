@@ -1,7 +1,7 @@
 import { queryKey } from '~/src/api/queryClient';
-import ManageTokenTab from '~/src/page/admin/ManageTokenTab';
-import OverViewTab from '~/src/page/admin/OverViewTab';
-import TokenRegisterTab from '~/src/page/admin/TokenRegisterTab';
+import ManageTokenTab from '~/src/page/admin/feature/manageTokenTab';
+import OverViewTab from '~/src/page/admin/feature/overviewTab';
+import TokenRegisterTab from '~/src/page/admin/feature/tokenRegisterTab';
 
 export type TabName = typeof tabList[number];
 export const tabList = ['overview', 'createToken', 'manageToken'] as const;
@@ -14,7 +14,7 @@ export const tapMapping: Record<
 		component: <OverViewTab />,
 	},
 	createToken: {
-		label: '참가자 생성',
+		label: '참가자 등록',
 		component: <TokenRegisterTab />,
 	},
 	manageToken: {

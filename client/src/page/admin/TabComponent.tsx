@@ -1,5 +1,5 @@
-import { useQueryClient } from '@tanstack/react-query';
-import { Fragment } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Fragment, useMemo } from 'react';
 
 import Spinner from '~/src/components/Spinner';
 import { useCtx } from '~/src/hooks/useCtx';
@@ -11,14 +11,27 @@ const excluded: TabName[] = ['createToken'];
 
 const TabComponent = () => {
 	const pageState = useCtx(PageStateContext);
-	const queryClient = useQueryClient();
-	const isTabLoading = queryClient.getQueriesData(
-		tabQueryKeyMapping[pageState.currentTab]
-	)[1];
 
-	if (isTabLoading && !excluded.includes(pageState.currentTab)) return <Spinner />;
+	const { isLoading } = useQuery({
+		queryKey: tabQueryKeyMapping[pageState.currentTab],
+	});
 
-	return <Fragment>{tapMapping[pageState.currentTab].component}</Fragment>;
+	const loading = useMemo(
+		() => isLoading && !excluded.includes(pageState.currentTab),
+		[isLoading, pageState.currentTab]
+	);
+
+	return (
+		<Fragment>
+			{loading && (
+				<Fragment>
+					<Spinner />
+					<div className='absolute top-0 w-full h-full bg-white'></div>
+				</Fragment>
+			)}
+			{tapMapping[pageState.currentTab].component}
+		</Fragment>
+	);
 };
 
 export default TabComponent;

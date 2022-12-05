@@ -17,6 +17,7 @@ export const queryClient = new QueryClient({
 
 export const queryKey = {
 	sessionTokens: ['sessionTokens'],
-	aggregateSequence: ['aggregate', 'sequence'],
+	aggregateSequence: ['sessionTokens'],
+	// aggregateSequence: ['aggregate', 'sequence'],
 	sessionLog: (sequenceId: string) => ['sessionLog', sequenceId],
 };

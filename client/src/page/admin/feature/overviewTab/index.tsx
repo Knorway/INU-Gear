@@ -11,14 +11,12 @@ const OverViewTab = () => {
 		queryFn: query.getSessionTokens,
 	});
 
-	const { data } = useQuery({
-		queryKey: queryKey.aggregateSequence,
-		queryFn: () => {
-			return query.getOverviewAggregate({ sequence: ['D', 'N', 'R'] });
-		},
-	});
-
-	console.log(data);
+	// const { data } = useQuery({
+	// 	queryKey: queryKey.aggregateSequence,
+	// 	queryFn: () => {
+	// 		return query.getOverviewAggregate({ sequence: ['D', 'N', 'R'] });
+	// 	},
+	// });
 
 	if (!sessionTokens) return null;
 
