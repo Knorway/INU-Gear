@@ -34,7 +34,8 @@ const DevicePage = () => {
 		return gen;
 	}, [sequences]);
 
-	console.log(startDest);
+	// console.log(startDest);
+	console.log(resultLogs);
 
 	const goNextStep = useCallback(
 		(log: SessionLogResult) => {

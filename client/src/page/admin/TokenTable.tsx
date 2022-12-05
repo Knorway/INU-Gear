@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Fragment, useCallback, useState } from 'react';
 
 import { query } from '~/src/api/fetcher';
+import { queryKey } from '~/src/api/queryClient';
 import Spinner from '~/src/components/Spinner';
 import Table from '~/src/components/Table';
 
@@ -13,12 +14,12 @@ const TokenTable = () => {
 	const [expandedRow, setExpandedRow] = useState('');
 
 	const { data: sessionTokens, isLoading } = useQuery({
-		queryKey: ['sessionTokens'],
+		queryKey: queryKey.sessionTokens,
 		queryFn: query.getSessionTokens,
 	});
 
 	const { data: log } = useQuery({
-		queryKey: ['sessionLog', expandedRow],
+		queryKey: queryKey.sessionLog(expandedRow),
 		queryFn: ({ queryKey }) => query.getSessionLog({ uuid: queryKey[1] }),
 		enabled: Boolean(expandedRow),
 	});
@@ -31,11 +32,11 @@ const TokenTable = () => {
 		setExpandedRow('');
 	}, []);
 
+	if (isLoading) return <Spinner />;
 	if (!sessionTokens) return null;
 
 	return (
 		<Fragment>
-			{isLoading && <Spinner />}
 			<Table data={sessionTokens} tableHeads={tableHeads}>
 				{({ data }) => (
 					<Fragment>

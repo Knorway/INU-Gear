@@ -1,3 +1,4 @@
+import { queryKey } from '~/src/api/queryClient';
 import ManageTokenTab from '~/src/page/admin/ManageTokenTab';
 import OverViewTab from '~/src/page/admin/OverViewTab';
 import TokenRegisterTab from '~/src/page/admin/TokenRegisterTab';
@@ -20,4 +21,10 @@ export const tapMapping: Record<
 		label: '참가자 관리',
 		component: <ManageTokenTab />,
 	},
+};
+
+export const tabQueryKeyMapping: Record<TabName, string[]> = {
+	overview: queryKey.aggregateSequence,
+	createToken: [],
+	manageToken: queryKey.sessionTokens,
 };

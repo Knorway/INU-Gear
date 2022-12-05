@@ -98,7 +98,7 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 				pass: log.pass,
 				diff: log.diff,
 			},
-		};
+		} as SessionLogResult;
 
 		const timeout = !initialized ? 1000 * 5 : 0;
 		setStepTimeout(timeout);
@@ -120,7 +120,7 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 				`}
 			>
 				<div
-					className={`flex text-9xl ${
+					className={`flex text-9xl select-none ${
 						isLeft ? 'flex-col space-y-8' : 'flex-row space-x-8'
 					} `}
 				>

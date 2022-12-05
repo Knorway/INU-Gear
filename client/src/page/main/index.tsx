@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { Fragment, useCallback, useRef, useState } from 'react';
 
 import { query, SessionToken } from '~/src/api/fetcher';
+import { queryKey } from '~/src/api/queryClient';
 import ListBox from '~/src/components/ListBox';
 import Spinner from '~/src/components/Spinner';
 
@@ -16,7 +17,7 @@ const MainPage = () => {
 	const router = useRouter();
 
 	const { data: sessionTokens, isLoading } = useQuery({
-		queryKey: ['sessionTokens'],
+		queryKey: queryKey.sessionTokens,
 		queryFn: query.getSessionTokens,
 		refetchOnWindowFocus: true,
 	});

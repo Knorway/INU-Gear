@@ -22,6 +22,7 @@ type LogDoc = {
 	sequence: SequenceChar[];
 	starting: SequenceChar;
 	destination: SequenceChar;
+	recordedAt: number;
 };
 
 const TRIAL_CHUNK_SIZE = 6;
@@ -39,10 +40,11 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 						sequence: e.sequence,
 						starting: e.starting,
 						destination: e.destination,
+						recordedAt: e?.log?.pass,
 					} as LogDoc)
 			);
 
-			console.log(log);
+			// console.log(log);
 
 			map[type as keyof ParsedLog] = _.groupBy(
 				doc,
@@ -64,58 +66,65 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 	};
 
 	const title = <span className='font-bold'>{token.label}</span>;
-	const description = <span className='text-black'>{token.uuid}</span>;
-	const component = (
-		<div className='relative'>
-			<span className='text-black'>생성된 로그: {log?.length}</span>
-			{!_.isEmpty(parsedLog) &&
-				Object.entries(parsedLog)
-					.sort((a, b) => (a[0] > b[0] ? 0 : -1))
-					.map(([key, value]) => (
-						<div key={key} className='flex flex-col mt-2 space-y-1'>
-							<span className='text-3xl font-bold text-black'>{key}</span>
-							{Object.entries(value).map(([key, value]) => (
-								<div key={key}>
-									<p className='my-2 font-bold text-black'>
-										[{key.split(',')}]
-									</p>
-									<div>
-										<Table tableHeads={tableHeads} data={value}>
-											{({ data }) => (
-												<tr
-													key={data.initialReaction}
-													className='bg-white border-b cursor-pointer hover:bg-gray-100'
-												>
-													{/* placeholder */}
-													<td className='w-4'></td>
-													<td className='px-6 py-1 text-black'>
-														{data.direction}
-													</td>
-													<td
-														scope='row'
-														className='px-6 py-1 font-normal text-black whitespace-nowrap'
+	const description = <span className='text-black'>[식별번호] {token.uuid}</span>;
+	const component = useMemo(() => {
+		return (
+			<div className='relative'>
+				<span className='text-base text-black'>
+					[생성된 로그] {log?.length}/{log?.length * 6} [진행률]:{' '}
+					{((log?.length / (log?.length * 6)) * 100).toFixed(2)}%
+				</span>
+				{!_.isEmpty(parsedLog) &&
+					Object.entries(parsedLog)
+						.sort((a, b) => (a[0] > b[0] ? 0 : -1))
+						.map(([key, value]) => (
+							<div key={key} className='flex flex-col mt-2 space-y-1'>
+								<span className='text-3xl font-bold text-black'>
+									{key}
+								</span>
+								{Object.entries(value).map(([key, value]) => (
+									<div key={key}>
+										<p className='my-2 font-bold text-black'>
+											[{key.split(',')}]
+										</p>
+										<div>
+											<Table tableHeads={tableHeads} data={value}>
+												{({ data }) => (
+													<tr
+														key={data.initialReaction}
+														className='bg-white border-b cursor-pointer hover:bg-gray-100'
 													>
-														{data.initialReaction}ms
-													</td>
-													<td className='px-6 py-1 text-black'>
-														{data.responseTime}ms
-													</td>
-													<td className='px-6 py-1 text-black'>
-														{data.starting}
-													</td>
-													<td className='px-6 py-1 text-black'>
-														{data.destination}
-													</td>
-												</tr>
-											)}
-										</Table>
+														{/* placeholder */}
+														<td className='w-4'></td>
+														<td className='px-6 py-1 text-black'>
+															{data.direction}
+														</td>
+														<td
+															scope='row'
+															className='px-6 py-1 font-normal text-black whitespace-nowrap'
+														>
+															{data.initialReaction}ms
+														</td>
+														<td className='px-6 py-1 text-black'>
+															{data.responseTime}ms
+														</td>
+														<td className='px-6 py-1 text-black'>
+															{data.starting}
+														</td>
+														<td className='px-6 py-1 text-black'>
+															{data.destination}
+														</td>
+													</tr>
+												)}
+											</Table>
+										</div>
 									</div>
-								</div>
-							))}
-						</div>
-					))}
-		</div>
-	);
+								))}
+							</div>
+						))}
+			</div>
+		);
+	}, [log?.length, parsedLog]);
 
 	return (
 		<Toast

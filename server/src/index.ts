@@ -8,12 +8,13 @@ import path from 'path';
 import { SEQUENCES, SessionLogResult, SessionToken } from './config';
 import { PubSub } from './pubsub';
 
+const PORT = process.env.PORT || 8090;
+const TEMP_MANAGER_ID = 3;
+
 const prisma = new PrismaClient({ log: ['query'] });
 const pubsub = new PubSub();
 
 const html = fs.readFileSync(path.resolve() + '/build/index.html', 'utf-8');
-const PORT = process.env.PORT || 8090;
-const TEMP_MANAGER_ID = 3;
 
 const app = express();
 
@@ -130,6 +131,9 @@ app.get(
 					uuid: req.params.uuid,
 				},
 			},
+			orderBy: {
+				createdAt: 'asc',
+			},
 		});
 		res.json(log);
 	})
@@ -156,6 +160,7 @@ app.post(
 					responseTime: e.logs.diff,
 					managerId: TEMP_MANAGER_ID,
 					tokenId: token?.id!,
+					createdAt: new Date(e.logs.pass),
 				} as Prisma.sessionLogCreateManyInput)
 		);
 

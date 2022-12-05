@@ -2,16 +2,17 @@ import { useQuery } from '@tanstack/react-query';
 import { Fragment } from 'react';
 
 import { query } from '~/src/api/fetcher';
+import { queryKey } from '~/src/api/queryClient';
 import Spinner from '~/src/components/Spinner';
 
 const OverViewTab = () => {
 	const { data: sessionTokens, isLoading } = useQuery({
-		queryKey: ['sessionTokens'],
+		queryKey: queryKey.sessionTokens,
 		queryFn: query.getSessionTokens,
 	});
 
 	const { data } = useQuery({
-		queryKey: ['aggregate', 'sequence'],
+		queryKey: queryKey.aggregateSequence,
 		queryFn: () => {
 			return query.getOverviewAggregate({ sequence: ['D', 'N', 'R'] });
 		},
