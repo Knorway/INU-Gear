@@ -17,7 +17,8 @@ export const queryClient = new QueryClient({
 
 export const queryKey = {
 	sessionTokens: ['sessionTokens'],
+	sessionTokensPage: (page: number) => ['sessionTokens', page] as const,
 	aggregateSequence: ['sessionTokens'],
 	// aggregateSequence: ['aggregate', 'sequence'],
-	sessionLog: (sequenceId: string) => ['sessionLog', sequenceId],
+	sessionLog: (sequenceId: string) => ['sessionLog', sequenceId] as const,
 };

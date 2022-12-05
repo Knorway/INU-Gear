@@ -44,7 +44,7 @@ model sessionLog {
     managerId Int          @map("manager_id")
     manager   manager      @relation(fields: [managerId], references: [id])
     tokenId   Int          @map("token_id")
-    token     sessionToken @relation(fields: [tokenId], references: [id])
+    token     sessionToken @relation(fields: [tokenId], references: [id], onDelete: Cascade)
 
     @@map("session_log")
 }

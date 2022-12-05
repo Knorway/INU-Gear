@@ -1,7 +1,7 @@
 import { FormProvider, useForm } from 'react-hook-form';
 
-import Pagination from '~/src/components/Pagination';
-
+import { FeatureContextProvider } from './context/FeatureContext';
+import TokenPagination from './TokenPagination';
 import TokenSearchInput from './TokenSearchInput';
 import TokenTable from './TokenTable';
 
@@ -18,8 +18,10 @@ const ManageTokenTab = () => {
 				<div>
 					<TokenSearchInput />
 				</div>
-				<TokenTable />
-				<Pagination />
+				<FeatureContextProvider>
+					<TokenTable />
+					<TokenPagination />
+				</FeatureContextProvider>
 			</div>
 		</FormProvider>
 	);

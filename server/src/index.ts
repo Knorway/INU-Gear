@@ -62,10 +62,26 @@ app.post(
 app.get(
 	'/session-token',
 	asyncHandler(async (req, res) => {
+		const pageQuery = Number(req.query.page) || 0;
+		const perPage = 10;
+		const skip = pageQuery * perPage;
+
+		// TODO: 메인 페이지는 전부 다 가져오는 게 나을 수도 있다. 그러면 옵션 조정보다는 그냥 쿼리키/페처 따로두거나 다른 엔드포인트
 		const tokens = await prisma.sessionToken.findMany({
 			orderBy: { createdAt: 'asc' },
+			skip,
+			take: perPage + 1,
 		});
-		res.json(tokens);
+		const totalCount = await prisma.sessionToken.count();
+		console.log(totalCount);
+
+		const payload = tokens.slice(0, 10);
+		res.json({
+			tokens: payload,
+			hasNext: tokens.length === perPage + 1,
+			count: payload.length,
+			totalCount,
+		});
 	})
 );
 

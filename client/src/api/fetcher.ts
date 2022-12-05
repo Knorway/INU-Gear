@@ -19,8 +19,15 @@ export type SessionToken = {
 };
 
 export const query = {
-	getSessionTokens: async () => {
-		const response = await request<SessionToken[]>({ url: '/session-token' });
+	getSessionTokens: async ({ page }: { page?: number } = {}) => {
+		const response = await request<{
+			tokens: SessionToken[];
+			hasNext: boolean;
+			count: number;
+			totalCount: number;
+		}>({
+			url: `/session-token?page=${page}`,
+		});
 		return response.data;
 	},
 

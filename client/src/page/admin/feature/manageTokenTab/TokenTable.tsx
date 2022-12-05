@@ -5,19 +5,33 @@ import { useFormContext } from 'react-hook-form';
 import { query } from '~/src/api/fetcher';
 import { queryKey } from '~/src/api/queryClient';
 import Table from '~/src/components/Table';
+import { useCtx } from '~/src/hooks/useCtx';
 
+import {
+  featureDispatchContext,
+  FeatureStateContext,
+} from './context/FeatureContext';
 import LogDocument from './LogDocument';
 
 const tableHeads = ['이름', '식별번호'];
 
 const TokenTable = () => {
 	const [expandedRow, setExpandedRow] = useState('');
+	const featureState = useCtx(FeatureStateContext);
+	const featureDispatch = useCtx(featureDispatchContext);
 
 	const { register } = useFormContext();
 
-	const { data: sessionTokens } = useQuery({
-		queryKey: queryKey.sessionTokens,
-		queryFn: query.getSessionTokens,
+	const { data } = useQuery({
+		queryKey: queryKey.sessionTokensPage(featureState.tokenPage),
+		queryFn: ({ queryKey }) => query.getSessionTokens({ page: queryKey[1] }),
+		onSuccess(data) {
+			featureDispatch({
+				hasNext: data.hasNext,
+				count: data.count,
+				totalCount: data.totalCount,
+			});
+		},
 	});
 
 	const { data: log } = useQuery({
@@ -34,11 +48,11 @@ const TokenTable = () => {
 		setExpandedRow('');
 	}, []);
 
-	if (!sessionTokens) return null;
+	if (!data) return null;
 
 	return (
 		<Fragment>
-			<Table data={sessionTokens} tableHeads={tableHeads}>
+			<Table data={data.tokens} tableHeads={tableHeads}>
 				{({ data }) => (
 					<Fragment>
 						<tr

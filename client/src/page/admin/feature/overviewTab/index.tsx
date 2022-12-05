@@ -6,9 +6,9 @@ import { queryKey } from '~/src/api/queryClient';
 import Spinner from '~/src/components/Spinner';
 
 const OverViewTab = () => {
-	const { data: sessionTokens, isLoading } = useQuery({
+	const { data, isLoading } = useQuery({
 		queryKey: queryKey.sessionTokens,
-		queryFn: query.getSessionTokens,
+		queryFn: () => query.getSessionTokens(),
 	});
 
 	// const { data } = useQuery({
@@ -18,12 +18,12 @@ const OverViewTab = () => {
 	// 	},
 	// });
 
-	if (!sessionTokens) return null;
+	if (!data) return null;
 
 	return (
 		<Fragment>
 			{isLoading && <Spinner />}
-			<div>생성된 참가자 세션: {sessionTokens.length}</div>
+			<div>생성된 참가자 세션: {data?.tokens?.length}</div>
 		</Fragment>
 	);
 };

@@ -23,8 +23,8 @@ export const tapMapping: Record<
 	},
 };
 
-export const tabQueryKeyMapping: Record<TabName, string[]> = {
+export const tabQueryKeyMapping = {
 	overview: queryKey.aggregateSequence,
 	createToken: [],
-	manageToken: queryKey.sessionTokens,
+	manageToken: queryKey.sessionTokensPage(0),
 };

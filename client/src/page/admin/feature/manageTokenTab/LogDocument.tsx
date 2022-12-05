@@ -5,7 +5,12 @@ import { SessionToken } from '~/src/api/fetcher';
 import Spinner from '~/src/components/Spinner';
 import Table from '~/src/components/Table';
 import Toast from '~/src/components/Toast';
-import { Sequence, SequenceChar } from '~/src/config/settings';
+import {
+  Sequence,
+  SequenceChar,
+  SEQUENCES,
+  TRIAL_REPEAT,
+} from '~/src/config/settings';
 
 type Props = {
 	token: SessionToken;
@@ -26,10 +31,10 @@ type LogDoc = {
 	recordedAt: number;
 };
 
-const TRIAL_CHUNK_SIZE = 6;
 const tableHeads = ['dir', 'initial', 'response', 'starting', 'destination'];
 
 const LogDocument = ({ token, log, onUnmount }: Props) => {
+	console.log(log);
 	const parsedLog = useMemo(() => {
 		return Object.entries(_.groupBy(log, 'type')).reduce((map, [type, log]) => {
 			const doc = log.map(
@@ -45,8 +50,6 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 					} as LogDoc)
 			);
 
-			// console.log(log);
-
 			map[type as keyof ParsedLog] = _.groupBy(
 				doc,
 				'sequence'
@@ -58,7 +61,7 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 
 	const trialChunkDivider = (idx: number) => {
 		return (
-			idx % TRIAL_CHUNK_SIZE === 0 && (
+			idx % TRIAL_REPEAT === 0 && (
 				<span className='text-xs font-bold text-black underline uppercase'>
 					trial: {idx + 1}
 				</span>
@@ -72,8 +75,10 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 		return (
 			<div className='relative'>
 				<span className='text-base text-black'>
-					[생성된 로그] {log?.length}/{log?.length * 6} [진행률]:{' '}
-					{((log?.length / (log?.length * 6)) * 100).toFixed(2)}%
+					[생성된 로그] {log?.length}/{TRIAL_REPEAT * SEQUENCES.length}{' '}
+					[진행률]:{' '}
+					{((log?.length / (TRIAL_REPEAT * SEQUENCES.length)) * 100).toFixed(2)}
+					%
 				</span>
 				{!_.isEmpty(parsedLog) &&
 					Object.entries(parsedLog)
@@ -95,8 +100,9 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 														key={data.initialReaction}
 														className='bg-white border-b cursor-pointer hover:bg-gray-100'
 													>
-														{/* placeholder */}
-														<td className='w-4'></td>
+														<td className='w-4'>
+															{/* placeholder */}
+														</td>
 														<td className='px-6 py-1 text-black'>
 															{data.direction}
 														</td>
@@ -133,7 +139,8 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 			className={{ body: 'max-h-[96vh] h-screen' }}
 			title={title}
 			description={description}
-			component={_.isEmpty(parsedLog) ? <Spinner /> : component}
+			component={!log ? <Spinner /> : component}
+			// component={_.isEmpty(parsedLog) ? <Spinner /> : component}
 			onLeave={onUnmount}
 		/>
 	);

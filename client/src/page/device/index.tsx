@@ -1,14 +1,15 @@
 import { useMutation } from '@tanstack/react-query';
-import _ from 'lodash';
 import { useRouter } from 'next/router';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { mutatation } from '~/src/api/fetcher';
-import { SEQUENCES, SessionLogResult } from '~/src/config/settings';
+import {
+  SEQUENCES,
+  SessionLogResult,
+  TRIAL_REPEAT,
+} from '~/src/config/settings';
 import DeviceScreen from '~/src/page/device/DeviceScreen';
 import { generateStartDest } from '~/src/utils';
-
-const STEP_LIMIT = 6;
 
 const DevicePage = () => {
 	const [sequences, setSequences] = useState<typeof SEQUENCES[number][] | null>(null);
@@ -39,7 +40,7 @@ const DevicePage = () => {
 
 	const goNextStep = useCallback(
 		(log: SessionLogResult) => {
-			if (step !== STEP_LIMIT) {
+			if (step !== TRIAL_REPEAT) {
 				setStep((prev) => prev + 1);
 				setResultLogs((prev) => [...prev, log]);
 			}
@@ -50,7 +51,7 @@ const DevicePage = () => {
 	useEffect(() => {
 		try {
 			const parsed = JSON.parse(router.query.sequence as string);
-			setSequences(Array(STEP_LIMIT).fill(parsed));
+			setSequences(Array(TRIAL_REPEAT).fill(parsed));
 		} catch (error) {
 			setSequences(null);
 		}
@@ -59,7 +60,7 @@ const DevicePage = () => {
 	useEffect(() => {
 		if (!sessionId) return;
 
-		if (step === STEP_LIMIT) {
+		if (step === TRIAL_REPEAT) {
 			publishMessage({
 				uuid: sessionId as string,
 				message: {

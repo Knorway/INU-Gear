@@ -16,9 +16,9 @@ const MainPage = () => {
 	const [selectedToken, setSelectedToken] = useState<SessionToken>();
 	const router = useRouter();
 
-	const { data: sessionTokens, isLoading } = useQuery({
+	const { data, isLoading } = useQuery({
 		queryKey: queryKey.sessionTokens,
-		queryFn: query.getSessionTokens,
+		queryFn: () => query.getSessionTokens(),
 		refetchOnWindowFocus: true,
 	});
 
@@ -41,7 +41,7 @@ const MainPage = () => {
 				<div className='space-x-4 text-blue-500 underline'></div>
 				<h1 className='text-4xl font-bold'>Gear</h1>
 				<ListBox
-					list={sessionTokens ?? []}
+					list={data?.tokens ?? []}
 					displayProperty='label'
 					defaultLabel={DEFAULT_LABEL}
 					onChange={selectSessionToken}

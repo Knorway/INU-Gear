@@ -1,21 +1,27 @@
 import React, { createContext, Reducer, useReducer } from 'react';
 
 type Props = {
-	children: React.ReactElement;
+	children: React.ReactNode;
 };
 
 type State = {
-	checkedToken: string[];
+	tokenPage: number;
+	hasNext: boolean;
+	count: number;
+	totalCount: number;
 };
 
-const reducer: Reducer<State, State> = (prev, cur) => ({ ...prev, ...cur });
+const reducer: Reducer<State, Partial<State>> = (prev, cur) => ({ ...prev, ...cur });
 
 export const FeatureStateContext = createContext<State | null>(null);
-export const featureDispatchContext = createContext<React.Dispatch<State> | null>(null);
+export const featureDispatchContext = createContext<React.Dispatch<
+	Partial<State>
+> | null>(null);
 
-export const PageContextProvider = (props: Props) => {
+export const FeatureContextProvider = (props: Props) => {
 	const [state, dispatch] = useReducer(reducer, {
-		checkedToken: [],
+		tokenPage: 0,
+		hasNext: false,
 	} as State);
 
 	return (
