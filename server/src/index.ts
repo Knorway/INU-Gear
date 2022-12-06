@@ -69,9 +69,9 @@ app.get(
 
 		const excluded = ['main'].includes(req.query.context as string);
 
-		const option = excluded
-			? {}
-			: ({
+		const option: Prisma.sessionTokenFindManyArgs = excluded
+			? { orderBy: { createdAt: 'asc' } }
+			: {
 					orderBy: { createdAt: 'asc' },
 					skip,
 					take: perPage + 1,
@@ -82,7 +82,7 @@ app.get(
 							}),
 						},
 					},
-			  } as Prisma.sessionTokenFindManyArgs);
+			  };
 
 		const tokens = await prisma.sessionToken.findMany(option);
 		const totalCount = await prisma.sessionToken.count({
@@ -187,7 +187,7 @@ app.get(
 );
 
 app.post(
-	// 이거 잘못 만듬. uuid가 토큰꺼임
+	// TODO: 이거 잘못 만듬. uuid가 토큰꺼임 body로 가야됨
 	'/session-log/:uuid',
 	asyncHandler(async (req, res) => {
 		const token = await prisma.sessionToken.findFirst({
@@ -221,14 +221,41 @@ app.post(
 app.delete(
 	'/session-log',
 	asyncHandler(async (req, res) => {
-		const uuids = req.body;
-		await prisma.sessionLog.deleteMany({
+		const { tokenId, uuids, sequence } = req.body;
+
+		const token = await prisma.sessionToken.findFirst({
 			where: {
-				uuid: {
-					in: uuids,
-				},
+				uuid: tokenId,
 			},
 		});
+		const newSequence = (token?.sequence as Prisma.JsonArray).map((e) => {
+			return (
+				JSON.stringify(e) === JSON.stringify(sequence)
+					? { ...sequence, repetition: 0 }
+					: e
+			) as SessionToken['sequence'][number];
+		});
+
+		await prisma.$transaction([
+			prisma.sessionToken.updateMany({
+				where: {
+					uuid: tokenId,
+				},
+				data: {
+					...token,
+					sequence: newSequence,
+				},
+			}),
+
+			prisma.sessionLog.deleteMany({
+				where: {
+					uuid: {
+						in: uuids,
+					},
+				},
+			}),
+		]);
+
 		res.end();
 	})
 );

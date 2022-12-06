@@ -25,6 +25,7 @@ type KeyChars = `${SequenceChar},${SequenceChar},${SequenceChar}`;
 type ParsedLog = Record<Sequence<'type'>, Record<KeyChars, LogDoc[]>>;
 type ValueOf<T> = T[keyof T];
 type LogDoc = {
+	type: Sequence<'type'>;
 	direction: Sequence<'direction'>;
 	initialReaction: number;
 	responseTime: number;
@@ -50,6 +51,7 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 			const doc = log.map(
 				(e) =>
 					({
+						type: e.type,
 						direction: e.direction,
 						initialReaction: e.initialReaction,
 						responseTime: e.responseTime,
@@ -82,7 +84,8 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 
 	const revokeTrial = useCallback(
 		(docs: LogDoc[]) => () => {
-			const { direction, sequence } = docs[0];
+			const { direction, sequence, type } = docs[0];
+
 			const confirm = window.confirm(
 				`direction: [${direction}] sequence: [${sequence}] \n해당 트라이얼의 로그 ${docs.length}개를 삭제합니다. \n계속하시겠습니까?`
 			);
@@ -90,7 +93,14 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 
 			rollbackTrial(
 				{
+					tokenId: token.uuid,
 					uuids: docs.map((e) => e.uuid),
+					sequence: {
+						type,
+						sequence,
+						direction,
+						repetition: 1,
+					},
 				},
 				{
 					onSuccess: () => {

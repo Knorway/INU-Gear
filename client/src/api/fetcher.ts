@@ -120,12 +120,14 @@ export const mutatation = {
 		}
 	),
 
-	deleteSessionLog: mutationizeFetcher(async ({ uuids }: { uuids: string[] }) => {
-		const response = await request<never>({
-			url: `/session-log`,
-			method: 'DELETE',
-			data: uuids,
-		});
-		return response.data;
-	}),
+	deleteSessionLog: mutationizeFetcher(
+		async (data: { uuids: string[]; sequence: unknown; tokenId: string }) => {
+			const response = await request<never>({
+				url: `/session-log`,
+				method: 'DELETE',
+				data,
+			});
+			return response.data;
+		}
+	),
 };
