@@ -1,28 +1,25 @@
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { TokenTableForm } from '../../config/table';
 import { FeatureContextProvider } from './context/FeatureContext';
 import TokenPagination from './TokenPagination';
 import TokenSearchInput from './TokenSearchInput';
 import TokenTable from './TokenTable';
 
-type FormType = {
-	checkedTokens: string[];
-};
-
 const ManageTokenTab = () => {
-	const formMethods = useForm<FormType>();
+	const formMethods = useForm<TokenTableForm>();
 
 	return (
 		<FormProvider {...formMethods}>
-			<div className='flex-col space-y-3'>
-				<div>
-					<TokenSearchInput />
-				</div>
-				<FeatureContextProvider>
+			<FeatureContextProvider>
+				<div className='flex-col space-y-3'>
+					<div>
+						<TokenSearchInput />
+					</div>
 					<TokenTable />
 					<TokenPagination />
-				</FeatureContextProvider>
-			</div>
+				</div>
+			</FeatureContextProvider>
 		</FormProvider>
 	);
 };

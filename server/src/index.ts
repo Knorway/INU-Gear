@@ -65,17 +65,29 @@ app.get(
 		const pageQuery = Number(req.query.page) || 0;
 		const perPage = 10;
 		const skip = pageQuery * perPage;
+		const searchText = req.query.search as string;
 
-		// TODO: 메인 페이지는 전부 다 가져오는 게 나을 수도 있다. 그러면 옵션 조정보다는 그냥 쿼리키/페처 따로두거나 다른 엔드포인트
-		const tokens = await prisma.sessionToken.findMany({
+		const option = {
 			orderBy: { createdAt: 'asc' },
 			skip,
 			take: perPage + 1,
+			where: {
+				label: {
+					...(Boolean(searchText) && {
+						contains: searchText,
+					}),
+				},
+			},
+		} as Prisma.sessionTokenFindManyArgs;
+
+		// TODO: 메인 페이지는 전부 다 가져오는 게 나을 수도 있다. 그러면 옵션 조정보다는 그냥 쿼리키/페처 따로두거나 다른 엔드포인트
+		const tokens = await prisma.sessionToken.findMany(option);
+		const totalCount = await prisma.sessionToken.count({
+			where: option.where,
 		});
-		const totalCount = await prisma.sessionToken.count();
-		console.log(totalCount);
 
 		const payload = tokens.slice(0, 10);
+
 		res.json({
 			tokens: payload,
 			hasNext: tokens.length === perPage + 1,

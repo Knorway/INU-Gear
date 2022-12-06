@@ -19,14 +19,17 @@ export type SessionToken = {
 };
 
 export const query = {
-	getSessionTokens: async ({ page }: { page?: number } = {}) => {
+	getSessionTokens: async ({
+		page,
+		search = '',
+	}: { page?: number; search?: string } = {}) => {
 		const response = await request<{
 			tokens: SessionToken[];
 			hasNext: boolean;
 			count: number;
 			totalCount: number;
 		}>({
-			url: `/session-token?page=${page}`,
+			url: `/session-token?page=${page}&search=${search}`,
 		});
 		return response.data;
 	},
