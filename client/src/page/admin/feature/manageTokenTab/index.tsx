@@ -1,6 +1,6 @@
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { TokenTableForm } from '../../config/table';
+import { TokenTableForm } from '../../config/form';
 import { FeatureContextProvider } from './context/FeatureContext';
 import TokenPagination from './TokenPagination';
 import TokenSearchInput from './TokenSearchInput';

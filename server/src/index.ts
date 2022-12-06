@@ -67,26 +67,29 @@ app.get(
 		const skip = pageQuery * perPage;
 		const searchText = req.query.search as string;
 
-		const option = {
-			orderBy: { createdAt: 'asc' },
-			skip,
-			take: perPage + 1,
-			where: {
-				label: {
-					...(Boolean(searchText) && {
-						contains: searchText,
-					}),
-				},
-			},
-		} as Prisma.sessionTokenFindManyArgs;
+		const excluded = ['main'].includes(req.query.context as string);
 
-		// TODO: 메인 페이지는 전부 다 가져오는 게 나을 수도 있다. 그러면 옵션 조정보다는 그냥 쿼리키/페처 따로두거나 다른 엔드포인트
+		const option = excluded
+			? {}
+			: ({
+					orderBy: { createdAt: 'asc' },
+					skip,
+					take: perPage + 1,
+					where: {
+						label: {
+							...(Boolean(searchText) && {
+								contains: searchText,
+							}),
+						},
+					},
+			  } as Prisma.sessionTokenFindManyArgs);
+
 		const tokens = await prisma.sessionToken.findMany(option);
 		const totalCount = await prisma.sessionToken.count({
 			where: option.where,
 		});
 
-		const payload = tokens.slice(0, 10);
+		const payload = excluded ? tokens : tokens.slice(0, 10);
 
 		res.json({
 			tokens: payload,
@@ -184,6 +187,7 @@ app.get(
 );
 
 app.post(
+	// 이거 잘못 만듬. uuid가 토큰꺼임
 	'/session-log/:uuid',
 	asyncHandler(async (req, res) => {
 		const token = await prisma.sessionToken.findFirst({
@@ -210,6 +214,21 @@ app.post(
 
 		await prisma.sessionLog.createMany({ data });
 
+		res.end();
+	})
+);
+
+app.delete(
+	'/session-log',
+	asyncHandler(async (req, res) => {
+		const uuids = req.body;
+		await prisma.sessionLog.deleteMany({
+			where: {
+				uuid: {
+					in: uuids,
+				},
+			},
+		});
 		res.end();
 	})
 );

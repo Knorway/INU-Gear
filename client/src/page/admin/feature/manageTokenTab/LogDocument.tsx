@@ -1,7 +1,10 @@
+import { ArrowPathIcon } from '@heroicons/react/24/outline';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import _ from 'lodash';
-import { useMemo } from 'react';
+import { Fragment, useCallback, useMemo } from 'react';
 
-import { SessionToken } from '~/src/api/fetcher';
+import { mutatation, SessionToken } from '~/src/api/fetcher';
+import { queryKey } from '~/src/api/queryClient';
 import Spinner from '~/src/components/Spinner';
 import Table from '~/src/components/Table';
 import Toast from '~/src/components/Toast';
@@ -29,12 +32,19 @@ type LogDoc = {
 	starting: SequenceChar;
 	destination: SequenceChar;
 	recordedAt: number;
+	uuid: string;
 };
 
 const tableHeads = ['dir', 'initial', 'response', 'starting', 'destination'];
 
 const LogDocument = ({ token, log, onUnmount }: Props) => {
-	console.log(log);
+	const queryClient = useQueryClient();
+	const { mutate: rollbackTrial, isLoading: isRollbackingTrial } = useMutation({
+		mutationFn: mutatation.deleteSessionLog,
+	});
+
+	const loadable = useMemo(() => !log || isRollbackingTrial, [isRollbackingTrial, log]);
+
 	const parsedLog = useMemo(() => {
 		return Object.entries(_.groupBy(log, 'type')).reduce((map, [type, log]) => {
 			const doc = log.map(
@@ -47,6 +57,7 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 						starting: e.starting,
 						destination: e.destination,
 						recordedAt: e?.log?.pass,
+						uuid: e.uuid,
 					} as LogDoc)
 			);
 
@@ -69,6 +80,30 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 		);
 	};
 
+	const revokeTrial = useCallback(
+		(docs: LogDoc[]) => () => {
+			const { direction, sequence } = docs[0];
+			const confirm = window.confirm(
+				`direction: [${direction}] sequence: [${sequence}] \n해당 트라이얼의 로그 ${docs.length}개를 삭제합니다. \n계속하시겠습니까?`
+			);
+			if (!confirm) return;
+
+			rollbackTrial(
+				{
+					uuids: docs.map((e) => e.uuid),
+				},
+				{
+					onSuccess: () => {
+						queryClient.invalidateQueries({
+							queryKey: queryKey.sessionLog(token.uuid),
+						});
+					},
+				}
+			);
+		},
+		[queryClient, rollbackTrial, token.uuid]
+	);
+
 	const title = <span className='font-bold'>{token.label}</span>;
 	const description = <span className='text-black'>[식별번호] {token.uuid}</span>;
 	const component = useMemo(() => {
@@ -83,55 +118,83 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 				{!_.isEmpty(parsedLog) &&
 					Object.entries(parsedLog)
 						.sort((a, b) => (a[0] > b[0] ? 0 : -1))
-						.map(([key, value]) => (
-							<div key={key} className='flex flex-col mt-2 space-y-1'>
+						.map(([type, logs]) => (
+							<div key={type} className='flex flex-col mt-2 space-y-1'>
 								<span className='text-3xl font-bold text-black'>
-									{key}
+									{type}
 								</span>
-								{Object.entries(value).map(([key, value]) => (
-									<div key={key}>
-										<p className='my-2 font-bold text-black'>
-											[{key.split(',')}]
-										</p>
-										<div>
-											<Table tableHeads={tableHeads} data={value}>
-												{({ data }) => (
-													<tr
-														key={data.initialReaction}
-														className='bg-white border-b cursor-pointer hover:bg-gray-100'
-													>
-														<td className='w-4'>
-															{/* placeholder */}
-														</td>
-														<td className='px-6 py-1 text-black'>
-															{data.direction}
-														</td>
-														<td
-															scope='row'
-															className='px-6 py-1 font-normal text-black whitespace-nowrap'
-														>
-															{data.initialReaction}ms
-														</td>
-														<td className='px-6 py-1 text-black'>
-															{data.responseTime}ms
-														</td>
-														<td className='px-6 py-1 text-black'>
-															{data.starting}
-														</td>
-														<td className='px-6 py-1 text-black'>
-															{data.destination}
-														</td>
-													</tr>
+								{Object.entries(logs).map(([seq, docs]) => {
+									const trialChunks = _.groupBy(docs, 'direction');
+									return (
+										<div key={seq}>
+											<p className='my-2 font-bold text-black'>
+												[{seq.split(',')}]
+											</p>
+											<div className='space-y-4'>
+												{Object.entries(trialChunks).map(
+													([dir, doc]) => (
+														<Fragment key={dir}>
+															<ArrowPathIcon
+																className='p-1 text-black border rounded-md cursor-pointer w-7 h-7'
+																onClick={revokeTrial(doc)}
+															/>
+															<Table
+																tableHeads={tableHeads}
+																data={doc}
+															>
+																{({ data }) => (
+																	<tr
+																		key={
+																			data.initialReaction
+																		}
+																		className='bg-white border-b cursor-pointer hover:bg-gray-100'
+																	>
+																		<td className='w-4'></td>
+																		<td className='px-6 py-1 text-black'>
+																			{
+																				data.direction
+																			}
+																		</td>
+																		<td
+																			scope='row'
+																			className='px-6 py-1 font-normal text-black whitespace-nowrap'
+																		>
+																			{
+																				data.initialReaction
+																			}
+																			ms
+																		</td>
+																		<td className='px-6 py-1 text-black'>
+																			{
+																				data.responseTime
+																			}
+																			ms
+																		</td>
+																		<td className='px-6 py-1 text-black'>
+																			{
+																				data.starting
+																			}
+																		</td>
+																		<td className='px-6 py-1 text-black'>
+																			{
+																				data.destination
+																			}
+																		</td>
+																	</tr>
+																)}
+															</Table>
+														</Fragment>
+													)
 												)}
-											</Table>
+											</div>
 										</div>
-									</div>
-								))}
+									);
+								})}
 							</div>
 						))}
 			</div>
 		);
-	}, [log?.length, parsedLog]);
+	}, [log?.length, parsedLog, revokeTrial]);
 
 	return (
 		<Toast
@@ -139,8 +202,7 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 			className={{ body: 'max-h-[96vh] h-screen' }}
 			title={title}
 			description={description}
-			component={!log ? <Spinner /> : component}
-			// component={_.isEmpty(parsedLog) ? <Spinner /> : component}
+			component={loadable ? <Spinner /> : component}
 			onLeave={onUnmount}
 		/>
 	);

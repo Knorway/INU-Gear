@@ -18,7 +18,7 @@ const MainPage = () => {
 
 	const { data, isLoading } = useQuery({
 		queryKey: queryKey.sessionTokens,
-		queryFn: () => query.getSessionTokens(),
+		queryFn: () => query.getSessionTokens({ context: 'main' }),
 		refetchOnWindowFocus: true,
 	});
 

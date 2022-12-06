@@ -19,17 +19,23 @@ export type SessionToken = {
 };
 
 export const query = {
-	getSessionTokens: async ({
-		page,
-		search = '',
-	}: { page?: number; search?: string } = {}) => {
+	getSessionTokens: async (param?: {
+		page?: number;
+		search?: string;
+		context?: 'main';
+	}) => {
+		let query = '';
+		for (const key in param) {
+			query += `${key}=${param[key as keyof typeof param] ?? ''}&`;
+		}
+
 		const response = await request<{
 			tokens: SessionToken[];
 			hasNext: boolean;
 			count: number;
 			totalCount: number;
 		}>({
-			url: `/session-token?page=${page}&search=${search}`,
+			url: `/session-token?${query}`,
 		});
 		return response.data;
 	},
@@ -113,4 +119,13 @@ export const mutatation = {
 			return response.data;
 		}
 	),
+
+	deleteSessionLog: mutationizeFetcher(async ({ uuids }: { uuids: string[] }) => {
+		const response = await request<never>({
+			url: `/session-log`,
+			method: 'DELETE',
+			data: uuids,
+		});
+		return response.data;
+	}),
 };

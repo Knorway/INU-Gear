@@ -9,22 +9,25 @@ import { queryKey } from '~/src/api/queryClient';
 import Spinner from '~/src/components/Spinner';
 import { useCtx } from '~/src/hooks/useCtx';
 
-import { TokenTableForm } from '../../config/table';
-import { FeatureStateContext } from './context/FeatureContext';
+import { TokenTableForm } from '../../config/form';
+import {
+  featureDispatchContext,
+  FeatureStateContext,
+} from './context/FeatureContext';
 
 const TokenSearchInput = () => {
 	const featureState = useCtx(FeatureStateContext);
+	const featureDispatch = useCtx(featureDispatchContext);
 	const { handleSubmit, register, getValues } = useFormContext<TokenTableForm>();
 	const queryClient = useQueryClient();
 
 	const { refetch, isFetching: isSearchingText } = useQuery({
 		queryKey: queryKey.sessionTokensPage(featureState.tokenPage),
-		queryFn: () =>
+		queryFn: ({ queryKey }) =>
 			query.getSessionTokens({
-				page: featureState.tokenPage,
+				page: queryKey[1],
 				search: getValues().searchText,
 			}),
-		retryOnMount: false,
 	});
 
 	const { mutate: deleteSelectedTokens, isLoading: isDeletingTokens } = useMutation({
@@ -33,7 +36,8 @@ const TokenSearchInput = () => {
 
 	const serachTokens = _.debounce(() => {
 		refetch();
-	}, 300);
+		featureDispatch({ tokenPage: 0 });
+	}, 200);
 
 	const deleteTokens: SubmitHandler<TokenTableForm> = async (data) => {
 		if (!data.checkedTokens.length) return;
