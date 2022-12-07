@@ -3,13 +3,14 @@ import express from 'express';
 
 import { asyncHandler } from '../asyncHandler';
 import { SessionLogResult, SessionToken, TEMP_MANAGER_ID } from '../config';
-import { prisma } from '../prisma';
 
 const router = express.Router();
 
 router.get(
 	'/:uuid',
 	asyncHandler(async (req, res) => {
+		const prisma = req.app.context.prisma;
+
 		const log = await prisma.sessionLog.findMany({
 			where: {
 				token: {
@@ -30,6 +31,8 @@ router.post(
 	// 내가 만약 하수라를 썼다면 이정도의 작업을 할 수 있었던 건가
 	'/:uuid',
 	asyncHandler(async (req, res) => {
+		const prisma = req.app.context.prisma;
+
 		const token = await prisma.sessionToken.findFirst({
 			where: { uuid: req.params.uuid },
 		});
@@ -61,6 +64,8 @@ router.post(
 router.delete(
 	'/',
 	asyncHandler(async (req, res) => {
+		const prisma = req.app.context.prisma;
+
 		const { tokenId, uuids, sequence } = req.body;
 
 		const token = await prisma.sessionToken.findFirst({
@@ -102,6 +107,6 @@ router.delete(
 );
 
 export default {
-	route: '/session-log',
+	path: '/session-log',
 	router,
 };

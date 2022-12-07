@@ -1,13 +1,14 @@
 import express from 'express';
 
 import { asyncHandler } from '../asyncHandler';
-import { prisma } from '../prisma';
 
 const router = express.Router();
 
 router.get(
 	'/:sequence',
 	asyncHandler(async (req, res) => {
+		const prisma = req.app.context.prisma;
+
 		const agg = await prisma.sessionLog.aggregate({
 			where: {
 				sequence: {
@@ -32,6 +33,6 @@ router.get(
 );
 
 export default {
-	route: '/aggregate',
+	path: '/aggregate',
 	router,
 };

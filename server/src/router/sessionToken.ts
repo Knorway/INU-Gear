@@ -3,13 +3,14 @@ import express from 'express';
 
 import { asyncHandler } from '../asyncHandler';
 import { SEQUENCES, SessionToken, TEMP_MANAGER_ID } from '../config';
-import { prisma } from '../prisma';
 
 const router = express.Router();
 
 router.get(
 	'/',
 	asyncHandler(async (req, res) => {
+		const prisma = req.app.context.prisma;
+
 		const pageQuery = Number(req.query.page) || 0;
 		const perPage = 10;
 		const skip = pageQuery * perPage;
@@ -51,6 +52,8 @@ router.get(
 router.post(
 	'/',
 	asyncHandler(async (req, res) => {
+		const prisma = req.app.context.prisma;
+
 		const { label } = req.body;
 		const token = await prisma.sessionToken.create({
 			data: {
@@ -66,6 +69,8 @@ router.post(
 router.delete(
 	'/',
 	asyncHandler(async (req, res) => {
+		const prisma = req.app.context.prisma;
+
 		const { tokens } = req.body;
 		await prisma.sessionToken.deleteMany({
 			where: {
@@ -81,6 +86,8 @@ router.delete(
 router.get(
 	'/:uuid',
 	asyncHandler(async (req, res) => {
+		const prisma = req.app.context.prisma;
+
 		const token = await prisma.sessionToken.findFirst({
 			where: { uuid: req.params.uuid },
 		});
@@ -92,6 +99,8 @@ router.patch(
 	// TODO: 사실 이것도 log하위에서 업데이트 하는 게 맞다
 	'/:uuid',
 	asyncHandler(async (req, res) => {
+		const prisma = req.app.context.prisma;
+
 		const token = await prisma.sessionToken.findFirst({
 			where: { uuid: req.params.uuid },
 		});
@@ -119,6 +128,6 @@ router.patch(
 );
 
 export default {
-	route: '/session-token',
+	path: '/session-token',
 	router,
 };

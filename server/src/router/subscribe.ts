@@ -1,11 +1,12 @@
 import express from 'express';
 
-import { pubsub } from '../pubsub';
-
 const router = express.Router();
 
 router.get('/:sessionId', (req, res) => {
+	const pubsub = req.app.context.pubsub;
+
 	const { sessionId } = req.params;
+
 	pubsub.subscribe({ key: sessionId, conn: res });
 	console.log(
 		`stream connected with ${JSON.stringify(
@@ -15,6 +16,6 @@ router.get('/:sessionId', (req, res) => {
 });
 
 export default {
-	route: '/subscribe',
+	path: '/subscribe',
 	router: router,
 };
