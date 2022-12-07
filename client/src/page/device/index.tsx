@@ -19,11 +19,8 @@ const DevicePage = () => {
 	const router = useRouter();
 	const sessionId = router.query.sessionId as string;
 
-	const { mutate: publishMessage, isSuccess: successPublishing } = useMutation({
+	const { mutate: publishMessage } = useMutation({
 		mutationFn: mutatation.postMessageStream,
-	});
-	const { mutate: updateSequnce, isSuccess: successUpdatingSequence } = useMutation({
-		mutationFn: mutatation.patchSequence,
 	});
 	const { mutate: createLog } = useMutation({
 		mutationFn: mutatation.postSessionLog,
@@ -69,18 +66,8 @@ const DevicePage = () => {
 				},
 			});
 
-			// TODO: 로그 업데이트 하면서 하나로
-			updateSequnce({
-				uuid: sessionId,
-				sequence: sequences![0],
-			});
-		}
-	}, [publishMessage, router, sequences, sessionId, step, updateSequnce]);
-
-	useEffect(() => {
-		if (successPublishing && successUpdatingSequence) {
 			createLog(
-				{ uuid: sessionId, data: resultLogs },
+				{ uuid: sessionId, logs: resultLogs, sequence: sequences![0] },
 				{
 					onSuccess: () => {
 						router.push('/');
@@ -88,14 +75,7 @@ const DevicePage = () => {
 				}
 			);
 		}
-	}, [
-		createLog,
-		resultLogs,
-		router,
-		sessionId,
-		successPublishing,
-		successUpdatingSequence,
-	]);
+	}, [createLog, publishMessage, resultLogs, router, sequences, sessionId, step]);
 
 	if (!sequences || !sessionId) return null;
 

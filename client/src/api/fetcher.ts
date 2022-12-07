@@ -92,27 +92,14 @@ export const mutatation = {
 		}
 	),
 
-	patchSequence: mutationizeFetcher(
-		async ({
-			uuid,
-			sequence,
-		}: {
+	postSessionLog: mutationizeFetcher(
+		async (data: {
 			uuid: string;
+			logs: SessionLogResult[];
 			sequence: typeof SEQUENCES[number];
 		}) => {
-			const response = await request<SessionToken>({
-				url: `/session-token/${uuid}`,
-				method: 'PATCH',
-				data: sequence,
-			});
-			return response.data;
-		}
-	),
-
-	postSessionLog: mutationizeFetcher(
-		async ({ uuid, data }: { uuid: string; data: SessionLogResult[] }) => {
 			const response = await request<never>({
-				url: `/session-log/${uuid}`,
+				url: `/session-log`,
 				method: 'POST',
 				data,
 			});

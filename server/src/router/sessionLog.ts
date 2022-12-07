@@ -6,38 +6,26 @@ import { SessionLogResult, SessionToken, TEMP_MANAGER_ID } from '../config';
 
 const router = express.Router();
 
-router.get(
-	'/:uuid',
-	asyncHandler(async (req, res) => {
-		const prisma = req.app.context.prisma;
-
-		const log = await prisma.sessionLog.findMany({
-			where: {
-				token: {
-					uuid: req.params.uuid,
-				},
-			},
-			orderBy: {
-				createdAt: 'asc',
-			},
-		});
-		res.json(log);
-	})
-);
-
 router.post(
-	// TODO: 이거 잘못 만듬. uuid가 토큰꺼임 body로 가야됨
-	// 그리고 여기서 sessionToken patch 작업 대신하고 isFinished 조건도 체크해야하고
-	// 내가 만약 하수라를 썼다면 이정도의 작업을 할 수 있었던 건가
-	'/:uuid',
+	'/',
 	asyncHandler(async (req, res) => {
 		const prisma = req.app.context.prisma;
+
+		const { uuid, logs, sequence } = req.body;
 
 		const token = await prisma.sessionToken.findFirst({
-			where: { uuid: req.params.uuid },
+			where: { uuid },
 		});
 
-		const data = (req.body as Array<SessionLogResult>).map(
+		const newSequence = (token?.sequence as Prisma.JsonArray).map((e) => {
+			return (
+				JSON.stringify(e) === JSON.stringify(sequence)
+					? { ...sequence, repetition: 1 }
+					: e
+			) as SessionToken['sequence'][number];
+		});
+
+		const data = (logs as Array<SessionLogResult>).map(
 			(e) =>
 				({
 					sequence: e.sequence,
@@ -55,7 +43,34 @@ router.post(
 				} as Prisma.sessionLogCreateManyInput)
 		);
 
-		await prisma.sessionLog.createMany({ data });
+		const transactions = [
+			prisma.sessionLog.createMany({ data }),
+			prisma.sessionToken.updateMany({
+				where: {
+					uuid,
+				},
+				data: {
+					...token,
+					sequence: newSequence,
+				},
+			}),
+		];
+
+		const isFinished = newSequence.every((seq) => seq.repetition === 1);
+		if (isFinished) {
+			transactions.push(
+				prisma.sessionToken.updateMany({
+					where: {
+						uuid,
+					},
+					data: {
+						isFinished: true,
+					},
+				})
+			);
+		}
+
+		await prisma.$transaction(transactions);
 
 		res.end();
 	})
@@ -103,6 +118,25 @@ router.delete(
 		]);
 
 		res.end();
+	})
+);
+
+router.get(
+	'/:uuid',
+	asyncHandler(async (req, res) => {
+		const prisma = req.app.context.prisma;
+
+		const log = await prisma.sessionLog.findMany({
+			where: {
+				token: {
+					uuid: req.params.uuid,
+				},
+			},
+			orderBy: {
+				createdAt: 'asc',
+			},
+		});
+		res.json(log);
 	})
 );
 

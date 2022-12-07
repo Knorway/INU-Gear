@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 import express from 'express';
 
 import { asyncHandler } from '../asyncHandler';
-import { SEQUENCES, SessionToken, TEMP_MANAGER_ID } from '../config';
+import { SEQUENCES, TEMP_MANAGER_ID } from '../config';
 
 const router = express.Router();
 
@@ -19,9 +19,13 @@ router.get(
 		const excluded = ['main'].includes(req.query.context as string);
 
 		const option: Prisma.sessionTokenFindManyArgs = excluded
-			? { orderBy: { createdAt: 'asc' } }
-			: {
+			? {
 					orderBy: { createdAt: 'asc' },
+					where: {
+						isFinished: false,
+					},
+			  }
+			: {
 					skip,
 					take: perPage + 1,
 					where: {
@@ -92,38 +96,6 @@ router.get(
 			where: { uuid: req.params.uuid },
 		});
 		res.json(token);
-	})
-);
-
-router.patch(
-	// TODO: 사실 이것도 log하위에서 업데이트 하는 게 맞다
-	'/:uuid',
-	asyncHandler(async (req, res) => {
-		const prisma = req.app.context.prisma;
-
-		const token = await prisma.sessionToken.findFirst({
-			where: { uuid: req.params.uuid },
-		});
-
-		const newSequence = (token?.sequence as Prisma.JsonArray).map((e) => {
-			return (
-				JSON.stringify(e) === JSON.stringify(req.body)
-					? { ...req.body, repetition: 1 }
-					: e
-			) as SessionToken['sequence'][number];
-		});
-
-		await prisma.sessionToken.updateMany({
-			where: {
-				uuid: req.params.uuid,
-			},
-			data: {
-				...token,
-				sequence: newSequence,
-			},
-		});
-
-		res.status(200).end();
 	})
 );
 

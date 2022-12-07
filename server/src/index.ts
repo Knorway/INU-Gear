@@ -30,24 +30,19 @@ Object.values(Router).forEach((route) => {
 	app.use(route.path, route.router);
 });
 
-const staticHtmlMap: Record<typeof rewrites[number]['page'], string> = {
-	admin: '',
-	panel: '',
-	device: '',
-	main: '',
-};
-
 /**
  * apply rewrites rules for static serving
  */
+const staticHtmlMap = new Map<typeof rewrites[number]['page'], string>();
+
 rewrites.forEach((rule) => {
-	staticHtmlMap[rule.page] = fs.readFileSync(
-		path.resolve() + `/build/${rule.filepath}`,
-		'utf-8'
+	staticHtmlMap.set(
+		rule.page,
+		fs.readFileSync(path.resolve() + `/build/${rule.filepath}`, 'utf-8')
 	);
 
 	app.get(rule.path as string, (req, res) => {
-		res.send(staticHtmlMap[rule.page]);
+		res.send(staticHtmlMap.get(rule.page));
 	});
 });
 
