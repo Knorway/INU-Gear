@@ -5,14 +5,12 @@ import path from 'path';
 
 import { prisma } from './prisma';
 import { pubsub } from './pubsub';
+import { rewrites } from './rewrites';
 import * as Router from './router';
 
 const app = express();
 
 const PORT = process.env.PORT || 8090;
-
-const mainHtml = fs.readFileSync(path.resolve() + '/build/index.html', 'utf-8');
-const adminHtml = fs.readFileSync(path.resolve() + '/build/admin.html', 'utf-8');
 
 export const serverContext = {
 	prisma,
@@ -32,12 +30,25 @@ Object.values(Router).forEach((route) => {
 	app.use(route.path, route.router);
 });
 
-app.get(['/admin', '/admin/*'], (req, res) => {
-	res.send(adminHtml);
-});
+const staticHtmlMap: Record<typeof rewrites[number]['page'], string> = {
+	admin: '',
+	panel: '',
+	device: '',
+	main: '',
+};
 
-app.get('*', (req, res) => {
-	res.send(mainHtml);
+/**
+ * apply rewrites rules for static serving
+ */
+rewrites.forEach((rule) => {
+	staticHtmlMap[rule.page] = fs.readFileSync(
+		path.resolve() + `/build/${rule.filepath}`,
+		'utf-8'
+	);
+
+	app.get(rule.path as string, (req, res) => {
+		res.send(staticHtmlMap[rule.page]);
+	});
 });
 
 app.use(<ErrorRequestHandler>((error, req, res, next) => {
