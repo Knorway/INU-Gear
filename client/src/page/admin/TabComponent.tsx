@@ -16,14 +16,14 @@ const TabComponent = () => {
 		queryKey: tabQueryKeyMapping[pageState.currentTab],
 	});
 
-	const loading = useMemo(
+	const loadable = useMemo(
 		() => isLoading && !excluded.includes(pageState.currentTab),
 		[isLoading, pageState.currentTab]
 	);
 
 	return (
 		<Fragment>
-			{loading && (
+			{loadable && (
 				<Fragment>
 					<Spinner />
 					<div className='absolute top-0 w-full h-full bg-white'></div>

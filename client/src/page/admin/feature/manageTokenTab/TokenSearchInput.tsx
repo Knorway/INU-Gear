@@ -34,7 +34,7 @@ const TokenSearchInput = () => {
 		mutationFn: mutatation.deleteSessionToken,
 	});
 
-	const serachTokens = _.debounce(() => {
+	const searchTokens = _.debounce(() => {
 		refetch();
 		featureDispatch({ tokenPage: 0 });
 	}, 200);
@@ -54,6 +54,7 @@ const TokenSearchInput = () => {
 			{ tokens: data.checkedTokens },
 			{
 				onSuccess: () => {
+					// TODO: manual cache filtering
 					queryClient.invalidateQueries({ queryKey: queryKey.sessionTokens });
 				},
 			}
@@ -94,7 +95,7 @@ const TokenSearchInput = () => {
 							className='block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 '
 							placeholder='Search for users'
 							{...register('searchText')}
-							onKeyDown={serachTokens}
+							onKeyDown={searchTokens}
 						/>
 					</div>
 				</div>

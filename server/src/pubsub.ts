@@ -1,6 +1,6 @@
 import { Response } from 'express';
 
-export class PubSub {
+class PubSub {
 	public readonly connections: Record<string, Response> = {};
 
 	public subscribe({ conn, key }: { conn: Response; key: string }) {
@@ -28,3 +28,5 @@ export class PubSub {
 		}
 	}
 }
+
+export const pubsub = new PubSub();

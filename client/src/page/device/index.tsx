@@ -69,6 +69,7 @@ const DevicePage = () => {
 				},
 			});
 
+			// TODO: 로그 업데이트 하면서 하나로
 			updateSequnce({
 				uuid: sessionId,
 				sequence: sequences![0],
@@ -100,7 +101,6 @@ const DevicePage = () => {
 
 	return (
 		<Fragment>
-			{/* <pre>Device session: {sessionId}</pre> */}
 			{sequences.map((sequence, idx) => {
 				if (step === idx) {
 					return (

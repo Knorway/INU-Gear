@@ -87,7 +87,7 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 			const { direction, sequence, type } = docs[0];
 
 			const confirm = window.confirm(
-				`direction: [${direction}] sequence: [${sequence}] \n해당 트라이얼의 로그 ${docs.length}개를 삭제합니다. \n계속하시겠습니까?`
+				`type: [${type}] direction: [${direction}] sequence: [${sequence}] \n해당 트라이얼의 로그 ${docs.length}개를 삭제합니다. \n계속하시겠습니까?`
 			);
 			if (!confirm) return;
 
@@ -157,7 +157,7 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 																		key={
 																			data.initialReaction
 																		}
-																		className='bg-white border-b cursor-pointer hover:bg-gray-100'
+																		className='bg-white border-b hover:bg-gray-100'
 																	>
 																		<td className='w-4'></td>
 																		<td className='px-6 py-1 text-black'>

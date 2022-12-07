@@ -59,3 +59,5 @@ export const SEQUENCES = [
 	{ type: 'B', direction: 'LEFT', sequence: ['R', 'N', 'D'], repetition: 0 as number },
 	{ type: 'B', direction: 'LEFT', sequence: ['D', 'N', 'R'], repetition: 0 as number },
 ] as const;
+
+export const TEMP_MANAGER_ID = 3;
