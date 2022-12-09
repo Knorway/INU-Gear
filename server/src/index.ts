@@ -3,19 +3,13 @@ import express, { ErrorRequestHandler } from 'express';
 import fs from 'fs';
 import path from 'path';
 
-import { prisma } from './prisma';
-import { pubsub } from './pubsub';
+import { serverContext } from './context';
 import { rewrites } from './rewrites';
 import * as Router from './router';
 
 const app = express();
 
 const PORT = process.env.PORT || 8090;
-
-export const serverContext = {
-	prisma,
-	pubsub,
-} as const;
 
 app.context = serverContext;
 
@@ -47,7 +41,9 @@ rewrites.forEach((rule) => {
 });
 
 app.use(<ErrorRequestHandler>((error, req, res, next) => {
-	res.status(500).json({ route: req.url, error: error.message, handled: true });
+	const statusCode = req.statusCode || 500;
+	res.status(statusCode).json({ route: req.url, error: error.message, handled: true });
+	//TODO: error log to db, status code
 }));
 
 app.listen(PORT, () => console.log(`server running on http://localhost:${PORT}`));

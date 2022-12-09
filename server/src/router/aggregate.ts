@@ -7,7 +7,7 @@ const router = express.Router();
 router.get(
 	'/:sequence',
 	asyncHandler(async (req, res) => {
-		const prisma = req.app.context.prisma;
+		const { prisma } = req.app.context;
 
 		const agg = await prisma.sessionLog.aggregate({
 			where: {
@@ -28,6 +28,7 @@ router.get(
 				initialReaction: true,
 			},
 		});
+
 		res.json(agg);
 	})
 );

@@ -9,7 +9,7 @@ const router = express.Router();
 router.get(
 	'/',
 	asyncHandler(async (req, res) => {
-		const prisma = req.app.context.prisma;
+		const { prisma } = req.app.context;
 
 		const pageQuery = Number(req.query.page) || 0;
 		const perPage = 10;
@@ -37,11 +37,12 @@ router.get(
 					},
 			  };
 
-		const tokens = await prisma.sessionToken.findMany(option);
-		const totalCount = await prisma.sessionToken.count({
-			where: option.where,
-		});
-
+		const [tokens, totalCount] = await Promise.all([
+			prisma.sessionToken.findMany(option),
+			prisma.sessionToken.count({
+				where: option.where,
+			}),
+		]);
 		const payload = excluded ? tokens : tokens.slice(0, 10);
 
 		res.json({
@@ -56,9 +57,9 @@ router.get(
 router.post(
 	'/',
 	asyncHandler(async (req, res) => {
-		const prisma = req.app.context.prisma;
-
+		const { prisma } = req.app.context;
 		const { label } = req.body;
+
 		const token = await prisma.sessionToken.create({
 			data: {
 				label,
@@ -66,6 +67,7 @@ router.post(
 				sequence: SEQUENCES,
 			},
 		});
+
 		res.json(token);
 	})
 );
@@ -73,9 +75,9 @@ router.post(
 router.delete(
 	'/',
 	asyncHandler(async (req, res) => {
-		const prisma = req.app.context.prisma;
-
+		const { prisma } = req.app.context;
 		const { tokens } = req.body;
+
 		await prisma.sessionToken.deleteMany({
 			where: {
 				uuid: {
@@ -83,6 +85,7 @@ router.delete(
 				},
 			},
 		});
+
 		res.end();
 	})
 );
@@ -90,11 +93,12 @@ router.delete(
 router.get(
 	'/:uuid',
 	asyncHandler(async (req, res) => {
-		const prisma = req.app.context.prisma;
+		const { prisma } = req.app.context;
 
 		const token = await prisma.sessionToken.findFirst({
 			where: { uuid: req.params.uuid },
 		});
+
 		res.json(token);
 	})
 );

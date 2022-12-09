@@ -9,8 +9,7 @@ const router = express.Router();
 router.post(
 	'/',
 	asyncHandler(async (req, res) => {
-		const prisma = req.app.context.prisma;
-
+		const { prisma } = req.app.context;
 		const { uuid, logs, sequence } = req.body;
 
 		const token = await prisma.sessionToken.findFirst({
@@ -79,8 +78,7 @@ router.post(
 router.delete(
 	'/',
 	asyncHandler(async (req, res) => {
-		const prisma = req.app.context.prisma;
-
+		const { prisma } = req.app.context;
 		const { tokenId, uuids, sequence } = req.body;
 
 		const token = await prisma.sessionToken.findFirst({
@@ -97,7 +95,7 @@ router.delete(
 			) as SessionToken['sequence'][number];
 		});
 
-		await prisma.$transaction([
+		const transactions = [
 			prisma.sessionToken.updateMany({
 				where: {
 					uuid: tokenId,
@@ -107,7 +105,6 @@ router.delete(
 					sequence: newSequence,
 				},
 			}),
-
 			prisma.sessionLog.deleteMany({
 				where: {
 					uuid: {
@@ -115,7 +112,9 @@ router.delete(
 					},
 				},
 			}),
-		]);
+		];
+
+		await prisma.$transaction(transactions);
 
 		res.end();
 	})
@@ -124,7 +123,7 @@ router.delete(
 router.get(
 	'/:uuid',
 	asyncHandler(async (req, res) => {
-		const prisma = req.app.context.prisma;
+		const { prisma } = req.app.context;
 
 		const log = await prisma.sessionLog.findMany({
 			where: {
@@ -136,6 +135,7 @@ router.get(
 				createdAt: 'asc',
 			},
 		});
+
 		res.json(log);
 	})
 );
