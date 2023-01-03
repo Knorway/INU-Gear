@@ -18,7 +18,7 @@ export const PageDispatchContext = createContext<React.Dispatch<State> | null>(n
 // TODO: wrapper 만들어서 state만 props로 넘기면 간단하게 context 뽑아낼 수 있게 만들 수 있을 거 같은데
 export const PageContextProvider = (props: Props) => {
 	const [state, dispatch] = useReducer(reducer, {
-		currentTab: 'overview',
+		currentTab: 'manageToken',
 	} as State);
 
 	return (

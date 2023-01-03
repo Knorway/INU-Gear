@@ -5,6 +5,29 @@ import { asyncHandler } from '../asyncHandler';
 const router = express.Router();
 
 router.get(
+	'/test',
+	asyncHandler(async (req, res) => {
+		const { prisma } = req.app.context;
+
+		// querystring: sequence, start/dest, dir, token,
+
+		const r = await prisma.sessionLog.aggregate({
+			where: {
+				sequence: {
+					equals: ['R', 'N', 'D'],
+				},
+				destination: 'P',
+			},
+			_avg: {
+				responseTime: true,
+			},
+		});
+
+		res.json(r);
+	})
+);
+
+router.get(
 	'/:sequence',
 	asyncHandler(async (req, res) => {
 		const { prisma } = req.app.context;

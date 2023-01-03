@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
     provider = "prisma-client-js"
 }
@@ -19,7 +16,7 @@ model manager {
     id        Int      @id @default(autoincrement())
     uuid      String   @default(uuid())
     account   String   @db.VarChar(255)
-    password  String   @map("paassword") @db.VarChar(255)
+    password  String   @map("password") @db.VarChar(255)
     createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
 
     sessionToken sessionToken[]
@@ -38,6 +35,7 @@ model sessionLog {
     direction       String @db.VarChar(255)
     distance        Int
     travel          Int
+    error           Int
     initialReaction Int    @map("initial_reaction")
     responseTime    Int    @map("response_time")
 

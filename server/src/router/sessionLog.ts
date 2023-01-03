@@ -34,6 +34,7 @@ router.post(
 					direction: e.direction,
 					distance: e.distance,
 					travel: e.travel,
+					error: e.logs.error,
 					initialReaction: e.logs.touch,
 					responseTime: e.logs.diff,
 					managerId: TEMP_MANAGER_ID,

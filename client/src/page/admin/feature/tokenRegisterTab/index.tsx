@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { Fragment } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
@@ -14,7 +15,7 @@ type FormType = {
 
 const TokenRegisterTab = () => {
 	const formMethods = useForm<FormType>();
-	const { isActive, activate } = useNotification();
+	const { activateToast, toast } = useNotification();
 
 	const {
 		mutate: registerSessionToken,
@@ -30,7 +31,21 @@ const TokenRegisterTab = () => {
 			{
 				onSuccess: () => {
 					formMethods.reset();
-					activate();
+					activateToast({
+						variant: 'positive',
+						title: '유저 세션을 생성했습니다',
+						description: '',
+					});
+				},
+				onError: (error) => {
+					console.log(error);
+					activateToast({
+						variant: 'negative',
+						title: '참가자 생성에 실패했습니다.',
+						description:
+							(error as AxiosError<any>).response?.data?.error ??
+							'unknown error',
+					});
 				},
 			}
 		);
@@ -61,16 +76,7 @@ const TokenRegisterTab = () => {
 					</div>
 				</form>
 			</FormProvider>
-			{isActive && (
-				<Toast
-					variant='positive'
-					title='유저 세션을 생성했습니다'
-					description={JSON.stringify({
-						label: data?.label,
-						token: data?.uuid,
-					})}
-				/>
-			)}
+			{toast}
 		</Fragment>
 	);
 };

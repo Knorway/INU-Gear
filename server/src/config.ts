@@ -25,6 +25,7 @@ export type SessionLogResult = {
 		touch: number;
 		pass: number;
 		diff: number;
+		error: number;
 		// delay: number;
 	};
 };

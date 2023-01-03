@@ -2,7 +2,11 @@ import { PrismaClient } from '@prisma/client';
 
 import { PubSub } from './pubsub';
 
-const prisma = new PrismaClient({ log: ['query'] });
+const isProd = process.env.NODE_ENV === 'production';
+
+const prisma = new PrismaClient({
+	log: isProd ? ['error', 'warn'] : ['query', 'error', 'info', 'warn'],
+});
 const pubsub = new PubSub();
 
 export const serverContext = {

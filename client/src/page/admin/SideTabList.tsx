@@ -2,7 +2,7 @@ import { Fragment, useCallback } from 'react';
 
 import { useCtx } from '~/src/hooks/useCtx';
 
-import { tabList, TabName, tapMapping } from './config/tab';
+import { tabList, tabMapping, TabName } from './config/tab';
 import { PageDispatchContext, PageStateContext } from './context/PageContext';
 
 const SideTabList = () => {
@@ -33,7 +33,7 @@ const SideTabList = () => {
 						isCurrentTab(tabName) ? 'font-normal' : 'font-thin'
 					} cursor-pointer min-w-max`}
 				>
-					{tapMapping[tabName].label}
+					{tabMapping[tabName].label}
 				</div>
 			))}
 		</Fragment>

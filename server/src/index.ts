@@ -5,7 +5,7 @@ import path from 'path';
 
 import { serverContext } from './context';
 import { rewrites } from './rewrites';
-import * as Router from './router';
+import * as Routes from './router';
 
 const app = express();
 
@@ -15,12 +15,16 @@ app.context = serverContext;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.resolve() + '/build'));
+app.use(
+	express.static(path.resolve() + '/build', {
+		maxAge: '365d',
+	})
+);
 
 /**
  * register router
  */
-Object.values(Router).forEach((route) => {
+Object.values(Routes).forEach((route) => {
 	app.use(route.path, route.router);
 });
 
@@ -43,7 +47,7 @@ rewrites.forEach((rule) => {
 app.use(<ErrorRequestHandler>((error, req, res, next) => {
 	const statusCode = req.statusCode || 500;
 	res.status(statusCode).json({ route: req.url, error: error.message, handled: true });
-	//TODO: error log to db, status code
+	console.log(`[ErrorRequestHandler]: ${error.message}`);
 }));
 
 app.listen(PORT, () => console.log(`server running on http://localhost:${PORT}`));

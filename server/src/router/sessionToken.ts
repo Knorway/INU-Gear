@@ -20,7 +20,6 @@ router.get(
 
 		const option: Prisma.sessionTokenFindManyArgs = excluded
 			? {
-					orderBy: { createdAt: 'asc' },
 					where: {
 						isFinished: false,
 					},
@@ -37,12 +36,17 @@ router.get(
 					},
 			  };
 
-		const [tokens, totalCount] = await Promise.all([
-			prisma.sessionToken.findMany(option),
+		const queries = [
+			prisma.sessionToken.findMany({
+				...option,
+				orderBy: { createdAt: 'desc' },
+			}),
 			prisma.sessionToken.count({
 				where: option.where,
 			}),
-		]);
+		] as const;
+
+		const [tokens, totalCount] = await Promise.all(queries);
 		const payload = excluded ? tokens : tokens.slice(0, 10);
 
 		res.json({

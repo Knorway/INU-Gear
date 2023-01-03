@@ -4,7 +4,7 @@ import { Fragment, useMemo } from 'react';
 import Spinner from '~/src/components/Spinner';
 import { useCtx } from '~/src/hooks/useCtx';
 
-import { TabName, tabQueryKeyMapping, tapMapping } from './config/tab';
+import { tabMapping, TabName, tabQueryKeyMapping } from './config/tab';
 import { PageStateContext } from './context/PageContext';
 
 const excluded: TabName[] = ['createToken'];
@@ -29,7 +29,7 @@ const TabComponent = () => {
 					<div className='absolute top-0 w-full h-full bg-white'></div>
 				</Fragment>
 			)}
-			{tapMapping[pageState.currentTab].component}
+			{tabMapping[pageState.currentTab].component}
 		</Fragment>
 	);
 };

@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import _ from 'lodash';
 import { useRouter } from 'next/router';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -15,6 +16,8 @@ const DevicePage = () => {
 	const [sequences, setSequences] = useState<typeof SEQUENCES[number][] | null>(null);
 	const [step, setStep] = useState(0);
 	const [resultLogs, setResultLogs] = useState<SessionLogResult[]>([]);
+
+	console.log(resultLogs);
 
 	const router = useRouter();
 	const sessionId = router.query.sessionId as string;
@@ -33,7 +36,7 @@ const DevicePage = () => {
 	}, [sequences]);
 
 	// console.log(startDest);
-	console.log(resultLogs);
+	// console.log(resultLogs);
 
 	const goNextStep = useCallback(
 		(log: SessionLogResult) => {
@@ -58,19 +61,27 @@ const DevicePage = () => {
 		if (!sessionId) return;
 
 		if (step === TRIAL_REPEAT) {
-			publishMessage({
-				uuid: sessionId as string,
-				message: {
-					type: 'complete',
-					payload: null,
-				},
-			});
-
 			createLog(
 				{ uuid: sessionId, logs: resultLogs, sequence: sequences![0] },
 				{
 					onSuccess: () => {
+						publishMessage({
+							uuid: sessionId as string,
+							message: {
+								type: 'complete',
+								payload: null,
+							},
+						});
 						router.push('/');
+					},
+					onError: () => {
+						publishMessage({
+							uuid: sessionId as string,
+							message: {
+								type: 'error',
+								payload: null,
+							},
+						});
 					},
 				}
 			);

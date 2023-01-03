@@ -29,14 +29,15 @@ type LogDoc = {
 	direction: Sequence<'direction'>;
 	initialReaction: number;
 	responseTime: number;
+	error: number;
 	sequence: SequenceChar[];
 	starting: SequenceChar;
 	destination: SequenceChar;
-	recordedAt: number;
+	createdAt: number;
 	uuid: string;
 };
 
-const tableHeads = ['dir', 'initial', 'response', 'starting', 'destination'];
+const tableHeads = ['dir', 'starting', 'destination', 'response', 'error'];
 
 const LogDocument = ({ token, log, onUnmount }: Props) => {
 	const queryClient = useQueryClient();
@@ -55,10 +56,11 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 						direction: e.direction,
 						initialReaction: e.initialReaction,
 						responseTime: e.responseTime,
+						error: e.error,
 						sequence: e.sequence,
 						starting: e.starting,
 						destination: e.destination,
-						recordedAt: e?.log?.pass,
+						createdAt: e.createdAt,
 						uuid: e.uuid,
 					} as LogDoc)
 			);
@@ -135,6 +137,17 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 								</span>
 								{Object.entries(logs).map(([seq, docs]) => {
 									const trialChunks = _.groupBy(docs, 'direction');
+									const avgResponse =
+										docs.reduce((acc, val) => {
+											acc += val.responseTime;
+											return acc;
+										}, 0) / docs.length;
+									const avgError =
+										docs.reduce((acc, val) => {
+											acc += val.error;
+											return acc;
+										}, 0) / docs.length;
+
 									return (
 										<div key={seq}>
 											<p className='my-2 font-bold text-black'>
@@ -148,6 +161,40 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 																className='p-1 text-black border rounded-md cursor-pointer w-7 h-7'
 																onClick={revokeTrial(doc)}
 															/>
+															<Table
+																tableHeads={[
+																	'aggregate',
+																	'response',
+																	'error',
+																]}
+																data={[
+																	{
+																		responseTime:
+																			avgResponse,
+																		error: avgError,
+																	},
+																]}
+															>
+																{({ data }) => (
+																	<>
+																		<td className='w-4'></td>
+																		<td className='px-6 py-1 text-black'>
+																			AVG
+																		</td>
+																		<td className='px-6 py-1 text-black'>
+																			{
+																				data.responseTime
+																			}
+																			ms
+																		</td>
+																		<td className='px-6 py-1 text-black'>
+																			{data.error.toFixed(
+																				2
+																			)}
+																		</td>
+																	</>
+																)}
+															</Table>
 															<Table
 																tableHeads={tableHeads}
 																data={doc}
@@ -170,9 +217,13 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 																			className='px-6 py-1 font-normal text-black whitespace-nowrap'
 																		>
 																			{
-																				data.initialReaction
+																				data.starting
 																			}
-																			ms
+																		</td>
+																		<td className='px-6 py-1 text-black'>
+																			{
+																				data.destination
+																			}
 																		</td>
 																		<td className='px-6 py-1 text-black'>
 																			{
@@ -181,14 +232,7 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 																			ms
 																		</td>
 																		<td className='px-6 py-1 text-black'>
-																			{
-																				data.starting
-																			}
-																		</td>
-																		<td className='px-6 py-1 text-black'>
-																			{
-																				data.destination
-																			}
+																			{data.error}
 																		</td>
 																	</tr>
 																)}

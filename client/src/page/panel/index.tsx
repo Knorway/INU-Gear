@@ -2,7 +2,6 @@ import { useRouter } from 'next/router';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 
 import { BACKEND_URL } from '~/src/api/request';
-import Toast from '~/src/components/Toast';
 import { MessageStream } from '~/src/config/settings';
 import { useNotification } from '~/src/hooks/useNotification';
 import PanelScreen from '~/src/page/panel/PanelScreen';
@@ -13,13 +12,14 @@ const PanelPage = () => {
 	const [message, setMessage] = useState<MessageStream['payload'] | null>(null);
 	const [initialized, setInitialized] = useState(false);
 	const [completed, setCompleted] = useState(false);
+	const [error, setError] = useState(false);
 
 	const firstEntering = useMemo(() => initialized && !message, [initialized, message]);
 
 	const router = useRouter();
 	const sessionId = router.query.sessionId as string;
 
-	const { isActive, activate } = useNotification();
+	const { activateToast, toast } = useNotification();
 
 	useEffect(() => {
 		if (!sessionId) return;
@@ -43,6 +43,10 @@ const PanelPage = () => {
 					setCompleted(true);
 					break;
 				}
+				case 'error': {
+					setError(true);
+					break;
+				}
 				default:
 					break;
 			}
@@ -60,7 +64,11 @@ const PanelPage = () => {
 	useEffect(() => {
 		if (!completed) return;
 
-		activate();
+		activateToast({
+			variant: 'positive',
+			title: '세션이 종료되었습니다',
+			description: '잠시후 메인 화면으로 되돌아갑니다',
+		});
 		const id = setTimeout(() => {
 			router.push('/');
 		}, 3500);
@@ -68,7 +76,17 @@ const PanelPage = () => {
 		return () => {
 			clearTimeout(id);
 		};
-	}, [activate, completed, router]);
+	}, [activateToast, completed, router]);
+
+	useEffect(() => {
+		if (error) {
+			activateToast({
+				variant: 'negative',
+				title: '세션 저장에 실패했습니다.',
+				description: '',
+			});
+		}
+	}, [activateToast, error]);
 
 	useEffect(() => {
 		if (!message) return;
@@ -93,18 +111,10 @@ const PanelPage = () => {
 
 	return (
 		<Fragment>
-			{/* <h1>Panel sessionId: {router.query.sessionId}</h1>
-			<pre>{JSON.stringify(message, null, 2)}</pre> */}
 			<div className='flex items-center justify-center h-[85vh]'>
 				<PanelScreen message={message} />
 			</div>
-			{isActive && (
-				<Toast
-					variant='positive'
-					title='세션이 종료되었습니다'
-					description='잠시후 메인 화면으로 되돌아갑니다'
-				/>
-			)}
+			{toast}
 		</Fragment>
 	);
 };

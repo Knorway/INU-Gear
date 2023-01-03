@@ -21,7 +21,7 @@ export type SessionLogResult = {
 };
 
 export type MessageStream = {
-	type: 'initialize' | 'message' | 'complete';
+	type: 'initialize' | 'message' | 'complete' | 'error';
 	payload: {
 		timeStamp: number;
 		cursor: {

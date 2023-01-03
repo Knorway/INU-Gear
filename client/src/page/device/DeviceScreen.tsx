@@ -24,6 +24,8 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 	const [, setStepTimeout] = useState(0);
 	const [initialized, setInitialized] = useState(false);
 
+	// console.log(startDest);
+
 	const { cursor, sequence, info } = useSequence({ targetSequence, startDest });
 	const { chars, direction } = sequence;
 	const { current: currentCursor, destination, starting } = cursor;
@@ -54,9 +56,6 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 		},
 		[destination, isOperational, isFinished, publishMessage, sessionId, starting]
 	);
-
-	// console.log(starting, destination);
-	// console.log(distance, '--');
 
 	const tint = useCallback(
 		(idx: number) => {
@@ -91,12 +90,12 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 			direction: sequence.direction,
 			distance: info.distance,
 			travel: info.travel.length,
-			// TODO: overTraveled: travel - distance,
 			logs: {
 				init: log.init,
 				touch: log.touch - log.init,
 				pass: log.pass,
 				diff: log.diff,
+				error: log.error,
 			},
 		} as SessionLogResult;
 

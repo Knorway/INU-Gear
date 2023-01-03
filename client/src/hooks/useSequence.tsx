@@ -5,18 +5,20 @@ import { DEFAULT_DELAY, SequenceChar, SEQUENCES } from '~/src/config/settings';
 
 import { useSound } from './useSound';
 
-type LogTimeStamps = {
+type SessionLog = {
 	init: number;
 	touch: number;
 	pass: number;
 	diff: number;
+	error: number;
 };
 
-const initialTimeStamps: LogTimeStamps = {
+const initialLog: SessionLog = {
 	init: 0,
 	touch: 0,
 	pass: 0,
 	diff: 0,
+	error: 0,
 };
 
 const useSequence = ({
@@ -38,7 +40,7 @@ const useSequence = ({
 
 	const [travel, setTravel] = useState<('L' | 'R' | 'P')[]>([]);
 	const [cursor, setCursor] = useState(indexOfChar(starting));
-	const [log, setLog] = useState<LogTimeStamps>(initialTimeStamps);
+	const [log, setLog] = useState<SessionLog>(initialLog);
 	const [isFinished, setIsFinished] = useState(false);
 	const [optrTimeout, setOptrTimeout] = useState(0);
 	const [finalTouch, setFinalTouch] = useState(0);
@@ -46,7 +48,6 @@ const useSequence = ({
 	const initRef = useRef(false);
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
 	const isParked = useMemo(() => cursor === -1, [cursor]);
-	// const isParked = useMemo(() => type === 'B' && cursor === -1, [cursor, type]);
 
 	const { playSound } = useSound({ fileName: 'beep-sound-8333.mp3' });
 
@@ -63,6 +64,9 @@ const useSequence = ({
 		}
 		return Math.abs(indexOfChar(destination) - indexOfChar(starting));
 	}, [destination, indexOfChar, sequence, starting, type]);
+
+	// console.log(travel, 'travel');
+	// console.log(distance, 'distance');
 
 	const writeLog = useCallback((key: keyof typeof log, value: number) => {
 		setLog((prev) => {
@@ -85,8 +89,12 @@ const useSequence = ({
 			const P = e.deltaY;
 			const delta = isLeft ? 1 : -1;
 			if (P > 0) {
-				writeLog('touch', Date.now());
-				setTravel((prev) => [...prev, 'L']);
+				// writeLog('touch', Date.now());
+
+				if (cursor - 1 !== -1) {
+					writeLog('touch', Date.now());
+					setTravel((prev) => [...prev, 'L']);
+				}
 
 				const newCursor = (() => {
 					if (!isParked) return cursor + delta;
@@ -106,8 +114,12 @@ const useSequence = ({
 			const P = e.deltaY;
 			const delta = isLeft ? -1 : 1;
 			if (P < 0 || P === 0) {
-				writeLog('touch', Date.now());
-				setTravel((prev) => [...prev, 'R']);
+				// writeLog('touch', Date.now());
+
+				if (cursor + 1 <= sequence.length - 1) {
+					writeLog('touch', Date.now());
+					setTravel((prev) => [...prev, 'R']);
+				}
 
 				const newCursor = (() => {
 					if (!isParked) return cursor + delta;
@@ -123,10 +135,15 @@ const useSequence = ({
 
 	const onParking = useCallback(() => {
 		if (!isOperational) return;
-		writeLog('touch', Date.now());
-		setTravel((prev) => [...prev, 'P']);
+		// writeLog('touch', Date.now());
+
+		if (!(cursor === -1 && travel.at(-1) === 'P')) {
+			writeLog('touch', Date.now());
+			setTravel((prev) => [...prev, 'P']);
+		}
+
 		setCursor(-1);
-	}, [isOperational, writeLog]);
+	}, [cursor, isOperational, travel, writeLog]);
 
 	const pass = useMemo(
 		() =>
@@ -193,18 +210,40 @@ const useSequence = ({
 	useEffect(() => {
 		if (!isFinished) return;
 
-		writeLog('pass', finalTouch);
-
-		// TODO
-		// const offset = travel.length * DEFAULT_DELAY;
-
 		const diff = (() => {
 			if (distance === 1 && travel.length === 1) return log.touch - log.init;
 			return finalTouch - log.init;
 		})();
 
+		const error = (() => {
+			if (
+				((destination === sequence[0] && travel[0] !== 'L') ||
+					(destination === sequence.at(-1) && travel[0] !== 'R')) &&
+				starting === 'P'
+			) {
+				return Math.abs(travel.length - distance - 1);
+			}
+			return Math.abs(travel.length - distance);
+		})();
+
+		writeLog('pass', finalTouch);
 		writeLog('diff', diff);
-	}, [distance, finalTouch, isFinished, log.init, log.touch, travel.length, writeLog]);
+		writeLog('error', error);
+
+		// TODO: const offset = travel.length * DEFAULT_DELAY;
+	}, [
+		destination,
+		distance,
+		finalTouch,
+		indexOfChar,
+		isFinished,
+		log.init,
+		log.touch,
+		sequence,
+		starting,
+		travel,
+		writeLog,
+	]);
 
 	return {
 		cursor: {
