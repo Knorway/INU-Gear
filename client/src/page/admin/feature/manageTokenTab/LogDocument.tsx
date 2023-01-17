@@ -38,6 +38,7 @@ type LogDoc = {
 };
 
 const tableHeads = ['dir', 'starting', 'destination', 'response', 'error'];
+const aggTableHeads = ['aggregate', 'response'];
 
 const LogDocument = ({ token, log, onUnmount }: Props) => {
 	const queryClient = useQueryClient();
@@ -142,11 +143,9 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 											acc += val.responseTime;
 											return acc;
 										}, 0) / docs.length;
-									const avgError =
-										docs.reduce((acc, val) => {
-											acc += val.error;
-											return acc;
-										}, 0) / docs.length;
+									const aggTableData = {
+										responseTime: avgResponse.toFixed(0),
+									};
 
 									return (
 										<div key={seq}>
@@ -162,18 +161,8 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 																onClick={revokeTrial(doc)}
 															/>
 															<Table
-																tableHeads={[
-																	'aggregate',
-																	'response',
-																	'error',
-																]}
-																data={[
-																	{
-																		responseTime:
-																			avgResponse,
-																		error: avgError,
-																	},
-																]}
+																tableHeads={aggTableHeads}
+																data={[aggTableData]}
 															>
 																{({ data }) => (
 																	<>
@@ -187,11 +176,9 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 																			}
 																			ms
 																		</td>
-																		<td className='px-6 py-1 text-black'>
-																			{data.error.toFixed(
-																				2
-																			)}
-																		</td>
+																		{/* <td className='px-6 py-1 text-black'>
+																			{data.error}
+																		</td> */}
 																	</>
 																)}
 															</Table>

@@ -6,7 +6,6 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { mutatation } from '~/src/api/fetcher';
 import FormInput from '~/src/components/FormInput';
 import Spinner from '~/src/components/Spinner';
-import Toast from '~/src/components/Toast';
 import { useNotification } from '~/src/hooks/useNotification';
 
 type FormType = {
@@ -33,7 +32,7 @@ const TokenRegisterTab = () => {
 					formMethods.reset();
 					activateToast({
 						variant: 'positive',
-						title: '유저 세션을 생성했습니다',
+						title: '새로운 참가자를 생성했습니다',
 						description: '',
 					});
 				},

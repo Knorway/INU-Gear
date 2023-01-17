@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { mutatation } from '~/src/api/fetcher';
 import {
@@ -10,6 +10,7 @@ import {
 } from '~/src/config/settings';
 import { useEffectOnce } from '~/src/hooks/useEffectOnce';
 import useSequence from '~/src/hooks/useSequence';
+import { useSound } from '~/src/hooks/useSound';
 
 import Char from './Char';
 
@@ -31,7 +32,12 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 	const { current: currentCursor, destination, starting } = cursor;
 	const { isOperational, isFinished, log, distance } = info;
 
+	const [msgSentCount, setMsgSentCount] = useState(0);
+	const GEAR_RELEASED = useMemo(() => msgSentCount === 3, [msgSentCount]);
+
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
+
+	const { playSound } = useSound({ fileName: 'MP_Electronic Chime.mp3' });
 
 	const { mutate: publishMessage } = useMutation({
 		mutationFn: mutatation.postMessageStream,
@@ -53,6 +59,7 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 					},
 				},
 			});
+			setMsgSentCount((prev) => prev + 1);
 		},
 		[destination, isOperational, isFinished, publishMessage, sessionId, starting]
 	);
@@ -78,6 +85,12 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 			publish('message');
 		}
 	}, [initialized, publish]);
+
+	useEffect(() => {
+		if (GEAR_RELEASED) {
+			playSound();
+		}
+	}, [GEAR_RELEASED, playSound]);
 
 	useEffect(() => {
 		if (!isFinished) return;

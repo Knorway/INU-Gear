@@ -17,8 +17,6 @@ const DevicePage = () => {
 	const [step, setStep] = useState(0);
 	const [resultLogs, setResultLogs] = useState<SessionLogResult[]>([]);
 
-	console.log(resultLogs);
-
 	const router = useRouter();
 	const sessionId = router.query.sessionId as string;
 
