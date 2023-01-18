@@ -197,10 +197,26 @@
   dependencies:
     mini-svg-data-uri "^1.2.3"
 
+"@tanstack/match-sorter-utils@^8.7.0":
+  version "8.7.6"
+  resolved "https://registry.yarnpkg.com/@tanstack/match-sorter-utils/-/match-sorter-utils-8.7.6.tgz#ccf54a37447770e0cf0fe49a579c595fd2655b16"
+  integrity sha512-2AMpRiA6QivHOUiBpQAVxjiHAA68Ei23ZUMNaRJrN6omWiSFLoYrxGcT6BXtuzp0Jw4h6HZCmGGIM/gbwebO2A==
+  dependencies:
+    remove-accents "0.4.2"
+
 "@tanstack/query-core@4.18.0":
   version "4.18.0"
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.18.0.tgz#3e166ce319fd869c668536384ae94d174ea46a59"
   integrity sha512-PP4mG8MD08sq64RZCqMfXMYfaj7+Oulwg7xZ/fJoEOdTZNcPIgaOkHajZvUBsNLbi/0ViMvJB4cFkL2Jg2WPbw==
+
+"@tanstack/react-query-devtools@^4.22.0":
+  version "4.22.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-devtools/-/react-query-devtools-4.22.0.tgz#e39f04e55428ff6ce2b2796f3171db170afcb2a8"
+  integrity sha512-YeYFBnfqvb+ZlA0IiJqiHNNSzepNhI1p2o9i8NlhQli9+Zrn230M47OBaBUs8qr3DD1dC2zGB1Dis50Ktz8gAA==
+  dependencies:
+    "@tanstack/match-sorter-utils" "^8.7.0"
+    superjson "^1.10.0"
+    use-sync-external-store "^1.2.0"
 
 "@tanstack/react-query@^4.14.5":
   version "4.18.0"
@@ -602,6 +618,13 @@ concurrently@^7.6.0:
     supports-color "^8.1.0"
     tree-kill "^1.2.2"
     yargs "^17.3.1"
+
+copy-anything@^3.0.2:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/copy-anything/-/copy-anything-3.0.3.tgz#206767156f08da0e02efd392f71abcdf79643559"
+  integrity sha512-fpW2W/BqEzqPp29QS+MwwfisHCQZtiduTe/m8idFo0xbti9fIZ2WVhAsCv4ggFVH3AgCkVdpoOCtQC6gBrdhjw==
+  dependencies:
+    is-what "^4.1.8"
 
 core-js-pure@^3.25.1:
   version "3.26.1"
@@ -1393,6 +1416,11 @@ is-weakref@^1.0.2:
   dependencies:
     call-bind "^1.0.2"
 
+is-what@^4.1.8:
+  version "4.1.8"
+  resolved "https://registry.yarnpkg.com/is-what/-/is-what-4.1.8.tgz#0e2a8807fda30980ddb2571c79db3d209b14cbe4"
+  integrity sha512-yq8gMao5upkPoGEU9LsB2P+K3Kt8Q3fQFCGyNCWOAnJAMzEXVV9drYb0TXr42TTliLLhKIBvulgAXgtLLnwzGA==
+
 isexe@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
@@ -1910,6 +1938,11 @@ regexpp@^3.2.0:
   resolved "https://registry.yarnpkg.com/regexpp/-/regexpp-3.2.0.tgz#0425a2768d8f23bad70ca4b90461fa2f1213e1b2"
   integrity sha512-pq2bWo9mVD43nbts2wGv17XLiNLya+GklZ8kaDLV2Z08gDCsGpnKn9BFMepvWuHCbyVvY7J5o5+BVvoQbmlJLg==
 
+remove-accents@0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/remove-accents/-/remove-accents-0.4.2.tgz#0a43d3aaae1e80db919e07ae254b285d9e1c7bb5"
+  integrity sha512-7pXIJqJOq5tFgG1A2Zxti3Ht8jJF337m4sowbuHsW30ZnkQFnDzy9qBNhgzX8ZLW4+UBcXiiR7SwR6pokHsxiA==
+
 require-directory@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/require-directory/-/require-directory-2.1.1.tgz#8c64ad5fd30dab1c976e2344ffe7f792a6a6df42"
@@ -2097,6 +2130,13 @@ styled-jsx@5.1.0:
   integrity sha512-/iHaRJt9U7T+5tp6TRelLnqBqiaIT0HsO0+vgyj8hK2KUk7aejFqRrumqPUlAqDwAj8IbS/1hk3IhBAAK/FCUQ==
   dependencies:
     client-only "0.0.1"
+
+superjson@^1.10.0:
+  version "1.12.2"
+  resolved "https://registry.yarnpkg.com/superjson/-/superjson-1.12.2.tgz#072471f1e6add2d95a38b77fef8c7a199d82103a"
+  integrity sha512-ugvUo9/WmvWOjstornQhsN/sR9mnGtWGYeTxFuqLb4AiT4QdUavjGFRALCPKWWnAiUJ4HTpytj5e0t5HoMRkXg==
+  dependencies:
+    copy-anything "^3.0.2"
 
 supports-color@^7.1.0:
   version "7.2.0"

@@ -24,7 +24,7 @@ const SignInPage = () => {
 		signIn(data, {
 			onSuccess: (data) => {
 				localStorage.setItem('token', data);
-				location.reload();
+				location.href = '/';
 			},
 		});
 	};

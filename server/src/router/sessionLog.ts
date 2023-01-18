@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 import express from 'express';
 
 import { asyncHandler } from '../asyncHandler';
-import { SessionLogResult, SessionToken, TEMP_MANAGER_ID } from '../config';
+import { SessionLogResult, SessionToken } from '../config';
 import { jwtAuth } from '../middleware/authMiddleware';
 
 const router = express.Router();
@@ -39,7 +39,7 @@ router.post(
 					error: e.logs.error,
 					initialReaction: e.logs.touch,
 					responseTime: e.logs.diff,
-					managerId: TEMP_MANAGER_ID,
+					managerId: req.user.id,
 					tokenId: token?.id!,
 					createdAt: new Date(e.logs.pass),
 				} as Prisma.sessionLogCreateManyInput)

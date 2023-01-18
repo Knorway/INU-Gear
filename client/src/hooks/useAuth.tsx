@@ -9,9 +9,6 @@ export const useAuth = () => {
 		queryFn: query.getUserProfile,
 		retry: false,
 		refetchOnMount: false,
-		onSuccess: (data) => {
-			//
-		},
 	});
 
 	return {

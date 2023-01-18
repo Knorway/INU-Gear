@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 import express from 'express';
 
 import { asyncHandler } from '../asyncHandler';
-import { SEQUENCES, TEMP_MANAGER_ID } from '../config';
+import { SEQUENCES } from '../config';
 import { jwtAuth } from '../middleware/authMiddleware';
 
 const router = express.Router();
@@ -69,7 +69,7 @@ router.post(
 		const token = await prisma.sessionToken.create({
 			data: {
 				label,
-				managerId: TEMP_MANAGER_ID,
+				managerId: req.user.id,
 				sequence: SEQUENCES,
 			},
 		});
