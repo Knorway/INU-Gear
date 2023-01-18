@@ -3,6 +3,7 @@ import express from 'express';
 
 import { asyncHandler } from '../asyncHandler';
 import { SEQUENCES, TEMP_MANAGER_ID } from '../config';
+import { jwtAuth } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
@@ -60,6 +61,7 @@ router.get(
 
 router.post(
 	'/',
+	jwtAuth,
 	asyncHandler(async (req, res) => {
 		const { prisma } = req.app.context;
 		const { label } = req.body;
@@ -78,6 +80,7 @@ router.post(
 
 router.delete(
 	'/',
+	jwtAuth,
 	asyncHandler(async (req, res) => {
 		const { prisma } = req.app.context;
 		const { tokens } = req.body;

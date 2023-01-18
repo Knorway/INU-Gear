@@ -3,6 +3,7 @@ import express, { ErrorRequestHandler } from 'express';
 import fs from 'fs';
 import path from 'path';
 
+import { asyncHandler } from './asyncHandler';
 import { serverContext } from './context';
 import { rewrites } from './rewrites';
 import * as Routes from './router';

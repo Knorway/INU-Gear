@@ -17,7 +17,7 @@ const client = axios.create({
 });
 
 export const request = async <T>(config: AxiosRequestConfig) => {
-	const token = localStorage.getItem('access_token');
+	const token = localStorage.getItem('token');
 
 	return <AxiosResponse<T>>await client({
 		...config,

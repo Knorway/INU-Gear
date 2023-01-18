@@ -18,7 +18,21 @@ export type SessionToken = {
 	// TODO: isFinished
 };
 
+export type UserProfile = {
+	id: number;
+	uuid: string;
+	account: string;
+	createdAt: string;
+};
+
 export const query = {
+	getUserProfile: async () => {
+		const response = await request<UserProfile>({
+			url: `/auth/validate`,
+			method: 'GET',
+		});
+		return response.data;
+	},
 	getSessionTokens: async (param?: {
 		page?: number;
 		search?: string;
@@ -39,12 +53,10 @@ export const query = {
 		});
 		return response.data;
 	},
-
 	getSessionToken: async ({ uuid }: { uuid: string }) => {
 		const response = await request<SessionToken>({ url: `/session-token/${uuid}` });
 		return response.data;
 	},
-
 	getSessionLog: async ({ uuid }: { uuid: string }) => {
 		if (!uuid) return null;
 		const response = await request<any>({
@@ -52,7 +64,6 @@ export const query = {
 		});
 		return response.data;
 	},
-
 	getOverviewAggregate: async ({ sequence }: { sequence: SequenceChar[] }) => {
 		const response = await request<unknown>({
 			url: `/aggregate/${JSON.stringify(sequence)}`,
@@ -63,6 +74,14 @@ export const query = {
 };
 
 export const mutatation = {
+	singIn: mutationizeFetcher(async (data: { account: string; password: string }) => {
+		const response = await request<string>({
+			url: `/auth/sign-in`,
+			method: 'POST',
+			data,
+		});
+		return response.data;
+	}),
 	postSessionToken: mutationizeFetcher(async (data: { label: string }) => {
 		const response = await request<SessionToken>({
 			url: `/session-token`,
@@ -71,7 +90,6 @@ export const mutatation = {
 		});
 		return response.data;
 	}),
-
 	deleteSessionToken: mutationizeFetcher(async (data: { tokens: string[] }) => {
 		const response = await request<any>({
 			url: `/session-token`,
@@ -80,7 +98,6 @@ export const mutatation = {
 		});
 		return response.data;
 	}),
-
 	postMessageStream: mutationizeFetcher(
 		async ({ uuid, message }: { uuid: string; message: MessageStream }) => {
 			const response = await request<never>({
@@ -91,7 +108,6 @@ export const mutatation = {
 			return response.data;
 		}
 	),
-
 	postSessionLog: mutationizeFetcher(
 		async (data: {
 			uuid: string;
@@ -106,7 +122,6 @@ export const mutatation = {
 			return response.data;
 		}
 	),
-
 	deleteSessionLog: mutationizeFetcher(
 		async (data: { uuids: string[]; sequence: unknown; tokenId: string }) => {
 			const response = await request<never>({

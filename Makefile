@@ -1,15 +1,15 @@
 include .env
 
-dc-up:
+dev-up:
 	docker-compose up --build
 
-dc-down:
+dev-down:
 	docker-compose down && echo y | docker image prune
 
-dc-re:
-	make dc-down && make dc-up
+dev-re:
+	make dev-down && make dev-up
 
-dc-push:
+build-push:
 	(cd client && yarn export -o ../server/build)
 	docker-compose -f docker-compose.prod.yml build
 	docker-compose -f docker-compose.prod.yml push
@@ -28,3 +28,8 @@ atlas-apply:
 
 swarm-deploy:
 	ssh ${TUNNEL_MANAGER_NODE} '/root/up.sh'
+
+sync-commit:
+	git push origin main
+	make build-push
+	make swarm-deploy

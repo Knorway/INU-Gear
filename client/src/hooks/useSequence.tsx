@@ -65,9 +65,6 @@ const useSequence = ({
 		return Math.abs(indexOfChar(destination) - indexOfChar(starting));
 	}, [destination, indexOfChar, sequence, starting, type]);
 
-	// console.log(travel, 'travel');
-	// console.log(distance, 'distance');
-
 	const writeLog = useCallback((key: keyof typeof log, value: number) => {
 		setLog((prev) => {
 			if (!prev[key]) return { ...prev, [key]: value };
@@ -89,8 +86,6 @@ const useSequence = ({
 			const P = e.deltaY;
 			const delta = isLeft ? 1 : -1;
 			if (P > 0) {
-				// writeLog('touch', Date.now());
-
 				if (cursor - 1 !== -1) {
 					writeLog('touch', Date.now());
 					setTravel((prev) => [...prev, 'L']);
@@ -114,8 +109,6 @@ const useSequence = ({
 			const P = e.deltaY;
 			const delta = isLeft ? -1 : 1;
 			if (P < 0 || P === 0) {
-				// writeLog('touch', Date.now());
-
 				if (cursor + 1 <= sequence.length - 1) {
 					writeLog('touch', Date.now());
 					setTravel((prev) => [...prev, 'R']);
@@ -135,7 +128,6 @@ const useSequence = ({
 
 	const onParking = useCallback(() => {
 		if (!isOperational) return;
-		// writeLog('touch', Date.now());
 
 		if (!(cursor === -1 && travel.at(-1) === 'P')) {
 			writeLog('touch', Date.now());
