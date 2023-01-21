@@ -28,7 +28,7 @@ const TokenPagination = () => {
 	return (
 		<div className='flex flex-col items-center'>
 			<span className='text-sm text-gray-700 '>
-				<span className='font-semibold text-gray-900 '>{cur || null}</span> of{' '}
+				<span className='font-semibold text-gray-900 '>{cur || 0}</span> of{' '}
 				<span className='font-semibold text-gray-900 '>
 					{featureState.totalCount}
 				</span>

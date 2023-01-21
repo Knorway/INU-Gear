@@ -1,8 +1,20 @@
 import { ArrowPathIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import _ from 'lodash';
-import { Fragment, useEffect, useState } from 'react';
-import { SubmitHandler, useFormContext, useWatch } from 'react-hook-form';
+import {
+  ChangeEventHandler,
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import {
+  SubmitHandler,
+  useController,
+  useFormContext,
+  useWatch,
+} from 'react-hook-form';
 
 import { mutatation, query } from '~/src/api/fetcher';
 import { queryKey } from '~/src/api/queryClient';
@@ -16,27 +28,12 @@ import {
 } from './context/FeatureContext';
 
 const TokenSearchInput = () => {
-	const featureState = useCtx(FeatureStateContext);
-	const featureDispatch = useCtx(FeatureDispatchContext);
-	const queryClient = useQueryClient();
-
-	const { handleSubmit, register, getValues, control } =
-		useFormContext<TokenTableForm>();
-
-	const { searchText } = useWatch({ control });
 	const [isTyping, setIsTyping] = useState(false);
 
-	useEffect(() => {
-		setIsTyping(true);
-
-		const id = setTimeout(() => {
-			setIsTyping(false);
-		}, 200);
-
-		return () => {
-			clearTimeout(id);
-		};
-	}, [searchText]);
+	const featureState = useCtx(FeatureStateContext);
+	const featureDispatch = useCtx(FeatureDispatchContext);
+	const { handleSubmit, register, getValues } = useFormContext<TokenTableForm>();
+	const queryClient = useQueryClient();
 
 	const { refetch } = useQuery({
 		queryKey: queryKey.sessionTokensPage(featureState.tokenPage),
@@ -45,18 +42,29 @@ const TokenSearchInput = () => {
 				page: queryKey[1],
 				search: getValues().searchText,
 			}),
+		onSuccess: () => setIsTyping(false),
 	});
-
-	console.log(isTyping);
 
 	const { mutate: deleteSelectedTokens, isLoading: isDeletingTokens } = useMutation({
 		mutationFn: mutatation.deleteSessionToken,
 	});
 
-	const searchTokens = _.debounce(() => {
-		refetch();
-		featureDispatch({ tokenPage: 0 });
-	}, 300);
+	const onTyping: ChangeEventHandler<HTMLInputElement> = useCallback(
+		(e) => {
+			register('searchText').onChange({ target: e.target });
+			setIsTyping(true);
+		},
+		[register]
+	);
+
+	const searchTokens = useMemo(
+		() =>
+			_.debounce(() => {
+				refetch();
+				featureDispatch({ tokenPage: 0 });
+			}, 300),
+		[featureDispatch, refetch]
+	);
 
 	const deleteTokens: SubmitHandler<TokenTableForm> = async (data) => {
 		if (!data.checkedTokens.length) return;
@@ -90,7 +98,6 @@ const TokenSearchInput = () => {
 					</label>
 					<div className='relative'>
 						<div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-							{/* {!isSearchingText ? ( */}
 							{!isTyping ? (
 								<svg
 									className='w-5 h-5 text-gray-500'
@@ -115,6 +122,7 @@ const TokenSearchInput = () => {
 							className='block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 '
 							placeholder={'참가자 검색하기'}
 							{...register('searchText')}
+							onChange={onTyping}
 							onKeyDown={searchTokens}
 						/>
 					</div>

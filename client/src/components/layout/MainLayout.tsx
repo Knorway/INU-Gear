@@ -6,7 +6,7 @@ import { checkExcludedUrl } from '~/src/utils';
 import Header from './Header';
 
 type Props = {
-	children: React.ReactElement;
+	children: React.ReactNode;
 };
 
 const excluded = ['device'];

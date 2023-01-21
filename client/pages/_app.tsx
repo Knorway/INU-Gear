@@ -36,7 +36,7 @@ const EntryPoint = ({
 	const { isLoading, notLoggedIn } = useAuth();
 
 	if (isLoading) {
-		return null;
+		return <MainLayout>{null}</MainLayout>;
 	}
 
 	if (notLoggedIn) {
