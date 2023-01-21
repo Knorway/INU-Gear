@@ -14,7 +14,7 @@ type State = {
 const reducer: Reducer<State, Partial<State>> = (prev, cur) => ({ ...prev, ...cur });
 
 export const FeatureStateContext = createContext<State | null>(null);
-export const featureDispatchContext = createContext<React.Dispatch<
+export const FeatureDispatchContext = createContext<React.Dispatch<
 	Partial<State>
 > | null>(null);
 
@@ -26,9 +26,9 @@ export const FeatureContextProvider = (props: Props) => {
 
 	return (
 		<FeatureStateContext.Provider value={state}>
-			<featureDispatchContext.Provider value={dispatch}>
+			<FeatureDispatchContext.Provider value={dispatch}>
 				{props.children}
-			</featureDispatchContext.Provider>
+			</FeatureDispatchContext.Provider>
 		</FeatureStateContext.Provider>
 	);
 };

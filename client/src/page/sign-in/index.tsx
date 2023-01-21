@@ -1,3 +1,4 @@
+import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { useMutation } from '@tanstack/react-query';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
@@ -15,6 +16,7 @@ const SignInPage = () => {
 	const {
 		mutate: signIn,
 		isLoading,
+		isSuccess,
 		error,
 	} = useMutation({
 		mutationFn: mutatation.singIn,
@@ -65,7 +67,11 @@ const SignInPage = () => {
 							className='inline-flex justify-center px-4 py-2 text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2'
 							disabled={isLoading}
 						>
-							로그인
+							{isLoading || isSuccess ? (
+								<ArrowPathIcon className='w-5 h-5 animate-spin' />
+							) : (
+								'로그인'
+							)}
 						</button>
 					</div>
 				</form>

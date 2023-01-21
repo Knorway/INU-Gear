@@ -1,30 +1,34 @@
+import { useQuery } from '@tanstack/react-query';
+
+import { queryKey } from '~/src/api/queryClient';
 import { useCtx } from '~/src/hooks/useCtx';
 
 import {
-  featureDispatchContext,
+  FeatureDispatchContext,
   FeatureStateContext,
 } from './context/FeatureContext';
 
 const TokenPagination = () => {
 	const featureState = useCtx(FeatureStateContext);
-	const featureDispatch = useCtx(featureDispatchContext);
+	const featureDispatch = useCtx(FeatureDispatchContext);
 
-	//TODO: 이거 그냥 useQuery 호출해서 거기 정보 토대로 하는 게 낫겠다
-	// context 쓸거면 그냥 zustand 쓰는 게 낫고. 여러모로 그냥 컨텍스트 써본다에 의의를 두자
-	// 그리고 애초에 테이블 컴포넌트에 포함되어 있었어야
-	// NaN 뜨고 난리 났다. 그리고 input은 왜 로딩으로 안 가려지냐
+	const { data } = useQuery({
+		queryKey: queryKey.sessionTokensPage(featureState.tokenPage),
+		enabled: false,
+	});
 
 	const paginate = (delta: number) => () => {
 		featureDispatch({ tokenPage: featureState.tokenPage + delta });
 	};
 
 	const cur = featureState.tokenPage * 10 + featureState.count;
-	// console.log(featureState.tokenPage, featureState.count);
+
+	if (!data) return null;
 
 	return (
 		<div className='flex flex-col items-center'>
 			<span className='text-sm text-gray-700 '>
-				<span className='font-semibold text-gray-900 '>{cur}</span> of{' '}
+				<span className='font-semibold text-gray-900 '>{cur || null}</span> of{' '}
 				<span className='font-semibold text-gray-900 '>
 					{featureState.totalCount}
 				</span>

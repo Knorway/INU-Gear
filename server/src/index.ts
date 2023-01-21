@@ -3,7 +3,6 @@ import express, { ErrorRequestHandler } from 'express';
 import fs from 'fs';
 import path from 'path';
 
-import { asyncHandler } from './asyncHandler';
 import { serverContext } from './context';
 import { rewrites } from './rewrites';
 import * as Routes from './router';
@@ -19,6 +18,7 @@ app.use(express.json());
 app.use(
 	express.static(path.resolve() + '/build', {
 		maxAge: '365d',
+		index: false,
 	})
 );
 
@@ -32,21 +32,21 @@ Object.values(Routes).forEach((route) => {
 /**
  * apply rewrites rules for static serving
  */
-const staticHtmlMap = new Map<typeof rewrites[number]['page'], string>();
+const staticHtmlCache = new Map<typeof rewrites[number]['page'], string>();
 
 rewrites.forEach((rule) => {
-	staticHtmlMap.set(
+	staticHtmlCache.set(
 		rule.page,
 		fs.readFileSync(path.resolve() + `/build/${rule.filepath}`, 'utf-8')
 	);
 
 	app.get(rule.path as string, (req, res) => {
-		res.send(staticHtmlMap.get(rule.page));
+		res.send(staticHtmlCache.get(rule.page));
 	});
 });
 
 app.use(<ErrorRequestHandler>((error, req, res, next) => {
-	const statusCode = req.statusCode || 500;
+	const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
 	res.status(statusCode).json({ route: req.url, error: error.message, handled: true });
 	console.log(`[ErrorRequestHandler]: ${error.message}`);
 }));

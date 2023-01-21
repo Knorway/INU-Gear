@@ -19,6 +19,7 @@ router.post(
 		});
 
 		if (!manager) {
+			res.status(403);
 			throw new Error('error signing in');
 		}
 

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Fragment, useCallback, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -8,7 +8,7 @@ import Table from '~/src/components/Table';
 import { useCtx } from '~/src/hooks/useCtx';
 
 import {
-  featureDispatchContext,
+  FeatureDispatchContext,
   FeatureStateContext,
 } from './context/FeatureContext';
 import LogDocument from './LogDocument';
@@ -18,14 +18,24 @@ const tableHeads = ['이름', '식별번호'];
 const TokenTable = () => {
 	const [expandedRow, setExpandedRow] = useState('');
 	const featureState = useCtx(FeatureStateContext);
-	const featureDispatch = useCtx(featureDispatchContext);
+	const featureDispatch = useCtx(FeatureDispatchContext);
 
 	const { register } = useFormContext();
+
+	const queryClient = useQueryClient();
 
 	const { data } = useQuery({
 		queryKey: queryKey.sessionTokensPage(featureState.tokenPage),
 		queryFn: ({ queryKey }) => query.getSessionTokens({ page: queryKey[1] }),
 		onSuccess(data) {
+			if (data.hasNext) {
+				queryClient.prefetchQuery({
+					queryKey: queryKey.sessionTokensPage(featureState.tokenPage + 1),
+					queryFn: ({ queryKey }) =>
+						query.getSessionTokens({ page: queryKey[1] }),
+				});
+			}
+
 			featureDispatch({
 				hasNext: data.hasNext,
 				count: data.count,
