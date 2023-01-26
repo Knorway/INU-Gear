@@ -34,6 +34,18 @@ export const generateStartDest = (sequence?: Sequence<'sequence'>) => {
 	return [...result].map((e) => e.split('-')) as Array<SequenceChar[]>;
 };
 
+export const deduplicate = (gen: ReturnType<typeof generateStartDest>) => {
+	let result = _.shuffle(gen.concat(gen));
+	while (
+		result.some(
+			(e, idx) => idx < result.length - 1 && e.join('') === result[idx + 1].join('')
+		)
+	) {
+		result = _.shuffle(gen.concat(gen));
+	}
+	return result;
+};
+
 // export const generateStartDest = (sequence?: Sequence<'sequence'>) => {
 // 	if (!sequence || sequence.length < 2) return [];
 

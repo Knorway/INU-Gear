@@ -42,7 +42,7 @@ export const TIMEOUT_MIN = 3 * TIMEOUT_UNIT;
 
 export const REPETITION_LIMIT = 1;
 
-export const TRIAL_REPEAT = 6;
+export const TRIAL_REPEAT = 24;
 
 export const SEQUENCES = [
 	{

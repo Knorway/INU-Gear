@@ -25,8 +25,6 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 	const [, setStepTimeout] = useState(0);
 	const [initialized, setInitialized] = useState(false);
 
-	// console.log(startDest);
-
 	const { cursor, sequence, info } = useSequence({ targetSequence, startDest });
 	const { chars, direction } = sequence;
 	const { current: currentCursor, destination, starting } = cursor;
@@ -37,7 +35,7 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
 
-	const { playSound } = useSound({ fileName: 'MP_Electronic Chime.mp3' });
+	const { playSound } = useSound({ fileName: 'MP_Beep.mp3' });
 
 	const { mutate: publishMessage } = useMutation({
 		mutationFn: mutatation.postMessageStream,

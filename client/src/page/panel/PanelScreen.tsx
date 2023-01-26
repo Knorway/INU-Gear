@@ -11,8 +11,10 @@ const PanelScreen = ({ message }: Props) => {
 	const { starting, destination } = cursor;
 
 	const operationText = useMemo(() => {
-		if (isOperational) return `[${optrTable[destination]}] 상태로 변속하세요.`;
-		return `현재 [${optrTable[starting]}] 상태입니다.`;
+		if (isOperational) {
+			return `(${optrTable[destination]}[${destination}]) 상태로 변속하세요.`;
+		}
+		return `현재 (${optrTable[starting]}[${starting}]) 상태입니다.`;
 	}, [destination, isOperational, starting]);
 
 	return (

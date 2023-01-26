@@ -1,5 +1,6 @@
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import { mutatation } from '~/src/api/fetcher';
@@ -30,6 +31,10 @@ const SignInPage = () => {
 			},
 		});
 	};
+
+	useEffect(() => {
+		window.history.pushState({}, '', '/');
+	}, []);
 
 	return (
 		<div className='flex items-center justify-center p-4'>

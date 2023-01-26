@@ -49,7 +49,7 @@ const useSequence = ({
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
 	const isParked = useMemo(() => cursor === -1, [cursor]);
 
-	const { playSound } = useSound({ fileName: 'MP_Beep.mp3' });
+	const { playSound } = useSound({ fileName: 'MP_Electronic Chime.mp3' });
 
 	const isOperational = useMemo(
 		() => !isFinished && Boolean(optrTimeout),

@@ -10,7 +10,7 @@ import {
   TRIAL_REPEAT,
 } from '~/src/config/settings';
 import DeviceScreen from '~/src/page/device/DeviceScreen';
-import { generateStartDest } from '~/src/utils';
+import { deduplicate, generateStartDest } from '~/src/utils';
 
 const DevicePage = () => {
 	const [sequences, setSequences] = useState<typeof SEQUENCES[number][] | null>(null);
@@ -27,14 +27,10 @@ const DevicePage = () => {
 		mutationFn: mutatation.postSessionLog,
 	});
 
-	const startDest = useMemo(() => {
-		const gen = generateStartDest(sequences?.[0].sequence);
-		// return _.shuffle(gen.concat(gen));
-		return gen;
-	}, [sequences]);
-
-	// console.log(startDest);
-	// console.log(resultLogs);
+	const startDest = useMemo(
+		() => deduplicate(generateStartDest(sequences?.[0].sequence)),
+		[sequences]
+	);
 
 	const goNextStep = useCallback(
 		(log: SessionLogResult) => {
