@@ -56,7 +56,11 @@ const DevicePage = () => {
 
 		if (step === TRIAL_REPEAT) {
 			createLog(
-				{ uuid: sessionId, logs: resultLogs, sequence: sequences![0] },
+				{
+					uuid: sessionId,
+					logs: resultLogs,
+					sequence: sequences![0],
+				},
 				{
 					onSuccess: () => {
 						publishMessage({
