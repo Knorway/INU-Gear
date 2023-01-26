@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 
 import { MessageStream, optrTable } from '~/src/config/settings';
 
@@ -12,9 +12,29 @@ const PanelScreen = ({ message }: Props) => {
 
 	const operationText = useMemo(() => {
 		if (isOperational) {
-			return `(${optrTable[destination]}[${destination}]) 상태로 변속하세요.`;
+			return (
+				<Fragment>
+					{
+						<span className='text-red-700'>
+							{optrTable[destination]}[{destination}]
+						</span>
+					}{' '}
+					상태로 변속하세요.
+				</Fragment>
+			);
 		}
-		return `현재 (${optrTable[starting]}[${starting}]) 상태입니다.`;
+
+		return (
+			<Fragment>
+				현재{' '}
+				{
+					<span className='text-blue-700'>
+						{optrTable[starting]}[{starting}]
+					</span>
+				}{' '}
+				상태입니다.
+			</Fragment>
+		);
 	}, [destination, isOperational, starting]);
 
 	return (
@@ -22,8 +42,8 @@ const PanelScreen = ({ message }: Props) => {
 			<div className='flex-1'>
 				<div
 					style={{
-						fontSize: '40px',
-						border: '1px solid black',
+						fontSize: '84px',
+						fontWeight: 'bold',
 						textAlign: 'center',
 					}}
 				>
@@ -31,7 +51,8 @@ const PanelScreen = ({ message }: Props) => {
 						<h1
 							style={{
 								visibility: isFinished ? 'visible' : 'hidden',
-								fontSize: '40px',
+								fontSize: '84px',
+								fontWeight: 'bold',
 								color: 'green',
 							}}
 						>

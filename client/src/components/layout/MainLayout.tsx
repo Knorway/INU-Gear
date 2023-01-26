@@ -9,7 +9,7 @@ type Props = {
 	children: React.ReactNode;
 };
 
-const excluded = ['device'];
+const excluded = ['device', 'panel'];
 
 const MainLayout = (props: Props) => {
 	const router = useRouter();
