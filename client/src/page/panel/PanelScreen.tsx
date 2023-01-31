@@ -35,19 +35,7 @@ const PanelScreen = ({ message }: Props) => {
 	return (
 		<div className='w-full'>
 			<div className='flex-1'>
-				<div className='text-[84px] font-bold text-center'>
-					{isFinished ? (
-						<h1
-							className={`text-[84px] font-bold text-center text-[green] ${
-								isFinished ? 'visible' : 'hidden'
-							}`}
-						>
-							PASS
-						</h1>
-					) : (
-						operationText
-					)}
-				</div>
+				<div className='text-[84px] font-bold text-center'>{operationText}</div>
 			</div>
 		</div>
 	);

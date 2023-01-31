@@ -75,7 +75,6 @@ const DeviceScreen = ({
 
 	const tint = useCallback(
 		(idx: number) => {
-			// if (!initialized) return 'black';
 			if (!GEAR_RELEASED) return 'black';
 			if (idx === currentCursor) return 'rgb(250 204 21)';
 			return 'black';
