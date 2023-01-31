@@ -5,9 +5,9 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { mutatation } from '~/src/api/fetcher';
 import {
-  HOLD_RAND,
   SEQUENCES,
   SessionLogResult,
+  TRIAL_DELAY,
   TRIAL_REPEAT,
 } from '~/src/config/settings';
 import DeviceScreen from '~/src/page/device/DeviceScreen';
@@ -22,7 +22,7 @@ const DevicePage = () => {
 	const sessionId = router.query.sessionId as string;
 
 	const delays = useMemo(() => {
-		const result = _.shuffle(HOLD_RAND);
+		const result = _.shuffle(TRIAL_DELAY);
 		result[0] = result[0] + 5000;
 		return result;
 	}, []);
@@ -92,6 +92,8 @@ const DevicePage = () => {
 			);
 		}
 	}, [createLog, publishMessage, resultLogs, router, sequences, sessionId, step]);
+
+	console.log(resultLogs);
 
 	if (!sequences || !sessionId) return null;
 

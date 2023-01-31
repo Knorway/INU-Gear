@@ -31,7 +31,6 @@ const DeviceScreen = ({
 	startDest,
 	randHold,
 }: Props) => {
-	const [, setStepTimeout] = useState(0);
 	const [initialized, setInitialized] = useState(false);
 
 	const { cursor, sequence, info } = useSequence({
@@ -41,12 +40,13 @@ const DeviceScreen = ({
 	});
 	const { chars, direction } = sequence;
 	const { current: currentCursor, destination, starting } = cursor;
-	const { isOperational, isFinished, log, distance } = info;
+	const { isOperational, isFinished, log } = info;
 
 	const [msgSentCount, setMsgSentCount] = useState(0);
 	const GEAR_RELEASED = useMemo(() => msgSentCount === 3, [msgSentCount]);
 
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
+	const isTrialFinished = useMemo(() => isFinished && log.pass, [isFinished, log.pass]);
 
 	const { playSound } = useSound({ fileName: 'MP_Beep.mp3' });
 
@@ -104,7 +104,7 @@ const DeviceScreen = ({
 	}, [GEAR_RELEASED, playSound]);
 
 	useEffect(() => {
-		if (!isFinished) return;
+		if (!isTrialFinished) return;
 
 		const resultLog = {
 			sequence: targetSequence.sequence,
@@ -123,18 +123,8 @@ const DeviceScreen = ({
 			},
 		} as SessionLogResult;
 
-		// TODO: -ms
-		const timeout = !initialized ? 1000 * 5 : 0;
-		setStepTimeout(timeout);
-
-		const timeoutId = setTimeout(() => {
-			onFinish(resultLog);
-		}, timeout);
-
-		return () => {
-			clearTimeout(timeoutId);
-		};
-	}, [cursor, info, initialized, isFinished, log, onFinish, sequence, targetSequence]);
+		onFinish(resultLog);
+	}, [cursor, info, isTrialFinished, log, onFinish, sequence, targetSequence.sequence]);
 
 	return (
 		<div className='overflow-hidden'>
