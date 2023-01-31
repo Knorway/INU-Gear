@@ -1,4 +1,3 @@
-import OperationBackgroundImage from '/operation_background.png';
 import { useRouter } from 'next/router';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 
@@ -112,7 +111,7 @@ const PanelPage = () => {
 
 	return (
 		<Fragment>
-			<div className="absolute  bg-[url('/operation_background.png')] bg-no-repeat bg-cover w-full h-screen -z-10"></div>
+			<div className="absolute bg-[url('/operation_background.png')] bg-no-repeat bg-cover w-full h-screen -z-10"></div>
 			<div className='flex items-center justify-center h-[85vh]'>
 				<PanelScreen message={message} />
 			</div>

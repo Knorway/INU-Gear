@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export type Sequence<T extends keyof typeof SEQUENCES[number]> =
 	typeof SEQUENCES[number][T];
 
@@ -34,15 +36,9 @@ export type MessageStream = {
 };
 
 export const DEFAULT_DELAY = 40;
-export const DEFAULT_TIMEOUT = 1000 * 10;
-
-export const TIMEOUT_UNIT = 1000;
-export const TIMEOUT_RANGE = 4;
-export const TIMEOUT_MIN = 3 * TIMEOUT_UNIT;
-
 export const REPETITION_LIMIT = 1;
-
 export const TRIAL_REPEAT = 24;
+export const HOLD_RAND = _.shuffle([...Array(12).fill(4500), ...Array(12).fill(1000)]);
 
 export const SEQUENCES = [
 	{

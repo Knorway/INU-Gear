@@ -5,6 +5,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { mutatation } from '~/src/api/fetcher';
 import {
+  HOLD_RAND,
   SEQUENCES,
   SessionLogResult,
   TRIAL_REPEAT,
@@ -97,6 +98,7 @@ const DevicePage = () => {
 							key={idx}
 							targetSequence={sequence}
 							startDest={startDest[step]}
+							randHold={HOLD_RAND[idx]}
 							sessionId={sessionId}
 							onFinish={goNextStep}
 						/>

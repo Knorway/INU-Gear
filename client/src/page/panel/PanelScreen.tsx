@@ -11,28 +11,23 @@ const PanelScreen = ({ message }: Props) => {
 	const { starting, destination } = cursor;
 
 	const operationText = useMemo(() => {
-		if (isOperational) {
-			return (
-				<Fragment>
-					{
-						<span className='text-red-700'>
-							{optrTable[destination]}[{destination}]
-						</span>
-					}{' '}
-					상태로 변속하세요.
-				</Fragment>
-			);
+		if (!isOperational) {
+			return null;
 		}
 
 		return (
 			<Fragment>
-				현재{' '}
 				{
 					<span className='text-blue-700'>
 						{optrTable[starting]}[{starting}]
 					</span>
-				}{' '}
-				상태입니다.
+				}
+				{' -> '}
+				{
+					<span className='text-red-700'>
+						{optrTable[destination]}[{destination}]
+					</span>
+				}
 			</Fragment>
 		);
 	}, [destination, isOperational, starting]);
@@ -40,21 +35,12 @@ const PanelScreen = ({ message }: Props) => {
 	return (
 		<div className='w-full'>
 			<div className='flex-1'>
-				<div
-					style={{
-						fontSize: '84px',
-						fontWeight: 'bold',
-						textAlign: 'center',
-					}}
-				>
+				<div className='text-[84px] font-bold text-center'>
 					{isFinished ? (
 						<h1
-							style={{
-								visibility: isFinished ? 'visible' : 'hidden',
-								fontSize: '84px',
-								fontWeight: 'bold',
-								color: 'green',
-							}}
+							className={`text-[84px] font-bold text-center text-[green] ${
+								isFinished ? 'visible' : 'hidden'
+							}`}
 						>
 							PASS
 						</h1>

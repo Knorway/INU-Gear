@@ -18,14 +18,25 @@ type Props = {
 	targetSequence: typeof SEQUENCES[number];
 	sessionId: string;
 	startDest: SequenceChar[];
+	randHold: number;
 	onFinish: (log: SessionLogResult) => void;
 };
 
-const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props) => {
+const DeviceScreen = ({
+	targetSequence,
+	onFinish,
+	sessionId,
+	startDest,
+	randHold,
+}: Props) => {
 	const [, setStepTimeout] = useState(0);
 	const [initialized, setInitialized] = useState(false);
 
-	const { cursor, sequence, info } = useSequence({ targetSequence, startDest });
+	const { cursor, sequence, info } = useSequence({
+		targetSequence,
+		startDest,
+		randHold,
+	});
 	const { chars, direction } = sequence;
 	const { current: currentCursor, destination, starting } = cursor;
 	const { isOperational, isFinished, log, distance } = info;
@@ -64,11 +75,12 @@ const DeviceScreen = ({ targetSequence, onFinish, sessionId, startDest }: Props)
 
 	const tint = useCallback(
 		(idx: number) => {
-			if (!initialized) return 'black';
+			// if (!initialized) return 'black';
+			if (!GEAR_RELEASED) return 'black';
 			if (idx === currentCursor) return 'rgb(250 204 21)';
 			return 'black';
 		},
-		[currentCursor, initialized]
+		[GEAR_RELEASED, currentCursor]
 	);
 
 	useEffectOnce(() => {

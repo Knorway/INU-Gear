@@ -24,9 +24,11 @@ const initialLog: SessionLog = {
 const useSequence = ({
 	targetSequence,
 	startDest,
+	randHold,
 }: {
 	targetSequence: typeof SEQUENCES[number];
 	startDest: SequenceChar[];
+	randHold: number;
 }) => {
 	const { sequence, direction, type } = targetSequence;
 	const [starting, destination] = startDest;
@@ -91,13 +93,13 @@ const useSequence = ({
 					setTravel((prev) => [...prev, 'L']);
 				}
 
-				const newCursor = (() => {
+				const next = (() => {
 					if (!isParked) return cursor + delta;
 					if (!isLeft) return 0;
 					return sequence.length - 1;
 				})();
 
-				moveCursor(newCursor);
+				moveCursor(next);
 			}
 		},
 		[cursor, isLeft, isOperational, isParked, moveCursor, sequence.length, writeLog]
@@ -114,13 +116,13 @@ const useSequence = ({
 					setTravel((prev) => [...prev, 'R']);
 				}
 
-				const newCursor = (() => {
+				const next = (() => {
 					if (!isParked) return cursor + delta;
 					if (!isLeft) return sequence.length - 1;
 					return 0;
 				})();
 
-				moveCursor(newCursor);
+				moveCursor(next);
 			}
 		},
 		[cursor, isLeft, isOperational, isParked, moveCursor, sequence.length, writeLog]
@@ -148,7 +150,8 @@ const useSequence = ({
 	useEffect(() => {
 		if (isOperational) return;
 
-		const timeout = !initRef.current ? 5000 + 1000 * 4.5 : 1000 * 4.5;
+		// const timeout = !initRef.current ? 5000 + 1000 * 4.5 : 1000 * 4.5;
+		const timeout = !initRef.current ? 5000 + randHold : 1000 * 4.5;
 		initRef.current = true;
 
 		const timeoutId = setTimeout(() => {
@@ -158,7 +161,7 @@ const useSequence = ({
 		return () => {
 			clearTimeout(timeoutId);
 		};
-	}, [isOperational]);
+	}, [isOperational, randHold]);
 
 	useEffect(() => {
 		if (optrTimeout) {
