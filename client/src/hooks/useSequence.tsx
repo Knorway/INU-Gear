@@ -1,7 +1,13 @@
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { DEFAULT_DELAY, SequenceChar, SEQUENCES } from '~/src/config/settings';
+import {
+  DEFAULT_DELAY,
+  DEFAULT_OFFSET,
+  FIVE_SECONDS,
+  SequenceChar,
+  SEQUENCES,
+} from '~/src/config/settings';
 
 import { useSound } from './useSound';
 
@@ -150,8 +156,7 @@ const useSequence = ({
 	useEffect(() => {
 		if (isOperational) return;
 
-		// const timeout = !initRef.current ? 5000 + 1000 * 4.5 : 1000 * 4.5;
-		const timeout = !initRef.current ? 5000 + randHold : 1000 * 4.5;
+		const timeout = !initRef.current ? FIVE_SECONDS + randHold : 1000 * 4.5;
 		initRef.current = true;
 
 		const timeoutId = setTimeout(() => {
@@ -220,6 +225,8 @@ const useSequence = ({
 			}
 			return Math.abs(travel.length - distance);
 		})();
+
+		console.log(log.init, log.touch, diff, '---');
 
 		writeLog('pass', finalTouch);
 		writeLog('diff', diff);

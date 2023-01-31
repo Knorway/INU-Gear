@@ -3,6 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { mutatation } from '~/src/api/fetcher';
 import {
+  DEFAULT_OFFSET,
+  FIVE_SECONDS,
   MessageStream,
   SequenceChar,
   SEQUENCES,
@@ -86,7 +88,7 @@ const DeviceScreen = ({
 		publish('initialize');
 		setTimeout(() => {
 			setInitialized(true);
-		}, 5000);
+		}, FIVE_SECONDS);
 	});
 
 	useEffect(() => {
@@ -121,6 +123,7 @@ const DeviceScreen = ({
 			},
 		} as SessionLogResult;
 
+		// TODO: -ms
 		const timeout = !initialized ? 1000 * 5 : 0;
 		setStepTimeout(timeout);
 

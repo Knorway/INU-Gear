@@ -35,10 +35,14 @@ export type MessageStream = {
 	} | null;
 };
 
+export const DEFAULT_OFFSET = 32;
 export const DEFAULT_DELAY = 40;
 export const REPETITION_LIMIT = 1;
 export const TRIAL_REPEAT = 24;
-export const HOLD_RAND = [...Array(24).keys()].map(() => _.random(0, 3) * 1000);
+export const FIVE_SECONDS = 5000 + DEFAULT_OFFSET;
+export const HOLD_RAND = [...Array(24).keys()].map(
+	() => _.random(0, 3) * 1000 + DEFAULT_OFFSET
+);
 
 export const SEQUENCES = [
 	{

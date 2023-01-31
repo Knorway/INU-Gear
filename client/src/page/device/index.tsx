@@ -93,8 +93,6 @@ const DevicePage = () => {
 		}
 	}, [createLog, publishMessage, resultLogs, router, sequences, sessionId, step]);
 
-	console.log(delays);
-
 	if (!sequences || !sessionId) return null;
 
 	return (
