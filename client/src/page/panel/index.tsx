@@ -6,15 +6,12 @@ import { MessageStream } from '~/src/config/settings';
 import { useNotification } from '~/src/hooks/useNotification';
 import PanelScreen from '~/src/page/panel/PanelScreen';
 
-import EnteringCountDown from './EnteringCountDown';
-
 const PanelPage = () => {
 	const [message, setMessage] = useState<MessageStream['payload'] | null>(null);
-	const [initialized, setInitialized] = useState(false);
 	const [completed, setCompleted] = useState(false);
 	const [error, setError] = useState(false);
 
-	const firstEntering = useMemo(() => initialized && !message, [initialized, message]);
+	const notConnected = useMemo(() => !message, [message]);
 
 	const router = useRouter();
 	const sessionId = router.query.sessionId as string;
@@ -30,12 +27,7 @@ const PanelPage = () => {
 			const data = JSON.parse(e.data) as MessageStream;
 
 			switch (data.type) {
-				case 'initialize': {
-					setInitialized(true);
-					break;
-				}
 				case 'message': {
-					setInitialized(false);
 					setMessage(data.payload);
 					break;
 				}
@@ -93,9 +85,7 @@ const PanelPage = () => {
 		console.log(`${Date.now() - message.timeStamp}ms`);
 	}, [message]);
 
-	if (firstEntering) return <EnteringCountDown />;
-
-	if (!message) {
+	if (notConnected) {
 		return (
 			<div className='flex flex-col items-center justify-center h-screen'>
 				<div className='relative'>

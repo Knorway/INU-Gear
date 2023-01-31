@@ -1,12 +1,7 @@
 import _ from 'lodash';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import {
-  DEFAULT_DELAY,
-  FIVE_SECONDS,
-  SequenceChar,
-  SEQUENCES,
-} from '~/src/config/settings';
+import { DEFAULT_DELAY, SequenceChar, SEQUENCES } from '~/src/config/settings';
 
 import { useSound } from './useSound';
 
@@ -52,7 +47,6 @@ const useSequence = ({
 	const [optrTimeout, setOptrTimeout] = useState(0);
 	const [finalTouch, setFinalTouch] = useState(0);
 
-	const initRef = useRef(false);
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
 	const isParked = useMemo(() => cursor === -1, [cursor]);
 
@@ -155,13 +149,9 @@ const useSequence = ({
 	useEffect(() => {
 		if (isOperational) return;
 
-		const timeout = FIVE_SECONDS + randHold;
-		// const timeout = !initRef.current ? FIVE_SECONDS + randHold : 1000 * 4.5;
-		// initRef.current = true;
-
 		const timeoutId = setTimeout(() => {
-			setOptrTimeout(timeout);
-		}, timeout);
+			setOptrTimeout(randHold);
+		}, randHold);
 
 		return () => {
 			clearTimeout(timeoutId);

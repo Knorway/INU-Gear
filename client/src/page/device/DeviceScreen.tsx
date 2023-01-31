@@ -1,16 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { mutatation } from '~/src/api/fetcher';
 import {
-  DEFAULT_OFFSET,
-  FIVE_SECONDS,
   MessageStream,
   SequenceChar,
   SEQUENCES,
   SessionLogResult,
 } from '~/src/config/settings';
-import { useEffectOnce } from '~/src/hooks/useEffectOnce';
 import useSequence from '~/src/hooks/useSequence';
 import { useSound } from '~/src/hooks/useSound';
 
@@ -31,8 +28,6 @@ const DeviceScreen = ({
 	startDest,
 	randHold,
 }: Props) => {
-	const [initialized, setInitialized] = useState(false);
-
 	const { cursor, sequence, info } = useSequence({
 		targetSequence,
 		startDest,
@@ -43,7 +38,7 @@ const DeviceScreen = ({
 	const { isOperational, isFinished, log } = info;
 
 	const [msgSentCount, setMsgSentCount] = useState(0);
-	const GEAR_RELEASED = useMemo(() => msgSentCount === 3, [msgSentCount]);
+	const GEAR_RELEASED = useMemo(() => msgSentCount === 2, [msgSentCount]);
 
 	const isLeft = useMemo(() => direction === 'LEFT', [direction]);
 	const isTrialFinished = useMemo(() => isFinished && log.pass, [isFinished, log.pass]);
@@ -84,18 +79,9 @@ const DeviceScreen = ({
 		[GEAR_RELEASED, currentCursor]
 	);
 
-	useEffectOnce(() => {
-		publish('initialize');
-		setTimeout(() => {
-			setInitialized(true);
-		}, FIVE_SECONDS);
-	});
-
 	useEffect(() => {
-		if (initialized) {
-			publish('message');
-		}
-	}, [initialized, publish]);
+		publish('message');
+	}, [publish]);
 
 	useEffect(() => {
 		if (GEAR_RELEASED) {

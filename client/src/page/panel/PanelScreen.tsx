@@ -7,7 +7,7 @@ type Props = {
 };
 
 const PanelScreen = ({ message }: Props) => {
-	const { cursor, isFinished, isOperational } = message!;
+	const { cursor, isOperational } = message!;
 	const { starting, destination } = cursor;
 
 	const operationText = useMemo(() => {

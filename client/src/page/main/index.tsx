@@ -1,7 +1,7 @@
 import { ComputerDesktopIcon } from '@heroicons/react/24/solid';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-import { Fragment, useCallback, useRef, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 
 import { query, SessionToken } from '~/src/api/fetcher';
 import { queryKey } from '~/src/api/queryClient';
@@ -56,19 +56,8 @@ const MainPage = () => {
 			<div>
 				<SequenceGrid sessionToken={selectedToken} />
 			</div>
-			{/* <button onClick={play}>click</button>
-			<audio ref={audioRef}>
-				<source src='beep-sound-8333.mp3' type='audio/mp3' />
-			</audio> */}
 		</Fragment>
 	);
 };
 
 export default MainPage;
-
-// TODO
-// const { data: sessionToken } = useQuery({
-// 	queryKey: ['sessionToken', selectedToken?.uuid],
-// 	queryFn: () => getSessionToken({ uuid: selectedToken?.uuid as string }),
-// 	enabled: Boolean(selectedToken),
-// });

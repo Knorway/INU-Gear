@@ -13,7 +13,6 @@ type Props = {
 	onClick?: () => void;
 };
 
-// TODO: complex render props pattern
 const Accordion = (props: Props) => {
 	return (
 		<Disclosure>

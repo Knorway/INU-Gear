@@ -23,7 +23,7 @@ export type SessionLogResult = {
 };
 
 export type MessageStream = {
-	type: 'initialize' | 'message' | 'complete' | 'error';
+	type: 'message' | 'complete' | 'error';
 	payload: {
 		timeStamp: number;
 		cursor: {
@@ -35,13 +35,13 @@ export type MessageStream = {
 	} | null;
 };
 
-export const DEFAULT_OFFSET = 32;
+export const DEFAULT_OFFSET = 32; // TODO: need to check later
 export const DEFAULT_DELAY = 40;
 export const REPETITION_LIMIT = 1;
 export const FIVE_SECONDS = 5000 + DEFAULT_OFFSET;
 export const TRIAL_REPEAT = 6;
-export const TRIAL_DELAY = [...Array(24).keys()].map(
-	() => _.random(0, 3) * 1000 + DEFAULT_OFFSET
+export const TRIAL_DELAY = [...Array(TRIAL_REPEAT).keys()].map(
+	() => _.random(0, 3) * 1000 + FIVE_SECONDS
 );
 
 export const SEQUENCES = [
