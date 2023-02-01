@@ -87,7 +87,11 @@ const useSequence = ({
 			const P = e.deltaY;
 			const delta = isLeft ? 1 : -1;
 			if (P > 0) {
-				if (cursor - 1 !== -1) {
+				const loggingCond = isLeft
+					? cursor + 1 <= sequence.length - 1
+					: cursor - 1 !== -1;
+
+				if (loggingCond) {
 					writeLog('touch', Date.now());
 					setTravel((prev) => [...prev, 'L']);
 				}
@@ -110,7 +114,11 @@ const useSequence = ({
 			const P = e.deltaY;
 			const delta = isLeft ? -1 : 1;
 			if (P < 0 || P === 0) {
-				if (cursor + 1 <= sequence.length - 1) {
+				const loggingCond = isLeft
+					? cursor - 1 !== -1
+					: cursor + 1 <= sequence.length - 1;
+
+				if (loggingCond) {
 					writeLog('touch', Date.now());
 					setTravel((prev) => [...prev, 'R']);
 				}
@@ -225,7 +233,6 @@ const useSequence = ({
 		destination,
 		distance,
 		finalTouch,
-		indexOfChar,
 		isFinished,
 		log.init,
 		log.touch,
