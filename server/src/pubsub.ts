@@ -17,8 +17,8 @@ export class PubSub {
 		});
 	}
 
-	public publish({ key, payload }: { key: string; payload: unknown }) {
-		const data = JSON.stringify(payload);
+	public publish({ key, payload }: { key: string; payload: any }) {
+		const data = JSON.stringify({ [payload.type]: payload.data });
 		try {
 			this.connections[key].write(`data: ${data}\n\n`);
 		} catch (error) {

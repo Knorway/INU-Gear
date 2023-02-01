@@ -23,8 +23,7 @@ export type SessionLogResult = {
 };
 
 export type MessageStream = {
-	type: 'message' | 'complete' | 'error';
-	payload: {
+	message: {
 		timeStamp: number;
 		cursor: {
 			starting: SequenceChar;
@@ -33,16 +32,20 @@ export type MessageStream = {
 		isOperational: boolean;
 		isFinished: boolean;
 	} | null;
+	complete: boolean;
+	error: boolean;
 };
 
-export const DEFAULT_OFFSET = 32; // TODO: need to check later
-export const DEFAULT_DELAY = 40;
+// const f = <T extends keyof MessageStream>(x: { key: T; value: MessageStream[T] }) => true;
+// f({ key: 'complete', value: false });
+
+export const DEBOUNCE_DELAY = 40;
 export const REPETITION_LIMIT = 1;
-export const FIVE_SECONDS = 5000 + DEFAULT_OFFSET;
+export const OFFSET_DELAY = 32; // TODO: need to check later
 export const TRIAL_REPEAT = 6;
-export const TRIAL_DELAY = [...Array(TRIAL_REPEAT).keys()].map(
-	() => _.random(0, 3) * 1000 + FIVE_SECONDS
-);
+export const TRIAL_DELAY = [
+	7, 6, 5, 5, 6, 8, 5, 7, 8, 5, 8, 8, 7, 6, 5, 6, 7, 8, 6, 6, 6, 7, 6, 6,
+].map((e) => e * 1000 + OFFSET_DELAY);
 
 export const SEQUENCES = [
 	{

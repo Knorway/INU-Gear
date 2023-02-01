@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { DEFAULT_DELAY, SequenceChar, SEQUENCES } from '~/src/config/settings';
+import { DEBOUNCE_DELAY, SequenceChar, SEQUENCES } from '~/src/config/settings';
 
 import { useSound } from './useSound';
 
@@ -160,7 +160,7 @@ const useSequence = ({
 
 	useEffect(() => {
 		if (optrTimeout) {
-			writeLog('init', Date.now() + DEFAULT_DELAY);
+			writeLog('init', Date.now() + DEBOUNCE_DELAY);
 		}
 	}, [optrTimeout, writeLog]);
 
@@ -174,9 +174,9 @@ const useSequence = ({
 	}, [cursor, destination, pass, indexOfChar]);
 
 	useEffect(() => {
-		const dl = _.debounce(onWheelL, DEFAULT_DELAY);
-		const dr = _.debounce(onWheelR, DEFAULT_DELAY);
-		const beep = _.debounce(playSound, DEFAULT_DELAY);
+		const dl = _.debounce(onWheelL, DEBOUNCE_DELAY);
+		const dr = _.debounce(onWheelR, DEBOUNCE_DELAY);
+		const beep = _.debounce(playSound, DEBOUNCE_DELAY);
 
 		window.addEventListener('wheel', dl);
 		window.addEventListener('wheel', dr);

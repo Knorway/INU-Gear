@@ -3,20 +3,21 @@ import { Fragment, useEffect, useMemo, useState } from 'react';
 
 import { BACKEND_URL } from '~/src/api/request';
 import { MessageStream } from '~/src/config/settings';
-import { useNotification } from '~/src/hooks/useNotification';
 import PanelScreen from '~/src/page/panel/PanelScreen';
 
 const PanelPage = () => {
-	const [message, setMessage] = useState<MessageStream['payload'] | null>(null);
-	const [completed, setCompleted] = useState(false);
-	const [error, setError] = useState(false);
-
-	const notConnected = useMemo(() => !message, [message]);
+	const [message, setMessage] = useState<MessageStream>({
+		complete: false,
+		error: false,
+		message: null,
+	});
 
 	const router = useRouter();
 	const sessionId = router.query.sessionId as string;
 
-	const { activateToast, toast } = useNotification();
+	const notConnected = useMemo(() => !message.message, [message]);
+
+	console.log(message.message?.cursor);
 
 	useEffect(() => {
 		if (!sessionId) return;
@@ -25,25 +26,8 @@ const PanelPage = () => {
 
 		eventSource.addEventListener('message', (e) => {
 			const data = JSON.parse(e.data) as MessageStream;
-
-			switch (data.type) {
-				case 'message': {
-					setMessage(data.payload);
-					break;
-				}
-				case 'complete': {
-					setCompleted(true);
-					break;
-				}
-				case 'error': {
-					setError(true);
-					break;
-				}
-				default:
-					break;
-			}
+			setMessage((prev) => ({ ...prev, ...data }));
 		});
-
 		eventSource.addEventListener('error', (e) => {
 			console.log('eventSource error', e);
 		});
@@ -52,38 +36,6 @@ const PanelPage = () => {
 			eventSource.close();
 		};
 	}, [sessionId]);
-
-	useEffect(() => {
-		if (!completed) return;
-
-		activateToast({
-			variant: 'positive',
-			title: '세션이 종료되었습니다',
-			description: '잠시후 메인 화면으로 되돌아갑니다',
-		});
-		const id = setTimeout(() => {
-			router.push('/');
-		}, 3500);
-
-		return () => {
-			clearTimeout(id);
-		};
-	}, [activateToast, completed, router]);
-
-	useEffect(() => {
-		if (error) {
-			activateToast({
-				variant: 'negative',
-				title: '세션 저장에 실패했습니다.',
-				description: '',
-			});
-		}
-	}, [activateToast, error]);
-
-	useEffect(() => {
-		if (!message) return;
-		console.log(`${Date.now() - message.timeStamp}ms`);
-	}, [message]);
 
 	if (notConnected) {
 		return (
@@ -105,7 +57,6 @@ const PanelPage = () => {
 			<div className='flex items-center justify-center h-[85vh]'>
 				<PanelScreen message={message} />
 			</div>
-			{toast}
 		</Fragment>
 	);
 };

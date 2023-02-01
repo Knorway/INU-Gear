@@ -50,14 +50,14 @@ const DeviceScreen = ({
 	});
 
 	const publish = useCallback(
-		(type: MessageStream['type']) => {
+		(type: keyof MessageStream) => {
 			if (!sessionId) return;
 
 			publishMessage({
 				uuid: sessionId,
 				message: {
-					type,
-					payload: {
+					type: 'message',
+					data: {
 						timeStamp: Date.now(),
 						cursor: { starting, destination },
 						isOperational,

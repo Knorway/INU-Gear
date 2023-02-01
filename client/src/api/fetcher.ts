@@ -99,7 +99,13 @@ export const mutatation = {
 		return response.data;
 	}),
 	postMessageStream: mutationizeFetcher(
-		async ({ uuid, message }: { uuid: string; message: MessageStream }) => {
+		async <T extends keyof MessageStream>({
+			uuid,
+			message,
+		}: {
+			uuid: string;
+			message: { type: T; data: MessageStream[T] };
+		}) => {
 			const response = await request<never>({
 				url: `/publish/${uuid}`,
 				method: 'POST',

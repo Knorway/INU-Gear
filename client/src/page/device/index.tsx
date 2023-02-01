@@ -21,8 +21,6 @@ const DevicePage = () => {
 	const router = useRouter();
 	const sessionId = router.query.sessionId as string;
 
-	const delays = useMemo(() => _.shuffle(TRIAL_DELAY), []);
-
 	const { mutate: publishMessage } = useMutation({
 		mutationFn: mutatation.postMessageStream,
 	});
@@ -70,7 +68,7 @@ const DevicePage = () => {
 							uuid: sessionId as string,
 							message: {
 								type: 'complete',
-								payload: null,
+								data: true,
 							},
 						});
 						router.push('/');
@@ -80,7 +78,7 @@ const DevicePage = () => {
 							uuid: sessionId as string,
 							message: {
 								type: 'error',
-								payload: null,
+								data: true,
 							},
 						});
 					},
@@ -100,7 +98,7 @@ const DevicePage = () => {
 							key={idx}
 							targetSequence={sequence}
 							startDest={startDest[step]}
-							randHold={delays[idx]}
+							randHold={TRIAL_DELAY[idx]}
 							sessionId={sessionId}
 							onFinish={goNextStep}
 						/>
