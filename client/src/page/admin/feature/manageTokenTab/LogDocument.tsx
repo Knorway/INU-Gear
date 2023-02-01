@@ -138,15 +138,6 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 								</span>
 								{Object.entries(logs).map(([seq, docs]) => {
 									const trialChunks = _.groupBy(docs, 'direction');
-									const avgResponse =
-										docs.reduce((acc, val) => {
-											acc += val.responseTime;
-											return acc;
-										}, 0) / docs.length;
-									const aggTableData = {
-										responseTime: avgResponse.toFixed(0),
-									};
-
 									return (
 										<div key={seq}>
 											<p className='my-2 font-bold text-black'>
@@ -154,78 +145,94 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 											</p>
 											<div className='space-y-4'>
 												{Object.entries(trialChunks).map(
-													([dir, doc]) => (
-														<Fragment key={dir}>
-															<ArrowPathIcon
-																className='p-1 text-black border rounded-md cursor-pointer w-7 h-7'
-																onClick={revokeTrial(doc)}
-															/>
-															<Table
-																tableHeads={aggTableHeads}
-																data={[aggTableData]}
-															>
-																{({ data }) => (
-																	<>
-																		<td className='w-4'></td>
-																		<td className='px-6 py-1 text-black'>
-																			AVG
-																		</td>
-																		<td className='px-6 py-1 text-black'>
-																			{
-																				data.responseTime
+													([dir, doc]) => {
+														const avgResponse =
+															doc.reduce((acc, val) => {
+																acc += val.responseTime;
+																return acc;
+															}, 0) / doc.length;
+														const aggTableData = {
+															responseTime:
+																avgResponse.toFixed(0),
+														};
+														return (
+															<Fragment key={dir}>
+																<ArrowPathIcon
+																	className='p-1 text-black border rounded-md cursor-pointer w-7 h-7'
+																	onClick={revokeTrial(
+																		doc
+																	)}
+																/>
+																<Table
+																	tableHeads={
+																		aggTableHeads
+																	}
+																	data={[aggTableData]}
+																>
+																	{({ data }) => (
+																		<>
+																			<td className='w-4'></td>
+																			<td className='px-6 py-1 text-black'>
+																				AVG
+																			</td>
+																			<td className='px-6 py-1 text-black'>
+																				{
+																					data.responseTime
+																				}
+																				ms
+																			</td>
+																		</>
+																	)}
+																</Table>
+																<Table
+																	tableHeads={
+																		tableHeads
+																	}
+																	data={doc}
+																>
+																	{({ data }) => (
+																		<tr
+																			key={
+																				data.initialReaction
 																			}
-																			ms
-																		</td>
-																		{/* <td className='px-6 py-1 text-black'>
-																			{data.error}
-																		</td> */}
-																	</>
-																)}
-															</Table>
-															<Table
-																tableHeads={tableHeads}
-																data={doc}
-															>
-																{({ data }) => (
-																	<tr
-																		key={
-																			data.initialReaction
-																		}
-																		className='bg-white border-b hover:bg-gray-100'
-																	>
-																		<td className='w-4'></td>
-																		<td className='px-6 py-1 text-black'>
-																			{
-																				data.direction
-																			}
-																		</td>
-																		<td
-																			scope='row'
-																			className='px-6 py-1 font-normal text-black whitespace-nowrap'
+																			className='bg-white border-b hover:bg-gray-100'
 																		>
-																			{
-																				data.starting
-																			}
-																		</td>
-																		<td className='px-6 py-1 text-black'>
-																			{
-																				data.destination
-																			}
-																		</td>
-																		<td className='px-6 py-1 text-black'>
-																			{
-																				data.responseTime
-																			}
-																			ms
-																		</td>
-																		<td className='px-6 py-1 text-black'>
-																			{data.error}
-																		</td>
-																	</tr>
-																)}
-															</Table>
-														</Fragment>
-													)
+																			<td className='w-4'></td>
+																			<td className='px-6 py-1 text-black'>
+																				{
+																					data.direction
+																				}
+																			</td>
+																			<td
+																				scope='row'
+																				className='px-6 py-1 font-normal text-black whitespace-nowrap'
+																			>
+																				{
+																					data.starting
+																				}
+																			</td>
+																			<td className='px-6 py-1 text-black'>
+																				{
+																					data.destination
+																				}
+																			</td>
+																			<td className='px-6 py-1 text-black'>
+																				{
+																					data.responseTime
+																				}
+																				ms
+																			</td>
+																			<td className='px-6 py-1 text-black'>
+																				{
+																					data.error
+																				}
+																			</td>
+																		</tr>
+																	)}
+																</Table>
+															</Fragment>
+														);
+													}
 												)}
 											</div>
 										</div>
