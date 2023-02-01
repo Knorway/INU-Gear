@@ -102,7 +102,8 @@ const DeviceScreen = ({
 			travel: info.travel.length,
 			logs: {
 				init: log.init,
-				touch: log.touch - log.init,
+				// TODO: dir === LEFT && distance === 1 && sequence.at[0],[-1] -> touch = 0; (onWheelR, onWheelL)
+				touch: log.touch <= 0 ? log.pass - log.init : log.touch - log.init,
 				pass: log.pass,
 				diff: log.diff,
 				error: log.error,
