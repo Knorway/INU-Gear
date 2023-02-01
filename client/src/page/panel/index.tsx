@@ -1,21 +1,21 @@
 import { useRouter } from 'next/router';
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo } from 'react';
 
 import { BACKEND_URL } from '~/src/api/request';
 import { MessageStream } from '~/src/config/settings';
+import { useCtx } from '~/src/hooks/useCtx';
 import PanelScreen from '~/src/page/panel/PanelScreen';
 
+import { PageDispatchContext, PageStateContext } from './context/PageContext';
+
 const PanelPage = () => {
-	const [message, setMessage] = useState<MessageStream>({
-		complete: false,
-		error: false,
-		message: null,
-	});
+	const pageState = useCtx(PageStateContext);
+	const dispatch = useCtx(PageDispatchContext);
 
 	const router = useRouter();
 	const sessionId = router.query.sessionId as string;
 
-	const notConnected = useMemo(() => !message.message, [message]);
+	const notConnected = useMemo(() => !pageState.message, [pageState.message]);
 
 	useEffect(() => {
 		if (!sessionId) return;
@@ -24,7 +24,7 @@ const PanelPage = () => {
 
 		eventSource.addEventListener('message', (e) => {
 			const data = JSON.parse(e.data) as MessageStream;
-			setMessage((prev) => ({ ...prev, ...data }));
+			dispatch(data);
 		});
 		eventSource.addEventListener('error', (e) => {
 			console.log('eventSource error', e);
@@ -33,7 +33,7 @@ const PanelPage = () => {
 		return () => {
 			eventSource.close();
 		};
-	}, [sessionId]);
+	}, [dispatch, sessionId]);
 
 	if (notConnected) {
 		return (
@@ -55,7 +55,7 @@ const PanelPage = () => {
 				<img src='/operation_background.png' alt='bg' className='w-full h-full' />
 			</div>
 			<div className='flex items-center justify-center h-[100vh] absolute top-0 left-1/2 -translate-x-1/2'>
-				<PanelScreen message={message} />
+				<PanelScreen />
 			</div>
 		</Fragment>
 	);

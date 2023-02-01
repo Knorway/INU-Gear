@@ -1,15 +1,15 @@
 import { useRouter } from 'next/router';
 import { Fragment, useEffect, useMemo } from 'react';
 
-import { MessageStream, optrTable } from '~/src/config/settings';
+import { optrTable } from '~/src/config/settings';
+import { useCtx } from '~/src/hooks/useCtx';
 import { useNotification } from '~/src/hooks/useNotification';
 
-type Props = {
-	message: MessageStream;
-};
+import { PageStateContext } from './context/PageContext';
 
-const PanelScreen = ({ message }: Props) => {
-	const { cursor, isOperational } = message.message!;
+const PanelScreen = () => {
+	const pageState = useCtx(PageStateContext);
+	const { cursor, isOperational } = pageState.message!;
 	const { starting, destination } = cursor;
 
 	const router = useRouter();
@@ -82,7 +82,7 @@ const PanelScreen = ({ message }: Props) => {
 	}, [destination, isOperational, starting]);
 
 	useEffect(() => {
-		if (!message.complete) return;
+		if (!pageState.complete) return;
 
 		activateToast({
 			variant: 'positive',
@@ -96,22 +96,22 @@ const PanelScreen = ({ message }: Props) => {
 		return () => {
 			clearTimeout(id);
 		};
-	}, [activateToast, message.complete, router]);
+	}, [activateToast, pageState.complete, router]);
 
 	useEffect(() => {
-		if (message.error) {
+		if (pageState.error) {
 			activateToast({
 				variant: 'negative',
 				title: '세션 저장에 실패했습니다.',
 				description: '',
 			});
 		}
-	}, [activateToast, message.error]);
+	}, [activateToast, pageState.error]);
 
 	useEffect(() => {
-		if (!message.message) return;
-		console.log(`${Date.now() - message.message.timeStamp}ms`);
-	}, [message]);
+		if (!pageState.message) return;
+		console.log(`${Date.now() - pageState.message.timeStamp}ms`);
+	}, [pageState.message]);
 
 	return (
 		<Fragment>

@@ -30,7 +30,7 @@ export type MessageStream = {
 		};
 		isOperational: boolean;
 		isFinished: boolean;
-	} | null;
+	};
 	complete: boolean;
 	error: boolean;
 };

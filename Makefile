@@ -30,6 +30,6 @@ swarm-deploy:
 	ssh ${TUNNEL_MANAGER_NODE} '/root/up.sh'
 
 sync-commit:
-	git push origin main
 	make build-push
 	make swarm-deploy
+	git push origin main
