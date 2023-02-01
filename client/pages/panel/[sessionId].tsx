@@ -1,5 +1,3 @@
-import { useRouter } from 'next/router';
-
 import PanelPage from '../../src/page/panel';
 
 const Page = () => {

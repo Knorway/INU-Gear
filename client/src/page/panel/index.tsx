@@ -17,8 +17,6 @@ const PanelPage = () => {
 
 	const notConnected = useMemo(() => !message.message, [message]);
 
-	console.log(message.message?.cursor);
-
 	useEffect(() => {
 		if (!sessionId) return;
 
@@ -53,8 +51,10 @@ const PanelPage = () => {
 
 	return (
 		<Fragment>
-			<div className="absolute bg-[url('/operation_background.png')] bg-no-repeat bg-cover w-full h-screen -z-10"></div>
-			<div className='flex items-center justify-center h-[85vh]'>
+			<div className='w-full h-screen overflow-hidden'>
+				<img src='/operation_background.png' alt='bg' className='w-full h-full' />
+			</div>
+			<div className='flex items-center justify-center h-[100vh] absolute top-0 left-1/2 -translate-x-1/2'>
 				<PanelScreen message={message} />
 			</div>
 		</Fragment>
