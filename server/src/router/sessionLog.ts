@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import compression from 'compression';
 import express from 'express';
 
 import { asyncHandler } from '../asyncHandler';
@@ -6,6 +7,8 @@ import { SessionLogResult, SessionToken } from '../config';
 import { jwtAuth } from '../middleware/authMiddleware';
 
 const router = express.Router();
+
+router.use(compression());
 
 router.post(
 	'/',

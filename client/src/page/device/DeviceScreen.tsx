@@ -17,7 +17,7 @@ type Props = {
 	targetSequence: typeof SEQUENCES[number];
 	sessionId: string;
 	startDest: SequenceChar[];
-	randHold: number;
+	trialDelay: number;
 	onFinish: (log: SessionLogResult) => void;
 };
 
@@ -26,12 +26,12 @@ const DeviceScreen = ({
 	onFinish,
 	sessionId,
 	startDest,
-	randHold,
+	trialDelay,
 }: Props) => {
 	const { cursor, sequence, info } = useSequence({
 		targetSequence,
 		startDest,
-		randHold,
+		trialDelay,
 	});
 	const { chars, direction } = sequence;
 	const { current: currentCursor, destination, starting } = cursor;

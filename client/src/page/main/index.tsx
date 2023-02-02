@@ -10,7 +10,7 @@ import Spinner from '~/src/components/Spinner';
 
 import SequenceGrid from './SequenceGrid';
 
-const DEFAULT_LABEL = '세션을 선택해주세요.';
+const DEFAULT_LABEL = '참가자를 선택해주세요.';
 
 const MainPage = () => {
 	const [selectedToken, setSelectedToken] = useState<SessionToken>();

@@ -98,7 +98,7 @@ const DevicePage = () => {
 							key={idx}
 							targetSequence={sequence}
 							startDest={startDest[step]}
-							randHold={TRIAL_DELAY[idx]}
+							trialDelay={TRIAL_DELAY[idx]}
 							sessionId={sessionId}
 							onFinish={goNextStep}
 						/>

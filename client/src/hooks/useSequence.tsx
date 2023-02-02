@@ -24,11 +24,11 @@ const initialLog: SessionLog = {
 const useSequence = ({
 	targetSequence,
 	startDest,
-	randHold,
+	trialDelay,
 }: {
 	targetSequence: typeof SEQUENCES[number];
 	startDest: SequenceChar[];
-	randHold: number;
+	trialDelay: number;
 }) => {
 	const { sequence, direction, type } = targetSequence;
 	const [starting, destination] = startDest;
@@ -158,13 +158,13 @@ const useSequence = ({
 		if (isOperational) return;
 
 		const timeoutId = setTimeout(() => {
-			setOptrTimeout(randHold);
-		}, randHold);
+			setOptrTimeout(trialDelay);
+		}, trialDelay);
 
 		return () => {
 			clearTimeout(timeoutId);
 		};
-	}, [isOperational, randHold]);
+	}, [isOperational, trialDelay]);
 
 	useEffect(() => {
 		if (optrTimeout) {
