@@ -13,13 +13,13 @@ const OperationText = () => {
 	}
 
 	return (
-		<div className='text-[48px] text-center'>
+		<div className='text-[48px] text-center font-bold'>
 			<div className='relative flex bg-white border-2 border-black'>
 				<div className='flex-row'>
-					<div className='px-16 py-2 border-b-2 border-r-2 border-black'>
+					<div className='px-16 py-2 leading-none border-b-2 border-r-2 border-black text-[44px]'>
 						현재 위치
 					</div>
-					<div className='py-2 border-r-2 border-black'>
+					<div className='py-5 border-r-2 border-black'>
 						<span>
 							<span className='font-bold text-blue-600'>{starting}</span> [
 							<span className='text-blue-600'>{optrTable[starting]}</span>]
@@ -27,14 +27,14 @@ const OperationText = () => {
 					</div>
 				</div>
 				<div
-					className='absolute -translate-x-1/2 translate-y-[20%] top-1/2 left-1/2'
+					className='absolute -translate-x-[43%] translate-y-[5%] top-1/2 left-1/2'
 					style={{ margin: 0 }}
 				>
 					<svg
 						xmlns='http://www.w3.org/2000/svg'
 						fill='none'
 						viewBox='0 0 24 24'
-						strokeWidth={3}
+						strokeWidth={4}
 						stroke='currentColor'
 						className='w-16 h-16'
 					>
@@ -46,8 +46,10 @@ const OperationText = () => {
 					</svg>
 				</div>
 				<div className='flex-row'>
-					<div className='px-16 py-2 border-b-2 border-black'>목표 위치</div>
-					<div className='py-2'>
+					<div className='px-16 py-2 leading-none border-b-2 border-black text-[44px]'>
+						목표 위치
+					</div>
+					<div className='py-5'>
 						<span>
 							<span className='font-bold text-red-600 '>{destination}</span>{' '}
 							[

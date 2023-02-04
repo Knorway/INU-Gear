@@ -78,9 +78,6 @@ export const SEQUENCES = [
 	{ type: 'B', direction: 'LEFT', sequence: ['D', 'N', 'R'], repetition: 0 as number },
 ] as const;
 
-export const NUM_PHASE = 3;
-export const NUM_STEP = SEQUENCES.length - 1;
-
 export const optrTable: Record<SequenceChar, string> = {
 	D: '주행',
 	N: '중립',

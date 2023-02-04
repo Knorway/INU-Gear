@@ -66,12 +66,15 @@ const useSequence = ({
 		return Math.abs(indexOfChar(destination) - indexOfChar(starting));
 	}, [destination, indexOfChar, sequence, starting, type]);
 
-	const writeLog = useCallback((key: keyof typeof log, value: number) => {
-		setLog((prev) => {
-			if (!prev[key]) return { ...prev, [key]: value };
-			return prev;
-		});
-	}, []);
+	const writeLog = useCallback(
+		<T extends keyof typeof log>(key: T, value: typeof log[T]) => {
+			setLog((prev) => {
+				if (!prev[key]) return { ...prev, [key]: value };
+				return prev;
+			});
+		},
+		[]
+	);
 
 	const moveCursor = useCallback(
 		(value: number) => {
