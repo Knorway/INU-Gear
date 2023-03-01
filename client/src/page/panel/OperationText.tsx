@@ -20,10 +20,7 @@ const OperationText = () => {
 						현재 위치
 					</div>
 					<div className='py-5 border-r-2 border-black'>
-						<span>
-							<span className='font-bold text-blue-600'>{starting}</span> [
-							<span className='text-blue-600'>{optrTable[starting]}</span>]
-						</span>
+						<span className='text-blue-600'>{optrTable[starting]}</span>
 					</div>
 				</div>
 				<div
@@ -50,12 +47,7 @@ const OperationText = () => {
 						목표 위치
 					</div>
 					<div className='py-5'>
-						<span>
-							<span className='font-bold text-red-600 '>{destination}</span>{' '}
-							[
-							<span className='text-red-600'>{optrTable[destination]}</span>
-							]
-						</span>
+						<span className='text-red-600'>{optrTable[destination]}</span>
 					</div>
 				</div>
 			</div>

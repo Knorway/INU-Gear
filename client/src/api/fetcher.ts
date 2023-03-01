@@ -15,7 +15,7 @@ export type SessionToken = {
 	label: string;
 	mangerId: number;
 	sequence: typeof SEQUENCES;
-	// TODO: isFinished
+	isFinished: boolean;
 };
 
 export type UserProfile = {

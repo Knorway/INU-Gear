@@ -79,7 +79,7 @@ export const SEQUENCES = [
 ] as const;
 
 export const optrTable: Record<SequenceChar, string> = {
-	D: '주행',
+	D: '전진',
 	N: '중립',
 	P: '주차',
 	R: '후진',

@@ -38,7 +38,7 @@ type LogDoc = {
 };
 
 const tableHeads = ['dir', 'starting', 'destination', 'response', 'error'];
-const aggTableHeads = ['aggregate', 'response'];
+const aggTableHeads = ['aggregate', 'response', 'error'];
 
 const LogDocument = ({ token, log, onUnmount }: Props) => {
 	const queryClient = useQueryClient();
@@ -151,10 +151,13 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 																acc += val.responseTime;
 																return acc;
 															}, 0) / doc.length;
-														const aggTableData = {
-															responseTime:
-																avgResponse.toFixed(0),
-														};
+														const sumError = doc.reduce(
+															(acc, val) => {
+																acc += val.error;
+																return acc;
+															},
+															0
+														);
 														return (
 															<Fragment key={dir}>
 																<ArrowPathIcon
@@ -167,20 +170,40 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 																	tableHeads={
 																		aggTableHeads
 																	}
-																	data={[aggTableData]}
+																	data={[
+																		{
+																			tag: 'AVG',
+																			response:
+																				avgResponse.toFixed(
+																					0
+																				) + 'ms',
+																		},
+																		{
+																			tag: 'SUM',
+																			error: sumError,
+																		},
+																	]}
 																>
 																	{({ data }) => (
 																		<>
-																			<td className='w-4'></td>
-																			<td className='px-6 py-1 text-black'>
-																				AVG
-																			</td>
-																			<td className='px-6 py-1 text-black'>
-																				{
-																					data.responseTime
-																				}
-																				ms
-																			</td>
+																			<tr>
+																				<td className='w-4'></td>
+																				<td className='px-6 py-1 text-black'>
+																					{
+																						data.tag
+																					}
+																				</td>
+																				<td className='px-6 py-1 text-black'>
+																					{
+																						data.response
+																					}
+																				</td>
+																				<td className='px-6 py-1 text-black'>
+																					{
+																						data.error
+																					}
+																				</td>
+																			</tr>
 																		</>
 																	)}
 																</Table>

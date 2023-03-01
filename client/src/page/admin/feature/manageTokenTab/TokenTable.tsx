@@ -13,7 +13,7 @@ import {
 } from './context/FeatureContext';
 import LogDocument from './LogDocument';
 
-const tableHeads = ['이름', '식별번호'];
+const tableHeads = ['이름', '식별번호', '등록일자', '완료'];
 
 const TokenTable = () => {
 	const [expandedRow, setExpandedRow] = useState('');
@@ -92,6 +92,10 @@ const TokenTable = () => {
 								{data.label}
 							</th>
 							<td className='px-6 py-4'>{data.uuid}</td>
+							<td className='px-6 py-4'>
+								{data.createdAt.toString().substring(0, 10)}
+							</td>
+							<td className='px-6 py-4'>{data.isFinished ? '✔' : ''}</td>
 						</tr>
 						{expandedRow === data.uuid && (
 							<LogDocument
