@@ -121,6 +121,20 @@ router.delete(
 			}),
 		];
 
+		const isRevokable = token?.isFinished === true;
+		if (isRevokable) {
+			transactions.push(
+				prisma.sessionToken.updateMany({
+					where: {
+						uuid: tokenId,
+					},
+					data: {
+						isFinished: false,
+					},
+				})
+			);
+		}
+
 		await prisma.$transaction(transactions);
 
 		res.end();
