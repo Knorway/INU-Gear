@@ -1,19 +1,12 @@
 import { Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
-import {
-  Fragment,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
 type Props<T> = {
 	list: T[];
 	displayProperty: keyof T;
 	defaultLabel: string;
-	onChange: (sessionId: T) => void;
+	onChange: (field: T) => void;
 };
 
 const ListBox = <T extends object>(props: Props<T>) => {

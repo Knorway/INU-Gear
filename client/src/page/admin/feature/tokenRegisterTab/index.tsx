@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { Fragment } from 'react';
@@ -5,12 +6,25 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import { mutatation } from '~/src/api/fetcher';
 import FormInput from '~/src/components/FormInput';
+import ListBox from '~/src/components/ListBox';
 import Spinner from '~/src/components/Spinner';
 import { useNotification } from '~/src/hooks/useNotification';
 
 type FormType = {
 	label: string;
+	gender: string;
+	experience: number;
 };
+
+const genderList = [{ gender: '남' }, { gender: '여' }, { gender: '기타' }];
+const experienceList = [
+	{ experience: 1 },
+	{ experience: 2 },
+	{ experience: 3 },
+	{ experience: 4 },
+];
+
+const genderMap = { 남: 1, 여: 2, 기타: 3 };
 
 const TokenRegisterTab = () => {
 	const formMethods = useForm<FormType>();
@@ -25,8 +39,20 @@ const TokenRegisterTab = () => {
 	});
 
 	const registerToken: SubmitHandler<FormType> = async (data) => {
+		if (
+			Object.values(data).some(
+				(e, idx, arr) =>
+					arr.length !== 3 || ['', '성별', '운전숙련도'].includes(e)
+			)
+		)
+			return;
+
 		registerSessionToken(
-			{ label: data.label },
+			{
+				label: data.label,
+				experience: data.experience,
+				gender: genderMap[data.gender],
+			},
 			{
 				onSuccess: () => {
 					formMethods.reset();
@@ -50,6 +76,11 @@ const TokenRegisterTab = () => {
 		);
 	};
 
+	const onChangeListBox = (e: FormType) => {
+		const [key, value] = Object.entries(e).flat();
+		formMethods.setValue(key, value);
+	};
+
 	return (
 		<Fragment>
 			{isLoading && <Spinner />}
@@ -65,6 +96,20 @@ const TokenRegisterTab = () => {
 						innerLabel='이름'
 						autoComplete='off'
 					/>
+					<div className='flex space-x-2'>
+						<ListBox
+							list={genderList}
+							defaultLabel='성별'
+							displayProperty='gender'
+							onChange={onChangeListBox}
+						/>
+						<ListBox
+							list={experienceList}
+							defaultLabel='운전숙련도'
+							displayProperty='experience'
+							onChange={onChangeListBox}
+						/>
+					</div>
 					<div className='mt-4'>
 						<button
 							type='submit'

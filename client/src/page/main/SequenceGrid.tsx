@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useRouter } from 'next/router';
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 
 import { SessionToken } from '~/src/api/fetcher';
 import { REPETITION_LIMIT, SEQUENCES } from '~/src/config/settings';
@@ -14,7 +14,7 @@ const SequenceGrid = ({ sessionToken }: Props) => {
 
 	const overRepeated = (repetition: number) => repetition >= REPETITION_LIMIT;
 
-	const navigate = (sequence: typeof SEQUENCES[number]) => () => {
+	const navigate = (sequence: (typeof SEQUENCES)[number]) => () => {
 		if (!sessionToken) return;
 		router.push({
 			pathname: `/device/[sessionId]`,

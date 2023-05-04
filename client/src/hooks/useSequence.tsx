@@ -25,10 +25,12 @@ const useSequence = ({
 	targetSequence,
 	startDest,
 	trialDelay,
+	isTrial,
 }: {
 	targetSequence: typeof SEQUENCES[number];
 	startDest: SequenceChar[];
 	trialDelay: number;
+	isTrial?: boolean;
 }) => {
 	const { sequence, direction, type } = targetSequence;
 	const [starting, destination] = startDest;
@@ -176,13 +178,15 @@ const useSequence = ({
 	}, [optrTimeout, writeLog]);
 
 	useEffect(() => {
+		if (isTrial) return;
+
 		if (cursor === indexOfChar(destination)) {
 			setFinalTouch(Date.now());
 			pass();
 		} else {
 			pass.cancel();
 		}
-	}, [cursor, destination, pass, indexOfChar]);
+	}, [cursor, destination, indexOfChar, isTrial, pass]);
 
 	useEffect(() => {
 		const dl = _.debounce(onWheelL, DEBOUNCE_DELAY);

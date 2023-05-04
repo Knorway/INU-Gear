@@ -53,6 +53,8 @@ model sessionToken {
     createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
 
     label      String
+    gender     Int     @default(-1)
+    experience Int     @default(-1)
     sequence   Json
     isFinished Boolean @default(false) @map("is_finished")
 

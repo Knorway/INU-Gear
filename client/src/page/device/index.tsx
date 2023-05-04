@@ -1,22 +1,26 @@
 import { useMutation } from '@tanstack/react-query';
-import _ from 'lodash';
 import { useRouter } from 'next/router';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { mutatation } from '~/src/api/fetcher';
 import {
-  SEQUENCES,
-  SessionLogResult,
-  TRIAL_DELAY,
-  TRIAL_REPEAT,
+	SEQUENCES,
+	SessionLogResult,
+	TRIAL_DELAY,
+	TRIAL_REPEAT,
 } from '~/src/config/settings';
 import DeviceScreen from '~/src/page/device/DeviceScreen';
 import { deduplicate, generateStartDest } from '~/src/utils';
 
+import TrialDeviceScreen from './TrialDeviceScreen';
+
 const DevicePage = () => {
-	const [sequences, setSequences] = useState<typeof SEQUENCES[number][] | null>(null);
+	const [sequences, setSequences] = useState<(typeof SEQUENCES)[number][] | null>(null);
 	const [step, setStep] = useState(0);
 	const [resultLogs, setResultLogs] = useState<SessionLogResult[]>([]);
+	const [go, setGo] = useState(false);
+
+	console.log((resultLogs.at(-1)?.logs as any)?.error);
 
 	const router = useRouter();
 	const sessionId = router.query.sessionId as string;
@@ -91,20 +95,28 @@ const DevicePage = () => {
 
 	return (
 		<Fragment>
-			{sequences.map((sequence, idx) => {
-				if (step === idx) {
-					return (
-						<DeviceScreen
-							key={idx}
-							targetSequence={sequence}
-							startDest={startDest[step]}
-							trialDelay={TRIAL_DELAY[idx]}
-							sessionId={sessionId}
-							onFinish={goNextStep}
-						/>
-					);
-				}
-			})}
+			{!go && (
+				<TrialDeviceScreen
+					trigger={() => setGo((prev) => !prev)}
+					targetSequence={sequences[0]}
+					startDest={startDest[step]}
+				/>
+			)}
+			{go &&
+				sequences.map((sequence, idx) => {
+					if (step === idx) {
+						return (
+							<DeviceScreen
+								key={idx}
+								targetSequence={sequence}
+								startDest={startDest[step]}
+								trialDelay={TRIAL_DELAY[idx]}
+								sessionId={sessionId}
+								onFinish={goNextStep}
+							/>
+						);
+					}
+				})}
 		</Fragment>
 	);
 };

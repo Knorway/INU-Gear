@@ -23,25 +23,6 @@ const OperationText = () => {
 						<span className='text-blue-600'>{optrTable[starting]}</span>
 					</div>
 				</div>
-				<div
-					className='absolute -translate-x-[43%] translate-y-[5%] top-1/2 left-1/2'
-					style={{ margin: 0 }}
-				>
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						fill='none'
-						viewBox='0 0 24 24'
-						strokeWidth={4}
-						stroke='currentColor'
-						className='w-16 h-16'
-					>
-						<path
-							strokeLinecap='round'
-							strokeLinejoin='round'
-							d='M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3'
-						/>
-					</svg>
-				</div>
 				<div className='flex-row'>
 					<div className='px-16 py-2 leading-none border-b-2 border-black text-[44px]'>
 						목표 위치

@@ -1,9 +1,9 @@
 import { request } from '~/src/api/request';
 import {
-  MessageStream,
-  SequenceChar,
-  SEQUENCES,
-  SessionLogResult,
+	MessageStream,
+	SequenceChar,
+	SEQUENCES,
+	SessionLogResult,
 } from '~/src/config/settings';
 
 import { mutationizeFetcher } from './queryClient';
@@ -13,6 +13,8 @@ export type SessionToken = {
 	uuid: string;
 	createdAt: Date;
 	label: string;
+	gender: number;
+	experience: number;
 	mangerId: number;
 	sequence: typeof SEQUENCES;
 	isFinished: boolean;
@@ -82,14 +84,16 @@ export const mutatation = {
 		});
 		return response.data;
 	}),
-	postSessionToken: mutationizeFetcher(async (data: { label: string }) => {
-		const response = await request<SessionToken>({
-			url: `/session-token`,
-			method: 'POST',
-			data,
-		});
-		return response.data;
-	}),
+	postSessionToken: mutationizeFetcher(
+		async (data: { label: string; gender: number; experience: number }) => {
+			const response = await request<SessionToken>({
+				url: `/session-token`,
+				method: 'POST',
+				data,
+			});
+			return response.data;
+		}
+	),
 	deleteSessionToken: mutationizeFetcher(async (data: { tokens: string[] }) => {
 		const response = await request<any>({
 			url: `/session-token`,

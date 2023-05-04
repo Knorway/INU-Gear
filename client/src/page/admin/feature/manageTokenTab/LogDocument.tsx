@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import _ from 'lodash';
@@ -8,12 +9,7 @@ import { queryKey } from '~/src/api/queryClient';
 import Spinner from '~/src/components/Spinner';
 import Table from '~/src/components/Table';
 import Toast from '~/src/components/Toast';
-import {
-  Sequence,
-  SequenceChar,
-  SEQUENCES,
-  TRIAL_REPEAT,
-} from '~/src/config/settings';
+import { Sequence, SequenceChar, SEQUENCES, TRIAL_REPEAT } from '~/src/config/settings';
 
 type Props = {
 	token: SessionToken;
@@ -36,6 +32,9 @@ type LogDoc = {
 	createdAt: number;
 	uuid: string;
 };
+
+const genderMap = { [-1]: '알수없음', 1: '남', 2: '여', 3: '기타' };
+const experienceMap = { [-1]: '알수없음' };
 
 const tableHeads = ['dir', 'starting', 'destination', 'response', 'error'];
 const aggTableHeads = ['aggregate', 'response', 'error'];
@@ -117,12 +116,19 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 		[queryClient, rollbackTrial, token.uuid]
 	);
 
-	const title = <span className='font-bold'>{token.label}</span>;
+	const title = <span className='font-bold'>{token.label} </span>;
 	const description = <span className='text-black'>[식별번호] {token.uuid}</span>;
 	const component = useMemo(() => {
 		return (
 			<div className='relative'>
 				<span className='text-base text-black'>
+					[성별] {genderMap[token.gender]} [운전숙련도]{' '}
+					{experienceMap[token.experience]
+						? experienceMap[token.experience]
+						: token.experience}{' '}
+				</span>
+				<span className='text-base text-black'>
+					<br />
 					[생성된 로그] {log?.length}/{TRIAL_REPEAT * SEQUENCES.length}{' '}
 					[진행률]:{' '}
 					{((log?.length / (TRIAL_REPEAT * SEQUENCES.length)) * 100).toFixed(2)}
@@ -151,10 +157,22 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 																acc += val.responseTime;
 																return acc;
 															}, 0) / doc.length;
+														const avgError =
+															doc.reduce((acc, val) => {
+																return acc + val.error;
+															}, 0) / doc.length;
 														const sumError = doc.reduce(
 															(acc, val) => {
 																acc += val.error;
 																return acc;
+															},
+															0
+														);
+														const sumResponse = doc.reduce(
+															(acc, val) => {
+																return (
+																	acc + val.responseTime
+																);
 															},
 															0
 														);
@@ -173,6 +191,11 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 																	data={[
 																		{
 																			tag: 'AVG',
+																			error: avgError
+																				? avgError.toFixed(
+																						2
+																				  )
+																				: 0,
 																			response:
 																				avgResponse.toFixed(
 																					0
@@ -181,6 +204,16 @@ const LogDocument = ({ token, log, onUnmount }: Props) => {
 																		{
 																			tag: 'SUM',
 																			error: sumError,
+																			response:
+																				(
+																					sumResponse /
+																					1000
+																				)
+																					.toFixed(
+																						2
+																					)
+																					.toString() +
+																				's',
 																		},
 																	]}
 																>

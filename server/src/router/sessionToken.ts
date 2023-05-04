@@ -67,11 +67,13 @@ router.post(
 	jwtAuth,
 	asyncHandler(async (req, res) => {
 		const { prisma } = req.app.context;
-		const { label } = req.body;
+		const { label, gender, experience } = req.body;
 
 		const token = await prisma.sessionToken.create({
 			data: {
 				label,
+				gender,
+				experience,
 				managerId: req.user.id,
 				sequence: SEQUENCES,
 			},
