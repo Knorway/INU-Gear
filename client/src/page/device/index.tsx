@@ -20,8 +20,6 @@ const DevicePage = () => {
 	const [resultLogs, setResultLogs] = useState<SessionLogResult[]>([]);
 	const [go, setGo] = useState(false);
 
-	console.log((resultLogs.at(-1)?.logs as any)?.error);
-
 	const router = useRouter();
 	const sessionId = router.query.sessionId as string;
 
@@ -95,6 +93,7 @@ const DevicePage = () => {
 
 	return (
 		<Fragment>
+			{/* <Debug resultLogs={resultLogs} /> */}
 			{!go && (
 				<TrialDeviceScreen
 					trigger={() => setGo((prev) => !prev)}
@@ -118,6 +117,30 @@ const DevicePage = () => {
 					}
 				})}
 		</Fragment>
+	);
+};
+
+const Debug = ({ resultLogs }: { resultLogs: SessionLogResult[] }) => {
+	// type, dir, starting, dees, distance, travel, logs
+	return (
+		<div style={{ position: 'absolute', left: '45%' }}>
+			<pre>
+				{resultLogs.at(-1) &&
+					JSON.stringify(
+						{
+							type: resultLogs.at(-1)?.type,
+							direction: resultLogs.at(-1)?.direction,
+							starting: resultLogs.at(-1)?.starting,
+							destination: resultLogs.at(-1)?.destination,
+							distance: resultLogs.at(-1)?.distance,
+							travel: resultLogs.at(-1)?.travel,
+							erorr: (resultLogs.at(-1)?.logs as any)?.error,
+						},
+						null,
+						2
+					)}
+			</pre>
+		</div>
 	);
 };
 

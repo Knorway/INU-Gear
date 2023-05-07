@@ -27,7 +27,7 @@ const useSequence = ({
 	trialDelay,
 	isTrial,
 }: {
-	targetSequence: typeof SEQUENCES[number];
+	targetSequence: (typeof SEQUENCES)[number];
 	startDest: SequenceChar[];
 	trialDelay: number;
 	isTrial?: boolean;
@@ -69,7 +69,7 @@ const useSequence = ({
 	}, [destination, indexOfChar, sequence, starting, type]);
 
 	const writeLog = useCallback(
-		<T extends keyof typeof log>(key: T, value: typeof log[T]) => {
+		<T extends keyof typeof log>(key: T, value: (typeof log)[T]) => {
 			setLog((prev) => {
 				if (!prev[key]) return { ...prev, [key]: value };
 				return prev;
@@ -221,11 +221,20 @@ const useSequence = ({
 		})();
 
 		const error = (() => {
+			// if (
+			// 	((destination === sequence[0] && travel[0] !== 'R') ||
+			// 		(destination === sequence.at(-1) && travel[0] !== 'L')) &&
+			// 	starting === 'P' &&
+			// 	type === 'B'
+			// )
 			if (
-				((destination === sequence[0] && travel[0] !== 'L') ||
-					(destination === sequence.at(-1) && travel[0] !== 'R')) &&
-				starting === 'P'
+				starting === 'P' &&
+				type === 'B' &&
+				([sequence[0], sequence.at(-1)] as SequenceChar[]).includes(destination)
 			) {
+				if (travel.length === 1) {
+					return 0;
+				}
 				return Math.abs(travel.length - distance - 1);
 			}
 			return Math.abs(travel.length - distance);
@@ -246,6 +255,7 @@ const useSequence = ({
 		sequence,
 		starting,
 		travel,
+		type,
 		writeLog,
 	]);
 

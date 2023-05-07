@@ -16,6 +16,20 @@ const Header = () => {
 						className='cursor-pointer'
 					/>
 				</div>
+				{/* <div
+					style={{
+						position: 'absolute',
+						left: '50%',
+						transform: 'translateX(-50%)',
+						padding: 8,
+						border: '2px solid black',
+						color: 'crimson',
+						fontWeight: 'bold',
+						fontSize: 18,
+					}}
+				>
+					DEBUG MODE
+				</div> */}
 				<div>
 					<Cog6ToothIcon
 						className='w-6 h-6 cursor-pointer'

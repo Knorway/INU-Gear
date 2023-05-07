@@ -41,12 +41,12 @@ export type MessageStream = {
 export const DEBOUNCE_DELAY = 40;
 export const REPETITION_LIMIT = 1;
 export const OFFSET_DELAY = 32; // TODO: need to check later
-// export const TRIAL_DELAY = [
-// 	7, 6, 5, 5, 6, 8, 5, 7, 8, 5, 8, 8, 7, 6, 5, 6, 7, 8, 6, 6, 6, 7, 6, 6,
-// ].map((e) => e * 1000 + OFFSET_DELAY);
 export const TRIAL_DELAY = [
 	7, 6, 5, 5, 6, 8, 5, 7, 8, 5, 8, 8, 7, 6, 5, 6, 7, 8, 6, 6, 6, 7, 6, 6,
-].map((e) => 1000);
+].map((e) => e * 1000 + OFFSET_DELAY);
+// export const TRIAL_DELAY = [
+// 	7, 6, 5, 5, 6, 8, 5, 7, 8, 5, 8, 8, 7, 6, 5, 6, 7, 8, 6, 6, 6, 7, 6, 6,
+// ].map((e) => 1000);
 export const TRIAL_REPEAT = TRIAL_DELAY.length;
 // export const TRIAL_REPEAT = 1;
 
